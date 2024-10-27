@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ATM\AtmBranchOfficeController;
+use App\Http\Controllers\ATM\AtmHeadOfficeController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -95,6 +97,27 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/clients/create', 'clientCreate')->name('clients.create');
         Route::post('/clients/update', 'clientUpdate')->name('clients.update');
         Route::post('/pension_number/validate', 'PensionNumberValidate')->name('pension.number.validate');
+    });
+});
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::controller(AtmHeadOfficeController::class)->group(function () {
+        Route::get('/HeadOfficePage', 'HeadOfficePage')->name('HeadOfficePage');
+        Route::get('/HeadOfficeData', 'HeadOfficeData')->name('HeadOfficeData');
+    });
+});
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::controller(AtmHeadOfficeController::class)->group(function () {
+        Route::get('/BranchOfficePage', 'BranchOfficePage')->name('BranchOfficePage');
+        Route::get('/BranchOfficeData', 'BranchOfficeData')->name('BranchOfficeData');
+    });
+});
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::controller(AtmBranchOfficeController::class)->group(function () {
+        Route::get('/BranchOfficePage', 'BranchOfficePage')->name('BranchOfficePage');
+        Route::get('/BranchOfficeData', 'BranchOfficeData')->name('BranchOfficeData');
     });
 });
 

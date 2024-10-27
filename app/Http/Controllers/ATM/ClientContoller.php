@@ -1,25 +1,26 @@
 <?php
 
 namespace App\Http\Controllers\ATM;
-use App\Models\Branch;
 use App\Models\SystemLogs;
 
 use Illuminate\Http\Request;
-use App\Models\DataBankLists;
-use App\Models\DataUserGroup;
-use App\Models\AtmClientBanks;
+
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
+use App\Http\Controllers\Controller;
+use Yajra\DataTables\Facades\DataTables;
+
 use App\Models\ClientInformation;
 use App\Models\DataCollectionDate;
-use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
-use App\Models\AtmTransactionAction;
-use Illuminate\Support\Facades\Auth;
+use App\Models\AtmBanksTransaction;
 use App\Models\AtmTransactionSequence;
-use Yajra\DataTables\Facades\DataTables;
-use App\Models\AtmClientBanksTransaction;
 use App\Models\AtmTransactionBalanceLogs;
-use App\Models\AtmClientBanksTransactionApproval;
+use App\Models\AtmBanksTransactionApproval;
+use App\Models\DataBankLists;
+use App\Models\AtmClientBanks;
+use App\Models\Branch;
 
 class ClientContoller extends Controller
 {
@@ -126,7 +127,7 @@ class ClientContoller extends Controller
                 $branch_abbreviation = $BranchGet->branch_abbreviation;
 
                 // Fetch the last transaction number based on the branch_id and branch_code
-                $lastTransaction = AtmClientBanksTransaction::where('branch_id', $branch_id)
+                $lastTransaction = AtmBanksTransaction::where('branch_id', $branch_id)
                     ->orderBy('transaction_number', 'desc') // Order by transaction_number in descending order
                     ->first();
 
@@ -182,9 +183,10 @@ class ClientContoller extends Controller
                             'expiration_date' => $expirationDate,
                             'collection_date' => $request->collection_date ?? NULL,
                             'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
                         ]);
 
-                        $AtmClientBanksTransaction = AtmClientBanksTransaction::create([
+                        $AtmBanksTransaction = AtmBanksTransaction::create([
                             'client_banks_id' => $AtmClientBanks->id,
                             'transaction_actions_id' => 5,
                             'request_by_user_id' => Auth::user()->id,
@@ -208,8 +210,8 @@ class ClientContoller extends Controller
                             // Set the status based on the sequence number
                             $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
-                            $AtmClientBanksTransactionApproval = AtmClientBanksTransactionApproval::create([
-                                'banks_transactions_id' => $AtmClientBanksTransaction->id,
+                            $AtmBanksTransactionApproval = AtmBanksTransactionApproval::create([
+                                'banks_transactions_id' => $AtmBanksTransaction->id,
                                 'transaction_actions_id' => 5,
                                 'employee_id' => NULL,
                                 'date_approved' => NULL,
@@ -217,18 +219,18 @@ class ClientContoller extends Controller
                                 'sequence_no' => $transactionSequence->sequence_no,
                                 'status' => $status,
                                 'type' => $transactionSequence->type,
+                                'created_at' => Carbon::now(),
                             ]);
                         }
 
+                        $balance = floatval(preg_replace('/[^\d]/', '', $request->atm_balance[$key]));
+
                         AtmTransactionBalanceLogs::create([
-                            'banks_transactions_id' => $AtmClientBanksTransaction->id,
-                            'transaction_actions_id' => 5,
-                            'employee_id' => NULL,
-                            'date_approved' => NULL,
-                            'user_groups_id' => $transactionSequence->user_group_id,
-                            'sequence_no' => $transactionSequence->sequence_no,
-                            'status' => $status,
-                            'type' => $transactionSequence->type,
+                            'banks_transactions_id' => $AtmBanksTransactionApproval->id,
+                            'check_by_user_id' => Auth::user()->id,
+                            'balance' => $balance,
+                            'remarks' => $request->remarks[$key] ?? NULL,
+                            'created_at' => Carbon::now(),
                         ]);
 
                     }
@@ -262,7 +264,7 @@ class ClientContoller extends Controller
         $user_branch_id =  Auth::user()->branch_id;
 
         // Query to find if the pension number exists in the client information
-        $clientInfo = ClientInformation::with('Branch', 'DataPensionTypesLists')
+        $clientInfo = ClientInformation::with('Branch')
                         ->where('pension_number', $pension_number_get)
                         ->first();
 

@@ -110,13 +110,13 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" key="atm_ho_lists">
+                            <a href="{{ route('HeadOfficePage') }}" key="atm_ho_lists">
                                 <span class="badge rounded-pill bg-success float-start me-2 fw-bold text-dark">20</span>
                                 H.O. ATM Lists
                             </a>
                         </li>
                         <li>
-                            <a href="#" key="atm_branch_lists">
+                            <a href="{{ route('BranchOfficePage') }}" key="atm_branch_lists">
                                 <span class="badge rounded-pill bg-primary float-start me-2">20</span>
                                 Branch ATM Lists
                             </a>

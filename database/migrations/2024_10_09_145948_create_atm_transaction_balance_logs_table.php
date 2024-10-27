@@ -15,12 +15,12 @@ return new class extends Migration
     {
         Schema::create('atm_transaction_balance_logs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('atm_banks_transactions_id')->nullable();
+            $table->unsignedBigInteger('banks_transactions_id')->nullable();
             $table->unsignedBigInteger('check_by_user_id')->nullable();
             $table->integer('balance')->default(0);
             $table->string('remarks')->nullable();
-            $table->foreign('atm_banks_transactions_id')->references('id')->on('atm_client_banks_transactions')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('check_by_user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('banks_transactions_id')->references('id')->on('atm_banks_transactions')->onDelete('set null')->onUpdate('cascade');
+            $table->foreign('check_by_user_id')->references('id')->on('users')->onDelete('set null')->onUpdate('cascade');
             $table->softDeletes();
             $table->timestamps();
         });
