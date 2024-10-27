@@ -481,7 +481,6 @@
                         return ''; // Return empty string if no bank names
                     }
                 }
-
             ];
             dataTable.initialize(url, columns, {
                 drawCallback: function() {

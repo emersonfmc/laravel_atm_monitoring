@@ -15,16 +15,25 @@ return new class extends Migration
     {
         Schema::create('atm_transaction_approvals_balance_logs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('atm_transaction_approvals_id')->nullable();
+            $table->unsignedBigInteger('trans_approvals_id')->nullable();
             $table->unsignedBigInteger('check_by_user_id')->nullable();
             $table->integer('balance')->default(0);
             $table->string('remarks')->nullable();
-            $table->foreign('atm_transaction_approvals_id')->references('id')->on('atm_client_banks_transaction_approvals')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('check_by_user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+
+            // Manually set shorter names for the foreign keys
+            $table->foreign('trans_approvals_id', 'trans_approvals_id')
+                ->references('id')->on('atm_banks_transaction_approvals')
+                ->onDelete('set null')->onUpdate('cascade');
+
+            $table->foreign('check_by_user_id', 'check_by_user_id')
+                ->references('id')->on('users')
+                ->onDelete('set null')->onUpdate('cascade');
+
             $table->softDeletes();
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.
