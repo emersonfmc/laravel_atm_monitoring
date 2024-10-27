@@ -127,8 +127,9 @@
 
                             <div class="col-md-3">
                                 <div class="form-group mb-3">
-                                    <label class="fw-bold h6">Pension Type</label>
-                                    <select name="pension_account_type" id="pension_type" class="form-select select2" readonly required>
+                                    <label class="fw-bold h6">Pension Account Type</label>
+                                    <select name="pension_account_type" id="pension_type" class="form-select select2" required disabled>
+                                        <option value="" selected disabled>Pension Account Type</option>
                                     </select>
                                 </div>
                             </div>
@@ -692,7 +693,7 @@
                         $.each(response, function(index, item) {
                             options += `<option value="${item.id}">${item.pension_name}</option>`;
                         });
-                        $('#pension_type').prop('readonly', false); // Remove disabled attribute
+                        $('#pension_type').prop('disabled', false); // Remove disabled attribute
                         $('#pension_type').html(options); // Set the dropdown options
                     },
                     error: function(xhr, status, error) {
