@@ -1,24 +1,26 @@
 <?php
 
 namespace App\Http\Controllers\ATM;
-use App\Models\Branch;
 use App\Models\SystemLogs;
 
 use Illuminate\Http\Request;
-use App\Models\DataBankLists;
-use App\Models\DataUserGroup;
-use App\Models\AtmClientBanks;
+
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
+use App\Http\Controllers\Controller;
+use Yajra\DataTables\Facades\DataTables;
+
 use App\Models\ClientInformation;
 use App\Models\DataCollectionDate;
-use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
-use App\Models\AtmTransactionAction;
-use Illuminate\Support\Facades\Auth;
+use App\Models\AtmBanksTransaction;
 use App\Models\AtmTransactionSequence;
-use Yajra\DataTables\Facades\DataTables;
-use App\Models\AtmClientBanksTransaction;
-use App\Models\AtmClientBanksTransactionApproval;
+use App\Models\AtmTransactionBalanceLogs;
+use App\Models\AtmBanksTransactionApproval;
+use App\Models\DataBankLists;
+use App\Models\AtmClientBanks;
+use App\Models\Branch;
 
 class ClientContoller extends Controller
 {
@@ -62,9 +64,9 @@ class ClientContoller extends Controller
 
     public function clientCreate(Request $request)
     {
-        // DB::beginTransaction();
-        // try
-        // {
+        DB::beginTransaction();
+        try
+        {
             $existingPensionNumber = ClientInformation::where('pension_number', $request->pension_number)
                         ->where('pension_type', $request->pension_type)
                         ->exists();
@@ -125,7 +127,7 @@ class ClientContoller extends Controller
                 $branch_abbreviation = $BranchGet->branch_abbreviation;
 
                 // Fetch the last transaction number based on the branch_id and branch_code
-                $lastTransaction = AtmClientBanksTransaction::where('branch_id', $branch_id)
+                $lastTransaction = AtmBanksTransaction::where('branch_id', $branch_id)
                     ->orderBy('transaction_number', 'desc') // Order by transaction_number in descending order
                     ->first();
 
@@ -139,21 +141,19 @@ class ClientContoller extends Controller
                 // Create the new transaction number
                 $TransactionNumber = $branch_abbreviation . '-' . date('mdy') . '-' . str_pad(($lastadded + 1), 5, '0', STR_PAD_LEFT);
 
-                // $table->string('pension_type')->nullable();
-                // $table->enum('pension_account_type', ['SSS', 'GSIS'])->nullable();
-
                 $pension_number = floatval(preg_replace('/[^\d]/', '', $request->pension_number));
 
                 $ClientInformation = ClientInformation::create([
-                    'pension_number' => $pension_number ?? '',
-                    'branch_id' => $branch_id ?? '',
-                    'pension_type' => $request->pension_type ?? '',
-                    'pension_account_type' => $request->pension_account_type ?? '',
-                    'first_name' => $request->first_name ?? '',
-                    'middle_name' => $request->middle_name ?? '',
-                    'last_name' => $request->last_name ?? '',
+                    'pension_number' => $pension_number ?? NULL,
+                    'branch_id' => $branch_id ?? NULL,
+                    'pension_type' => $request->pension_type ?? NULL,
+                    'pension_account_type' => $request->pension_account_type ?? NULL,
+                    'first_name' => $request->first_name ?? NULL,
+                    'middle_name' => $request->middle_name ?? NULL,
+                    'last_name' => $request->last_name ?? NULL,
                     'suffix' => $request->suffix ?? NULL,
-                    'birth_date' => $request->birth_date ?? ''
+                    'birth_date' => $request->birth_date ?? NULL,
+                    'created_at' => Carbon::now(),
                 ]);
 
                 if (is_array($request->atm_type) && !empty($request->atm_type)) {
@@ -172,63 +172,82 @@ class ClientContoller extends Controller
 
                         $AtmClientBanks = AtmClientBanks::create([
                             'client_information_id' => $ClientInformation->id,
-                            'transaction_number' => '',
-                            'branch_id' => $branch_id ?? '',
+                            'transaction_number' => NULL,
+                            'branch_id' => $branch_id ?? NULL,
                             'atm_type' => $value,
                             'atm_status' => 'new',
-                            'bank_account_no' => $BankAccountNo ?? '',
-                            'bank_name' => $request->bank_id[$key] ?? '',
-                            'pin_no' => $request->pin_code[$key] ?? '',
+                            'location' => 'Branch',
+                            'bank_account_no' => $BankAccountNo ?? NULL,
+                            'bank_name' => $request->bank_id[$key] ?? NULL,
+                            'pin_no' => $request->pin_code[$key] ?? NULL,
                             'expiration_date' => $expirationDate,
-                            'collection_date' => $request->collection_date ?? '',
+                            'collection_date' => $request->collection_date ?? NULL,
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
                         ]);
 
-                        $AtmClientBanksTransaction = AtmClientBanksTransaction::create([
+                        $AtmBanksTransaction = AtmBanksTransaction::create([
                             'client_banks_id' => $AtmClientBanks->id,
                             'transaction_actions_id' => 5,
-                            'request_by_user_id' => $value,
+                            'request_by_user_id' => Auth::user()->id,
                             'transaction_number' => $TransactionNumber,
                             'atm_type' => $value,
                             'branch_id' => $branch_id,
-                            'aprb_no' => '',
+                            'aprb_no' => NULL,
                             'reason' => 'New Client',
-                            'reason_remarks' => '',
-                            'yellow_copy' => '',
-                            'released_client_images_id' => '',
+                            'reason_remarks' => NULL,
+                            'yellow_copy' => NULL,
+                            'released_client_images_id' => NULL,
+                            'created_at' => Carbon::now(),
                         ]);
 
-                        // $AtmTransactionSequences = AtmTransactionSequence::where('atm_transaction_actions_id', 5)->get();
+                        $AtmTransactionSequences = AtmTransactionSequence::where('atm_transaction_actions_id', 5)
+                            ->orderBy('sequence_no')
+                            ->get();
 
-                        // foreach ($AtmTransactionSequences as $transactionSequence) {
-                        //     // Set the status based on the sequence number
-                        //     $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
+                        foreach ($AtmTransactionSequences as $transactionSequence)
+                        {
+                            // Set the status based on the sequence number
+                            $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
-                        //     $AtmClientBanksTransactionApproval = AtmClientBanksTransactionApproval::create([
-                        //         'transaction_actions_id' => 5,
-                        //         'banks_transactions_id' => $AtmClientBanksTransaction->id,
-                        //         'employee_id' => NULL,
-                        //         'date_approved' => NULL,
-                        //         'user_groups_id' => $transactionSequence->user_group_id,
-                        //         'sequence_no' => $transactionSequence->sequence_no,
-                        //         'status' => $status,
-                        //         'type' => $transactionSequence->type,
-                        //     ]);
-                        // }
+                            $AtmBanksTransactionApproval = AtmBanksTransactionApproval::create([
+                                'banks_transactions_id' => $AtmBanksTransaction->id,
+                                'transaction_actions_id' => 5,
+                                'employee_id' => NULL,
+                                'date_approved' => NULL,
+                                'user_groups_id' => $transactionSequence->user_group_id,
+                                'sequence_no' => $transactionSequence->sequence_no,
+                                'status' => $status,
+                                'type' => $transactionSequence->type,
+                                'created_at' => Carbon::now(),
+                            ]);
+                        }
+
+                        $balance = floatval(preg_replace('/[^\d]/', '', $request->atm_balance[$key]));
+
+                        AtmTransactionBalanceLogs::create([
+                            'banks_transactions_id' => $AtmBanksTransactionApproval->id,
+                            'check_by_user_id' => Auth::user()->id,
+                            'balance' => $balance,
+                            'remarks' => $request->remarks[$key] ?? NULL,
+                            'created_at' => Carbon::now(),
+                        ]);
+
                     }
                 }
 
             }
 
-        //     DB::commit();  // Commit the transaction if successful
-        // }
-        // catch (\Exception $e)
-        // {
-        //     DB::rollBack();  // Roll back the transaction on error
-        //     return response()->json([
-        //         'status' => 'error',
-        //         'message' => 'An Error Occurred, Please Check and Repeat!'
-        //     ]);
-        // }
+            DB::commit();  // Commit the transaction if successful
+        }
+        catch (\Exception $e)
+        {
+            DB::rollBack();  // Roll back the transaction on error
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An Error Occurred, Please Check and Repeat!'
+            ]);
+        }
 
         return response()->json([
             'status' => 'success',
@@ -245,7 +264,7 @@ class ClientContoller extends Controller
         $user_branch_id =  Auth::user()->branch_id;
 
         // Query to find if the pension number exists in the client information
-        $clientInfo = ClientInformation::with('Branch', 'DataPensionTypesLists')
+        $clientInfo = ClientInformation::with('Branch')
                         ->where('pension_number', $pension_number_get)
                         ->first();
 

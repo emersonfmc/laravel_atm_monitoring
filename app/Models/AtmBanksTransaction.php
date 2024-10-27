@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class AtmClientBanksTransactionApproval extends Model
+class AtmBanksTransaction extends Model
 {
     use HasFactory, SoftDeletes;
 

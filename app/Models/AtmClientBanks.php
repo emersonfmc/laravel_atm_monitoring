@@ -16,4 +16,9 @@ class AtmClientBanks extends Model
     {
         return $this->belongsTo(ClientInformation::class, 'client_information_id','id');
     }
+
+    public function Branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id','id');
+    }
 }
