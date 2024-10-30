@@ -13,12 +13,13 @@ use App\Models\DataUserGroup;
 
 use Illuminate\Support\Carbon;
 
+use App\Models\DataReleaseOption;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\AtmTransactionAction;
 use Illuminate\Support\Facades\Auth;
-use App\Models\DataPensionTypesLists;
 
+use App\Models\DataPensionTypesLists;
 use App\Models\AtmTransactionSequence;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -65,8 +66,9 @@ class SettingsController extends Controller
             SystemLogs::create([
                 'system' => 'ATM Monitoring',
                 'action' => 'Create',
-                'description' => 'Create New Usergroup' . $request->user_group,
-                'user_id' => Auth::user()->id,
+                'title' => 'Create New Usergroup',
+                'description' => 'Creation of New Usergroup' . $request->user_group,
+                'employee_id' => Auth::user()->employee_id,
                 'ip_address' => $request->ip(),
                 'created_at' => Carbon::now(),
                 'company_id' => Auth::user()->company_id,
@@ -107,8 +109,9 @@ class SettingsController extends Controller
             SystemLogs::create([
                 'system' => 'ATM Monitoring',
                 'action' => 'Update',
-                'description' => 'Update Usergroup' . $TblUserGroup->user_group,
-                'user_id' => Auth::user()->id,
+                'title' => 'Update Usergroup',
+                'description' => 'Updating of Usergroup' . $TblUserGroup->user_group,
+                'employee_id' => Auth::user()->employee_id,
                 'ip_address' => $request->ip(),
                 'created_at' => Carbon::now(),
                 'company_id' => Auth::user()->company_id,
@@ -170,8 +173,9 @@ class SettingsController extends Controller
         SystemLogs::create([
             'system' => 'ATM Monitoring',
             'action' => 'Create',
-            'description' => 'Create New District' .  $request->district_number .' - '.$request->district_name,
-            'user_id' => Auth::user()->id,
+            'title' => 'Create New District',
+            'description' => 'Creation of New District' .  $request->district_number .' - '.$request->district_name,
+            'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
             'company_id' => Auth::user()->company_id,
@@ -200,8 +204,9 @@ class SettingsController extends Controller
         SystemLogs::create([
             'system' => 'ATM Monitoring',
             'action' => 'Update',
-            'description' => 'Update District' .  $TblDistrict->district_number .' - '.$TblDistrict->district_name,
-            'user_id' => Auth::user()->id,
+            'title' => 'Update District',
+            'description' => 'Updating of District' .  $TblDistrict->district_number .' - '.$TblDistrict->district_name,
+            'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
             'company_id' => Auth::user()->company_id,
@@ -255,8 +260,9 @@ class SettingsController extends Controller
         SystemLogs::create([
             'system' => 'ATM Monitoring',
             'action' => 'Create',
-            'description' => 'Create Area' .  $request->area_no .' - '.$request->area_supervisor,
-            'user_id' => Auth::user()->id,
+            'title' => 'Create Area',
+            'description' => 'Creation of New Area' .  $request->area_no .' - '.$request->area_supervisor,
+            'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
             'company_id' => Auth::user()->company_id,
@@ -284,8 +290,9 @@ class SettingsController extends Controller
         SystemLogs::create([
             'system' => 'ATM Monitoring',
             'action' => 'Update',
-            'description' => 'Update Area' .  $TblArea->area_no .' - '.$TblArea->area_supervisor,
-            'user_id' => Auth::user()->id,
+            'title' => 'Update Area',
+            'description' => 'Updating of Area' .  $TblArea->area_no .' - '.$TblArea->area_supervisor,
+            'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
             'company_id' => Auth::user()->company_id,
@@ -357,9 +364,9 @@ class SettingsController extends Controller
         // Create System Logs used for Auditing of Logs
         SystemLogs::create([
             'system' => 'ATM Monitoring',
-            'action' => 'Create',
-            'description' => 'Create New Branch' .  $request->branch_location,
-            'user_id' => Auth::user()->id,
+            'action' => 'Create New Branch',
+            'description' => 'Creation of New Branch' .  $request->branch_location,
+            'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
             'company_id' => Auth::user()->company_id,
@@ -391,8 +398,9 @@ class SettingsController extends Controller
         SystemLogs::create([
             'system' => 'ATM Monitoring',
             'action' => 'Update',
-            'description' => 'Update Branch' .  $AtmBankLists->branch_location,
-            'user_id' => Auth::user()->id,
+            'title' => 'Update Branch',
+            'description' => 'Updating of Branch' .  $AtmBankLists->branch_location,
+            'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
             'company_id' => Auth::user()->company_id,
@@ -439,8 +447,9 @@ class SettingsController extends Controller
         SystemLogs::create([
             'system' => 'ATM Monitoring',
             'action' => 'Create',
-            'description' => 'Create New Bank' .  $request->bank_name,
-            'user_id' => Auth::user()->id,
+            'title' => 'Create New Bank',
+            'description' => 'Creation of New Bank' .  $request->bank_name,
+            'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
             'company_id' => Auth::user()->company_id,
@@ -467,8 +476,9 @@ class SettingsController extends Controller
         SystemLogs::create([
             'system' => 'ATM Monitoring',
             'action' => 'Update',
-            'description' => 'Update Bank' .  $AtmBankLists->bank_name,
-            'user_id' => Auth::user()->id,
+            'title' => 'Update Bank',
+            'description' => 'Updating of Bank' .  $AtmBankLists->bank_name,
+            'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
             'company_id' => Auth::user()->company_id,
@@ -515,8 +525,9 @@ class SettingsController extends Controller
         SystemLogs::create([
             'system' => 'ATM Monitoring',
             'action' => 'Create',
-            'description' => 'Create Pension Types' .  $request->types . ' - ' . $request->pension_name,
-            'user_id' => Auth::user()->id,
+            'title' => 'Create Pension Types',
+            'description' => 'Creation of New Pension Types' .  $request->types . ' - ' . $request->pension_name,
+            'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
             'company_id' => Auth::user()->company_id,
@@ -545,8 +556,9 @@ class SettingsController extends Controller
         SystemLogs::create([
             'system' => 'ATM Monitoring',
             'action' => 'Update',
-            'description' => 'Update Pension Types' .  $AtmPensionTypesLists->types . ' - ' . $AtmPensionTypesLists->pension_name,
-            'user_id' => Auth::user()->id,
+            'title' => 'Update Pension Types',
+            'description' => 'Updating of Pension Types' .  $AtmPensionTypesLists->types . ' - ' . $AtmPensionTypesLists->pension_name,
+            'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
             'company_id' => Auth::user()->company_id,
@@ -605,8 +617,9 @@ class SettingsController extends Controller
         SystemLogs::create([
             'system' => 'ATM Monitoring',
             'action' => 'Create',
-            'description' => 'Create Transaction Action' .  $request->name,
-            'user_id' => Auth::user()->id,
+            'title' => 'Create Transaction Action',
+            'description' => 'Creation of Transaction Action' .  $request->name,
+            'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
             'company_id' => Auth::user()->company_id,
@@ -634,7 +647,8 @@ class SettingsController extends Controller
         SystemLogs::create([
             'system' => 'ATM Monitoring',
             'action' => 'Update',
-            'description' => 'Update Transaction Action' .  $AtmTransactionAction->name,
+            'title' => 'Update Transaction Action',
+            'description' => 'Updating of Transaction Action' .  $AtmTransactionAction->name,
             'user_id' => Auth::user()->id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -644,6 +658,88 @@ class SettingsController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Transaction Action updated successfully!'  // Changed message to reflect update action
+        ]);
+    }
+
+    public function release_reason_page()
+    {
+        return view('pages.pages_backend.settings.release_reason_page');
+    }
+
+    public function release_reason_data()
+    {
+       $DataReleaseOption = DataReleaseOption::where('status','Active')
+            ->latest('updated_at')
+            ->whereNull('deleted_at')
+            ->get();
+
+        return DataTables::of($DataReleaseOption)
+            ->setRowId('id')
+            ->make(true);
+    }
+
+    public function release_reason_get($id)
+    {
+        $DataReleaseOption = DataReleaseOption::findOrFail($id);
+        return response()->json($DataReleaseOption);
+    }
+
+    public function release_reason_create(Request $request)
+    {
+        DataReleaseOption::create([
+            'reason' => $request->reason,
+            'description' => $request->description,
+            'status' => 'Active',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // Create System Logs used for Auditing of Logs
+        SystemLogs::create([
+            'system' => 'ATM Monitoring',
+            'action' => 'Create',
+            'title' => 'Create Release Reason',
+            'description' => 'Creation of Release Reason' .  $request->reason . ' - ' . $request->description,
+            'employee_id' => Auth::user()->employee_id,
+            'ip_address' => $request->ip(),
+            'created_at' => Carbon::now(),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Release Reason Created successfully!'
+        ]);
+    }
+
+    public function release_reason_update(Request $request)
+    {
+        // Find the user group by ID
+        $DataReleaseOption = DataReleaseOption::findOrFail($request->item_id);
+
+        // Proceed with update if validation passes
+        $DataReleaseOption->update([  // Update the instance instead of using the class method
+            'reason' => $request->reason,
+            'description' => $request->description,
+            'status' => $request->status,
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // Create System Logs used for Auditing of Logs
+        SystemLogs::create([
+            'system' => 'ATM Monitoring',
+            'action' => 'Update',
+            'title' => 'Update Release Reason',
+            'description' => 'Updating of Release Reason' .  $DataReleaseOption->reason . ' - ' . $DataReleaseOption->description .' into '. $request->reason .' - ' . $request->description,
+            'employee_id' => Auth::user()->employee_id,
+            'ip_address' => $request->ip(),
+            'created_at' => Carbon::now(),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Release Reason Updated Successfully!'  // Changed message to reflect update action
         ]);
     }
 

@@ -29,11 +29,34 @@ class ClientInformationFactory extends Factory
     public function configure()
     {
         return $this->afterCreating(function (ClientInformation $client) {
-            // Create 2 ATMs for each client
-            AtmClientBanks::factory()->count(2)->create([
-                'client_information_id' => $client->id,
-                'branch_id' => $client->branch_id, // Ensure branch_id matches the client
-            ]);
+            // Format today's date as MMDDYY for the transaction number prefix
+            $datePart = now()->format('mdy'); // e.g., "103024" for October 30, 2024
+
+            // Create 2 unique ATMs for each client
+            for ($i = 0; $i < 2; $i++) {
+                // Fetch the latest transaction number for today and increment it
+                $latestTransactionNumber = AtmClientBanks::where('transaction_number', 'LIKE', "AD-$datePart-%")
+                    ->orderBy('transaction_number', 'desc')
+                    ->value('transaction_number');
+
+                // Determine the next increment
+                $increment = $latestTransactionNumber ? ((int)substr($latestTransactionNumber, -5) + 1) : 1;
+
+                // Generate a 5-digit incremented part, e.g., "00001"
+                $incrementedPart = str_pad($increment, 5, '0', STR_PAD_LEFT);
+
+                // Form the full transaction number
+                $transactionNumber = "AD-$datePart-$incrementedPart";
+
+                // Create an ATM record for the client with a unique transaction number
+                AtmClientBanks::factory()->create([
+                    'client_information_id' => $client->id,
+                    'branch_id' => $client->branch_id,
+                    'transaction_number' => $transactionNumber,
+                ]);
+            }
         });
     }
+
+
 }
