@@ -85,6 +85,12 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'settings'], functio
         Route::get('/area/using/district', 'areaGetBydistrict')->name('settings.area.using.district');
         Route::get('/branch/using/area', 'branchGetByarea')->name('settings.branch.using.area');
 
+        Route::get('/release_reason/page', 'release_reason_page')->name('settings.release.reason.page');
+        Route::get('/release_reason/data', 'release_reason_data')->name('settings.release.reason.data');
+        Route::get('/release/reason/get/{id}', 'release_reason_get')->name('settings.release.reason.get');
+        Route::post('/release/reason/create', 'release_reason_create')->name('settings.release.reason.create');
+        Route::post('/release/reason/update', 'release_reason_update')->name('settings.release.reason.update');
+
         Route::get('/login_get_test', 'login_page')->name('login.page.test');
     });
 });

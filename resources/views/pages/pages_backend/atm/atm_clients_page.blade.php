@@ -342,18 +342,13 @@
                             day: 'numeric'
                         }) : '';
 
+                        // Check for branch location
+                        const branchLocation = row.branch ? row.branch.branch_location : 'N/A';
+
                         return `<span class="fw-bold" style="font-size : 14px;">${fullName}</span><br>
+                                <span class="text-primary">${branchLocation}</span><br>
                                 <span style="font-size:12px;">${createdAtFormatted}</span>`;
                     }
-                },
-                {
-                    data: 'branch_id',
-                    name: 'branch.branch_location',
-                    render: function(data, type, row, meta) {
-                        return row.branch ? '<span>' + row.branch.branch_location + '</span>' : '';
-                    },
-                    orderable: true,
-                    searchable: true,
                 },
                 {
                     data: 'pension_number', // Correct field name
@@ -365,6 +360,24 @@
                     },
                     orderable: true,
                     searchable: true,
+                },
+                {
+                    data: null, // No direct data for ATM sequences; will be created from response
+                    render: function(data, type, row) {
+                        // Check if atm_client_banks exists and is an array
+                        if (data.atm_client_banks && Array.isArray(data.atm_client_banks)) {
+                            // Initialize an empty string for PincODE
+                            let AtmTransactionNumber = '';
+
+                            // Use each to loop through the sequences
+                            $.each(data.atm_client_banks, function(index, rows) {
+                                AtmTransactionNumber += `<span class="fw-bold h6">${rows.transaction_number}</span><br>`;
+                            });
+
+                            return AtmTransactionNumber; // Return the concatenated PIN display
+                        }
+                        return ''; // Return empty string if no bank names
+                    }
                 },
                 {
                     data: null, // No direct data for ATM sequences; will be created from response

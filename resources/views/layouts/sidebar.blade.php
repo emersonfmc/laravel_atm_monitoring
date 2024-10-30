@@ -271,9 +271,11 @@
                                     <a href="{{ route('settings.pension.types.page') }}" key="settings_atm_pension_types">Pension Types</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('settings.transaction.action.page') }}" key="settings_atm_pension_types">Transaction Action</a>
+                                    <a href="{{ route('settings.transaction.action.page') }}" key="settings_atm_transaction_action">Transaction Action</a>
                                 </li>
-
+                                <li>
+                                    <a href="{{ route('settings.release.reason.page') }}" key="settings_atm_release_reason">Release Reason</a>
+                                </li>
                             </ul>
                         </li>
                         <li>

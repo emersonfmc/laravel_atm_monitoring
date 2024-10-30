@@ -41,7 +41,10 @@
                                     <th>Type</th>
                                     <th>Usergroup</th>
                                     <th>Password</th>
-                                    <th>Created Date</th>
+                                    <th>District</th>
+                                    <th>Area</th>
+                                    <th>Branch</th>
+                                    {{-- <th>Created Date</th> --}}
                                     <th>Roles and Permission</th>
                                     <th>Action</th>
                                 </tr>
@@ -489,23 +492,50 @@
                     data: 'password',
                     name: 'password',
                     render: function(data, type, row, meta) {
-                        return '<span>' + 'Encrypted' + '</span>'; // Display user's email
+                        return '<span class="badge bg-danger">' + 'Encrypted' + '</span>'; // Display user's email
                     },
                     orderable: true,
                     searchable: true,
                 },
                 {
-                    data: 'created_at',
-                    name: 'created_at',
-                    render: function(data, type, row) {
-                        return new Date(data).toLocaleDateString('en-US', {
-                            month: 'long',
-                            day: 'numeric',
-                            year: 'numeric'
-                        });
-                    }
-
+                    data: 'district_code_id',
+                    name: 'district',
+                    render: function(data, type, row, meta) {
+                        return row.district ? '<span>' + row.district.district_name + '</span>' : '';
+                    },
+                    orderable: true,
+                    searchable: true,
                 },
+                {
+                    data: 'area_code_id',
+                    name: 'area',
+                    render: function(data, type, row, meta) {
+                        return row.area ? '<span>' + row.area.area_supervisor + '</span>' : '';
+                    },
+                    orderable: true,
+                    searchable: true,
+                },
+                {
+                    data: 'branch_id',
+                    name: 'branch',
+                    render: function(data, type, row, meta) {
+                        return row.branch ? '<span>' + row.branch.branch_location + '</span>' : '';
+                    },
+                    orderable: true,
+                    searchable: true,
+                },
+                // {
+                //     data: 'created_at',
+                //     name: 'created_at',
+                //     render: function(data, type, row) {
+                //         return new Date(data).toLocaleDateString('en-US', {
+                //             month: 'long',
+                //             day: 'numeric',
+                //             year: 'numeric'
+                //         });
+                //     }
+
+                // },
                 {
                     data: null,
                     name: 'roles',
