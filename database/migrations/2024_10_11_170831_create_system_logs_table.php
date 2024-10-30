@@ -17,12 +17,13 @@ return new class extends Migration
             $table->id();
             $table->enum('system',['CFS','ATM Monitoring'])->nullable();
             $table->enum('action',['Create','Update','Delete'])->nullable();
+            $table->string('title')->nullable();
             $table->string('description')->nullable();
-            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('employee_id')->nullable();
             $table->ipAddress('ip_address');
             $table->unsignedBigInteger('company_id');
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('employee_id')->references('employee_id')->on('users')->onDelete('set null')->onUpdate('cascade');
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('restrict')->onUpdate('cascade');
             $table->softDeletes();
             $table->timestamps();

@@ -127,7 +127,6 @@ class UserController extends Controller
                 'contact_no' => $contact_no,
                 'address' => $request->address,
                 'username' => $request->username,
-                'name' => $request->username,
                 'password' => Hash::make($request->password), // Hash the password
                 'email_verified_at' => Carbon::now(),
                 'session' => 'Offline',
@@ -226,7 +225,6 @@ class UserController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'employee_id' => $request->employee_id,
-                'name' => $request->username,
 
                 'contact_no' => $contact_no,
                 'address' => $request->address,

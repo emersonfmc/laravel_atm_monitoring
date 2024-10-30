@@ -64,9 +64,7 @@ class ClientContoller extends Controller
 
     public function clientCreate(Request $request)
     {
-        DB::beginTransaction();
-        try
-        {
+
             $existingPensionNumber = ClientInformation::where('pension_number', $request->pension_number)
                         ->where('pension_type', $request->pension_type)
                         ->exists();
@@ -172,7 +170,7 @@ class ClientContoller extends Controller
 
                         $AtmClientBanks = AtmClientBanks::create([
                             'client_information_id' => $ClientInformation->id,
-                            'transaction_number' => NULL,
+                            'transaction_number' => $TransactionNumber,
                             'branch_id' => $branch_id ?? NULL,
                             'atm_type' => $value,
                             'atm_status' => 'new',
@@ -226,7 +224,7 @@ class ClientContoller extends Controller
                         $balance = floatval(preg_replace('/[^\d]/', '', $request->atm_balance[$key]));
 
                         AtmTransactionBalanceLogs::create([
-                            'banks_transactions_id' => $AtmBanksTransactionApproval->id,
+                            'banks_transactions_id' => $AtmBanksTransaction->id,
                             'check_by_user_id' => Auth::user()->id,
                             'balance' => $balance,
                             'remarks' => $request->remarks[$key] ?? NULL,
@@ -238,16 +236,6 @@ class ClientContoller extends Controller
 
             }
 
-            DB::commit();  // Commit the transaction if successful
-        }
-        catch (\Exception $e)
-        {
-            DB::rollBack();  // Roll back the transaction on error
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An Error Occurred, Please Check and Repeat!'
-            ]);
-        }
 
         return response()->json([
             'status' => 'success',
