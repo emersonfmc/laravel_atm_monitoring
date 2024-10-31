@@ -20,8 +20,6 @@ class DefaultController extends Controller
         return response()->json($DataPensionTypesLists);
     }
 
-
-
     public function AtmClientFetch(Request $request)
     {
         $new_atm_id = $request->new_atm_id;

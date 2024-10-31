@@ -3,18 +3,24 @@
 namespace App\Http\Controllers\ATM;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\Facades\DataTables;
-
 use App\Models\AtmClientBanks;
 use App\Models\ClientInformation;
+use App\Http\Controllers\Controller;
+
+use App\Models\AtmTransactionAction;
+use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 
 class AtmHeadOfficeController extends Controller
 {
     public function HeadOfficePage()
     {
-        return view('pages.pages_backend.atm.atm_head_office_atm_lists');
+
+        $AtmTransactionAction = AtmTransactionAction::where('type','Going to Branch Office')
+            ->where('status','Active')
+            ->get();
+
+        return view('pages.pages_backend.atm.atm_head_office_atm_lists', compact('AtmTransactionAction'));
     }
 
     public function HeadOfficeData()

@@ -67,15 +67,74 @@
                     <button type="button" class="btn-close closeCreateModal" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <div id="create_fullname" class="fw-bold h4"></div>
+                                <span id="create_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="create_pension_account_type" class="fw-bold h5"></span>
+                            </div>
+                            <hr>
+                            <div class="row mb-3">
+                                <div class="form-group col-6">
+                                    <label class="fw-bold h6">Transaction Number</label>
+                                    <input type="text" class="form-control" id="create_transaction_number" readonly>
+                                </div>
 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                </div>
+                                <div class="form-group col-6">
+                                    <label class="fw-bold h6">Birthdate</label>
+                                    <input type="text" class="form-control" id="create_birth_date" readonly>
+                                </div>
+                            </div>
 
-            </div>
+                            <div class="row mb-3">
+                                <div class="form-group col-6">
+                                    <label class="fw-bold h6">Bank Account Number</label>
+                                    <input type="text" class="form-control" id="create_bank_account_no" readonly>
+                                </div>
+                                <div class="form-group col-6">
+                                    <label class="fw-bold h6">Bank Name</label>
+                                    <input type="text" class="form-control" id="create_bank_name" readonly>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="form-group col-6">
+                                    <label class="fw-bold h6">Type</label>
+                                    <input type="text" class="form-control" id="create_atm_type" readonly>
+                                </div>
+                                <div class="form-group col-6">
+                                    <label class="fw-bold h6">Expiration Date</label>
+                                    <input type="text" class="form-control" id="create_expiration_date" readonly>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="form-group col-6">
+                                    <label class="fw-bold h6">Collection Date</label>
+                                    <input type="text" class="form-control" id="create_collection_date" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="fw-bold h6">Select Reason For Pullout</label>
+                                <select name="reason_for_pull_out" class="form-select">
+                                    <option value="" selected disabled>Reason for Pullout</option>
+                                    @foreach ($AtmTransactionAction as $item)
+                                    <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
         </div>
-</div>
+    </div>
 
     <script>
         $(document).ready(function () {
@@ -286,6 +345,32 @@
                     data: { new_atm_id : new_atm_id },
                     success: function(data) {
                         console.log(data);
+                        let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+
+                        $('#create_fullname').text(data.client_information.last_name +', '+ data.client_information.first_name +' '+ data.client_information.middle_name +' '+ data.client_information.suffix ?? '');
+
+                        $('#create_pension_number_display').text(data.client_information.pension_number ?? '');
+                        $('#create_pension_number_display').inputmask("99-9999999-99");
+
+                        $('#create_pension_number').val(data.client_information.pension_number);
+                        $('#create_pension_account_type').text(data.client_information.pension_account_type);
+                        $('#create_pension_type').val(data.client_information.pension_type);
+                        $('#create_birth_date').val(formattedBirthDate);
+                        $('#create_branch_location').val(data.branch.branch_location);
+
+                        $('#create_bank_account_no').val(data.bank_account_no ?? '');
+                        $('#create_collection_date').val(data.collection_date ?? '');
+                        $('#create_atm_type').val(data.atm_type ?? '');
+                        $('#create_bank_name').val(data.bank_name ?? '');
+                        $('#create_transaction_number').val(data.transaction_number ?? '');
+
+                        let expirationDate = '';
+                        if (data.expiration_date && data.expiration_date !== '0000-00-00') {
+                            expirationDate = new Date(data.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                        }
+                        $('#create_expiration_date').val((expirationDate || ''));
+
+
                         $('#createTransactionModal').modal('show');
                     },
                     error: function(xhr, status, error) {

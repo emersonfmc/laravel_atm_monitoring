@@ -1018,16 +1018,27 @@
                                     text: response.success,
                                     icon: 'success',
                                 }).then((result) => {
-                                    // Check if the user clicked "OK"
                                     if (result.isConfirmed) {
-                                        // Display the "Create Client" button
-                                        $('#AddClientButton').show();
+                                        // Prompt the user with Yes/No confirmation
+                                        Swal.fire({
+                                            title: 'Proceed to create client?',
+                                            text: 'Do you want to create a new client?',
+                                            icon: 'question',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Yes',
+                                            cancelButtonText: 'No'
+                                        }).then((confirmation) => {
+                                            if (confirmation.isConfirmed) {
+                                                // Display the "Create Client" button
+                                                $('#AddClientButton').show();
 
-                                        // Set the validated pension number in the modal's input field
-                                        $('#pension_number_get').val($('#pension_number').val());
+                                                // Set the validated pension number in the modal's input field
+                                                $('#pension_number_get').val($('#pension_number').val());
 
-                                        // Open the create client modal
-                                        $('#createClientModal').modal('show');
+                                                // Open the create client modal
+                                                $('#createClientModal').modal('show');
+                                            }
+                                        });
                                     }
                                 });
                             }
