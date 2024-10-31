@@ -53,14 +53,13 @@
                                 <tr>
                                     <th>Action</th>
                                     <th>Clients</th>
-                                    <th>Branch</th>
                                     <th>Pension No. / Type</th>
+                                    <th>Transaction Number</th>
                                     <th>ATM / Passbook / Simcard</th>
                                     <th>Bank</th>
                                     <th>PIN Code</th>
                                     <th>Type</th>
                                     <th>Status</th>
-
                                 </tr>
                             </thead>
                             <tbody>
@@ -291,6 +290,76 @@
         </div>
     </div>
 
+    <div class="modal fade" id="viewClientModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="createClientModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 75%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-uppercase">Client Information</h5>
+                    <button type="button" class="btn-close closeCreateModal" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div id="fetch_full_name" class="fw-bold h4"></div>
+                                <span id="fetch_pension_number" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="fetch_pension_account_type" class="fw-bold h5"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <span class="fw-bold h6">Created Date</span><br>
+                            <span class="fw-bold h6 text-primary" id="fetch_created_at"></span>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <div class="row mb-2">
+                        <div class="form-group col-3">
+                            <label class="fw-bold h6">Birthdate</label>
+                            <input type="text" class="form-control" id="fetch_birth_date" readonly>
+                        </div>
+                        <div class="form-group col-3">
+                            <label class="fw-bold h6">Branch</label>
+                            <input type="text" class="form-control" id="fetch_branch_location" readonly>
+                        </div>
+                        <div class="form-group col-3">
+                            <label class="fw-bold h6">Pension Type</label>
+                            <input type="text" class="form-control" id="fetch_pension_type" readonly>
+                        </div>
+                    </div>
+                    <hr>
+
+
+                    <div class="table-responsive">
+                        <table class="table table-border dt-responsive wrap table-design">
+                            <thead>
+                                <th>Location</th>
+                                <th>Transaction Number</th>
+                                <th>Card No.</th>
+                                <th>Bank Name</th>
+                                <th>PIN Code</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Collection Date</th>
+                                <th>Expiration Date</th>
+                            </thead>
+
+                            <tbody id="displayClientInformation">
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
     <script>
         $(document).ready(function () {
             var FetchingDatatableBody = $('#FetchingDatatable tbody');
@@ -310,16 +379,6 @@
                     name: 'action',
                     render: function(data, type, row) {
                         return `
-                            <a href="#" class="text-warning editBtn me-1" data-id="${row.id}"
-                                data-bs-toggle="tooltip" data-bs-placement="top" title="Edit ">
-                                <i class="fas fa-pencil-alt me-2"></i>
-                            </a>
-
-                            <a href="#" class="text-danger deleteBtn me-1" data-id="${row.id}"
-                                data-bs-toggle="tooltip" data-bs-placement="top" title="Delete ">
-                                <i class="fas fa-trash-alt me-2"></i>
-                            </a>
-
                             <a href="#" class="text-info viewBtn me-1" data-id="${row.id}"
                                 data-bs-toggle="tooltip" data-bs-placement="top" title="View ">
                                 <i class="fas fa-eye me-2"></i>
@@ -505,6 +564,69 @@
                 }
             });
 
+            $('#FetchingDatatable').on('click', '.viewBtn', function(e) {
+                e.preventDefault();
+                var itemID = $(this).data('id');
+
+                var url = "/clients/get/" + itemID;
+
+                $.get(url, function(data) {
+                    $('#item_id').val(data.id);
+                    $('#userTypeSelectUpdate').val(data.user_types).trigger('change');
+
+                    // Format birth_date and created_at
+                    let formattedBirthDate = data.birth_date ? new Date(data.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+                    let formattedCreatedAt = data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+
+                    // Display formatted dates or blank if not valid
+                    $('#fetch_birth_date').val(formattedBirthDate);
+                    $('#fetch_created_at').text(formattedCreatedAt);
+
+                    $('#fetch_full_name').text(
+                        `${data.last_name} ${data.first_name} ${data.middle_name ?? ''} ${data.suffix ?? ''}`.trim()
+                    );
+                    $('#fetch_pension_number').val(data.pension_number ?? '');
+                    $('#fetch_pension_number').inputmask("99-9999999-99");
+
+                    $('#fetch_pension_type').val(data.pension_type ?? '');
+                    $('#fetch_pension_account_type').text(data.pension_account_type);
+                    $('#fetch_branch_location').val(data.branch.branch_location ?? '');
+
+                    $('#displayClientInformation').empty();
+                    data.atm_client_banks.forEach(function (rows) {
+                        // Format expiration_date to "Month Year"
+                        let expirationDate = '';
+                        if (rows.expiration_date && rows.expiration_date !== '0000-00-00') {
+                            expirationDate = new Date(rows.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                        }
+
+                        // Conditionally apply class for atm_type
+                        let atmTypeClass = '';
+                        if (rows.atm_type === 'ATM') atmTypeClass = 'text-primary';
+                        else if (rows.atm_type === 'Passbook') atmTypeClass = 'text-danger';
+                        else if (rows.atm_type === 'Sim Card') atmTypeClass = 'text-info';
+
+                        var newRow = '<tr>' +
+                            '<td>' + (rows.location ?? '') + '</td>' +
+                            '<td class="fw-bold h6">' + (rows.transaction_number ?? '') + '</td>' +
+                            '<td class="fw-bold h6 text-success">' + (rows.bank_account_no ?? '') + '</td>' +
+                            '<td>' + (rows.bank_name ?? '') + '</td>' +
+                            '<td><span class="badge bg-danger">Encrypted</span></td>' +
+                            '<td class="' + atmTypeClass + '">' + (rows.atm_type ?? '') + '</td>' +
+                            '<td>' + (rows.atm_status ?? '') + '</td>' +
+                            '<td>' + (rows.collection_date ?? '') + '</td>' +
+                            '<td>' + (expirationDate || '') + '</td>' +
+                            '</tr>';
+
+                        $('#displayClientInformation').append(newRow);
+                    });
+
+
+
+                    $('#viewClientModal').modal('show');
+                });
+            });
+
             $(document).on('click', '.view_pin_code', function(e) {
                 e.preventDefault(); // Prevent the default anchor behavior
 
@@ -533,7 +655,6 @@
                     }
                 });
             });
-
 
             $('#createValidateForm').validate({
                 rules: {

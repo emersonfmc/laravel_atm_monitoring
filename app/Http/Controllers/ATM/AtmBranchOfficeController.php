@@ -39,7 +39,7 @@ class AtmBranchOfficeController extends Controller
             ->setRowId('id')
             ->addColumn('action', function($row) use ($userGroup) {
                 // Only show the button for users in specific groups
-                if (in_array($userGroup, ['Developer', 'Admin', 'Branch Head'])) {
+                if (in_array($userGroup, ['Developer', 'Admin', 'Branch Head','Everfirst Admin'])) {
                     return '<a href="#" class="btn btn-warning createTransaction" data-id="' . $row->id . '">
                                 <i class="fas fa-plus-circle fs-5"></i>
                             </a>';

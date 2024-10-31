@@ -58,6 +58,25 @@
         </div> <!-- end col -->
     </div>
 
+    <div class="modal fade" id="createTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="createTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-uppercase">Create Transaction</h5>
+                    <button type="button" class="btn-close closeCreateModal" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                </div>
+
+            </div>
+        </div>
+</div>
+
     <script>
         $(document).ready(function () {
             var FetchingDatatableBody = $('#FetchingDatatable tbody');
@@ -93,10 +112,10 @@
                 },
                 // Reference No
                 {
-                    data: 'id',
-                    name: 'id',
+                    data: 'transaction_number',
+                    name: 'transaction_number',
                     render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6 text-primary">' + data + '</span>';
+                        return '<span class="fw-bold h6">' + data + '</span>';
                     },
                     orderable: true,
                     searchable: true,
@@ -256,6 +275,27 @@
 
             ];
             dataTable.initialize(url, columns);
+
+            $('#FetchingDatatable').on('click', '.createTransaction', function(e) {
+                e.preventDefault();
+                var new_atm_id = $(this).data('id');
+
+                $.ajax({
+                    url: "/AtmClientFetch",
+                    type: "GET",
+                    data: { new_atm_id : new_atm_id },
+                    success: function(data) {
+                        console.log(data);
+                        $('#createTransactionModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("An error occurred: " + error);
+                    }
+                });
+            });
+
+
+
         });
 
         $(document).on('click', '.view_pin_code', function(e) {

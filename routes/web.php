@@ -25,6 +25,7 @@ Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang'
 
 Route::controller(DefaultController::class)->group(function () {
     Route::get('/pension/types/fetch', 'PensionTypesFetch')->name('pension.types.fetch');
+    Route::get('/AtmClientFetch', 'AtmClientFetch')->name('AtmClientFetch');
 });
 
 
