@@ -2,10 +2,160 @@
 
 namespace App\Http\Controllers\ATM;
 
-use App\Http\Controllers\Controller;
+use App\Models\SystemLogs;
 use Illuminate\Http\Request;
+use App\Models\AtmClientBanks;
+use Illuminate\Support\Carbon;
+use App\Models\AtmBanksTransaction;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Models\DataPensionTypesLists;
+use App\Models\AtmTransactionSequence;
+use App\Models\AtmTransactionBalanceLogs;
+use App\Models\AtmBanksTransactionApproval;
 
 class AtmTransactionController extends Controller
 {
-    //
+    public function TransactionCreate(Request $request)
+    {
+        $reason_for_pull_out  = $request->reason_for_pull_out;
+
+        $atm_id               = $request->atm_id;
+        $aprb_no              = $request->aprb_no ?? NULL;
+        $remarks              = $request->remarks ?? NULL;
+        $release_reason       = $request->release_reason ?? NULL;
+        $borrow_reason        = $request->borrow_reason ?? NULL;
+
+        $AtmClientBanks = AtmClientBanks::with('ClientInformation','Branch')->findOrFail($atm_id);
+        $BankAccountNo = $AtmClientBanks->bank_account_no;
+        $BankType = $AtmClientBanks->atm_type;
+        $PensionNumber = $AtmClientBanks->ClientInformation->pension_number;
+        $TransactionNumber = $AtmClientBanks->transaction_number;
+        $ClientInformationId = $AtmClientBanks->client_information_id;
+        $branch_id = $AtmClientBanks->branch_id;
+
+        // Prevention of Duplication
+        $existingTransaction = AtmBanksTransaction::where('transaction_actions_id', $reason_for_pull_out)
+            ->where('transaction_number', $TransactionNumber)
+            ->where('bank_account_no', $BankAccountNo)
+            ->where('status', 'ON GOING')
+            ->first(); // Fetch the first matching record
+
+        if ($existingTransaction) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Transaction Already Processed'  // Changed message to reflect update action
+            ]);
+        }
+        else
+        {
+            // Releasing
+            if($reason_for_pull_out == '3' || $reason_for_pull_out == '16')
+            {
+                // Releasing with Balance
+                if($reason_for_pull_out == '16') {
+                    $reason = 'Releasing of ATM/PB/Simcard With Outstanding Balance';
+                } else {
+                    $reason = $release_reason;
+                }
+            }
+            else
+            {
+                if($reason_for_pull_out == '1') {
+                    $reason = 'Borrow ATM/PB';
+                } else if($reason_for_pull_out == '13')
+                {
+                    $reason = 'Cancelled Loan';
+                } else if($reason_for_pull_out == '11')
+                {
+                    $reason = 'Replacement of ATM/PB';
+                } else if($reason_for_pull_out == '6')
+                {
+                    $reason = 'For Safekeeping';
+                } else if($reason_for_pull_out == '7')
+                {
+                    $reason = 'For Renewal';
+                } else if($reason_for_pull_out == '19')
+                {
+                    $reason = 'Passbook Borrowed';
+                } else if($reason_for_pull_out == '20')
+                {
+                    $reason = 'Returning of Passbook Borrowed';
+                } else if($reason_for_pull_out == '9')
+                {
+                    $reason = 'Returning of Safekeep ATM';
+                } else if($reason_for_pull_out == '4')
+                {
+                    $reason = 'Returning of Borrowed ATM';
+                }
+                else {
+                    $reason = 'Unknown';
+                }
+                $AtmBanksTransaction = AtmBanksTransaction::create([
+                    'client_banks_id' => $atm_id,
+                    'transaction_actions_id' => $reason_for_pull_out,
+                    'transaction_number' => $TransactionNumber,
+                    'request_by_employee_id' => Auth::user()->employee_id,
+                    'bank_account_no' => $BankAccountNo,
+                    'atm_type' => $BankType,
+                    'branch_id' => $branch_id,
+                    'aprb_no' => $aprb_no,
+                    'reason' => $reason,
+                    'reason_remarks' => $remarks,
+                    'status' => 'ON GOING',
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
+
+                $AtmTransactionSequences = AtmTransactionSequence::where('atm_transaction_actions_id', $reason_for_pull_out)
+                    ->orderBy('sequence_no')
+                    ->get();
+
+                foreach ($AtmTransactionSequences as $transactionSequence)
+                {
+                    // Set the status based on the sequence number
+                    $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
+
+                    AtmBanksTransactionApproval::create([
+                        'banks_transactions_id' => $AtmBanksTransaction->id,
+                        'transaction_actions_id' => 5,
+                        'employee_id' => NULL,
+                        'date_approved' => NULL,
+                        'user_groups_id' => $transactionSequence->user_group_id,
+                        'sequence_no' => $transactionSequence->sequence_no,
+                        'status' => $status,
+                        'type' => $transactionSequence->type,
+                        'created_at' => Carbon::now(),
+                    ]);
+                }
+
+                $balance = floatval(preg_replace('/[^\d]/', '', $request->atm_balance ?? 0));
+
+                AtmTransactionBalanceLogs::create([
+                    'banks_transactions_id' => $AtmBanksTransaction->id,
+                    'check_by_user_id' => Auth::user()->id,
+                    'balance' => $balance,
+                    'remarks' => $remarks ?? NULL,
+                    'created_at' => Carbon::now(),
+                ]);
+
+                // Create System Logs used for Auditing of Logs
+                SystemLogs::create([
+                    'system' => 'ATM Monitoring',
+                    'action' => 'Create',
+                    'title' => 'Create Transaction',
+                    'description' => 'Creation of New Transaction'.' : ' . $TransactionNumber .' | '.$reason,
+                    'employee_id' => Auth::user()->employee_id,
+                    'ip_address' => $request->ip(),
+                    'created_at' => Carbon::now(),
+                    'company_id' => Auth::user()->company_id,
+                ]);
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Transaction Created successfully!'  // Changed message to reflect update action
+        ]);
+    }
 }

@@ -773,16 +773,15 @@
                                                 text: res.message,
                                                 icon: 'error',
                                             });
-                                        } else {
+                                        }
+                                        else
+                                        {
                                             Swal.fire({
                                                 title: 'Error!',
                                                 text: 'Error Occurred Please Try Again',
                                                 icon: 'error',
                                             });
                                         }
-
-
-
                                     },
                                     error: function(xhr, status, error) {
                                         var errorMessage =
@@ -845,11 +844,7 @@
                 $('#createClientModal').modal('hide');
                 $('#FetchingDatatable tbody').empty();
             }
-
-
         });
-
-
 
 
         $(document).ready(function () {
