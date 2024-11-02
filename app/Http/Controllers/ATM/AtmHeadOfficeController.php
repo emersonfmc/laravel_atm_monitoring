@@ -179,8 +179,6 @@ class AtmHeadOfficeController extends Controller
 
                 return $action; // Return all the accumulated buttons
             })
-
-
             ->addColumn('pending_to', function($row) {
                 $groupName = ''; // Variable to hold the group name
                 $atmTransactionActionName = ''; // Variable to hold the ATM transaction action name
@@ -219,9 +217,6 @@ class AtmHeadOfficeController extends Controller
                 // Prepare the output
                 return $atmTransactionActionName . ' <div class="text-dark"> ' . $groupName .'</div>'; // Combine the group name and action name
             })
-
-
-
             ->rawColumns(['action', 'pending_to']) // Render HTML in both the action and pending_to columns
             ->make(true);
     }

@@ -138,6 +138,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(AtmTransactionController::class)->group(function () {
+        Route::get('/TransactionPage', 'TransactionPage')->name('TransactionPage');
+        Route::get('/TransactionData', 'TransactionData')->name('TransactionData');
         Route::post('/TransactionCreate', 'TransactionCreate')->name('TransactionCreate');
         // Route::resource('products', ProductController::class);
     });

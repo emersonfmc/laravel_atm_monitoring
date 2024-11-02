@@ -2,20 +2,39 @@
 
 namespace App\Http\Controllers\ATM;
 
-use App\Models\SystemLogs;
 use Illuminate\Http\Request;
-use App\Models\AtmClientBanks;
 use Illuminate\Support\Carbon;
-use App\Models\AtmBanksTransaction;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Models\DataPensionTypesLists;
+
+use App\Http\Controllers\Controller;
+use Yajra\DataTables\Facades\DataTables;
+
+use App\Models\SystemLogs;
+use App\Models\AtmClientBanks;
 use App\Models\AtmTransactionSequence;
+use App\Models\AtmBanksTransaction;
 use App\Models\AtmTransactionBalanceLogs;
 use App\Models\AtmBanksTransactionApproval;
 
 class AtmTransactionController extends Controller
 {
+    public function TransactionPage()
+    {
+        return view('pages.pages_backend.atm.atm_transactions');
+    }
+
+    public function TransactionData()
+    {
+        $AtmBanksTransaction = AtmBanksTransaction::with('AtmClientBanks','AtmClientBanks.ClientInformation','AtmTransactionAction',    'AtmBanksTransactionApproval','Branch')
+            ->latest('updated_at')
+            ->get();
+
+        return DataTables::of($AtmBanksTransaction)
+            ->setRowId('id')
+            ->make(true);
+    }
+
+
     public function TransactionCreate(Request $request)
     {
         $reason_for_pull_out  = $request->reason_for_pull_out;
