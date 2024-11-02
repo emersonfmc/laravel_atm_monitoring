@@ -243,6 +243,12 @@ class ClientContoller extends Controller
         ]);
     }
 
+    public function clientGet($id)
+    {
+        $ClientInformation = ClientInformation::with('Branch','AtmClientBanks')->findOrFail($id);
+        return response()->json($ClientInformation);
+    }
+
     public function PensionNumberValidate(Request $request)
     {
         // Remove any non-numeric characters (like hyphens) from the pension number

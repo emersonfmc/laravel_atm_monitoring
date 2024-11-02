@@ -410,15 +410,14 @@
                                             '<td>' +
                                                 '<input type="text" value="' + rows.sequence_no + '" class="sequence_no_update form-control" name="sequence_no[]" readonly>' +
                                                 '<input type="hidden" value="' + rows.id + '" class="form-control" name="items_id[]">' +
+                                                '<input type="hidden" value="" class="remove_flag" name="remove_flag[]">' +  // Initially empty, to be set on removal
                                             '</td>' +
                                             '<td>' +
                                                 '<div class="form-group">' +
                                                     '<select name="user_group_id[]" class="form-select select2 user-select" required>' +
                                                         '<option value="" disabled>Select User</option>';
 
-                                                        // Loop through your `$DataUserGroup` to create the dropdown options
                                                         @foreach ($DataUserGroup as $item)
-                                                            // Check if the current item ID matches the `user_group_id` to pre-select it
                                                             newRow += '<option value="{{ $item->id }}" ' + (rows.user_group_id == {{ $item->id }} ? 'selected' : '') + '>{{ $item->group_name }}</option>';
                                                         @endforeach
 
@@ -433,12 +432,24 @@
                                                 '</select>' +
                                             '</td>' +
                                             '<td>' +
-                                                '<a href="#" class="btn btn-danger removeUpdateRow" disabled><i class="fas fa-trash-alt"></i></a>' +
+                                                '<a href="#" class="btn btn-danger removeUpdateRow"><i class="fas fa-trash-alt"></i></a>' +
                                             '</td>' +
                                         '</tr>';
 
                             $('#sequenceTableUpdateBody').append(newRow);
                         });
+
+                        // Add event handler for the remove button to mark rows as removed
+                        $('#sequenceTableUpdateBody').on('click', '.removeUpdateRow', function(e) {
+                            e.preventDefault();
+
+                            var row = $(this).closest('tr');
+                            var itemId = row.find('input[name="items_id[]"]').val();  // Get the ID for this row
+                            row.find('.remove_flag').val(itemId);  // Set remove_flag to the row's ID for deletion in database
+                            row.css('background-color', '#f8d7da');  // Optional: Change background color to indicate removed row
+                            row.find('input, select').attr('disabled', true);  // Disable inputs to prevent further editing
+                        });
+
                     $('#updateTransactionActionModal').modal('show');
                 });
             });

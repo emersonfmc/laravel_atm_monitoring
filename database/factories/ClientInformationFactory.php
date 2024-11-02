@@ -33,7 +33,7 @@ class ClientInformationFactory extends Factory
             $datePart = now()->format('mdy'); // e.g., "103024" for October 30, 2024
 
             // Create 2 unique ATMs for each client
-            for ($i = 0; $i < 2; $i++) {
+            for ($i = 0; $i < 3; $i++) {
                 // Fetch the latest transaction number for today and increment it
                 $latestTransactionNumber = AtmClientBanks::where('transaction_number', 'LIKE', "AD-$datePart-%")
                     ->orderBy('transaction_number', 'desc')

@@ -21,4 +21,10 @@ class AtmClientBanks extends Model
     {
         return $this->belongsTo(Branch::class, 'branch_id','id');
     }
+
+    public function AtmBanksTransaction()
+    {
+        return $this->hasMany(AtmBanksTransaction::class, 'client_banks_id','id');
+    }
+
 }

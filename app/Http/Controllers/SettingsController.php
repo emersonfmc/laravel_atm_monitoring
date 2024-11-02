@@ -36,7 +36,7 @@ class SettingsController extends Controller
     public function users_group_data()
     {
        $user_group = DataUserGroup::with('Company')
-            ->latest('updated_at')
+            ->orderBy('updated_at', 'desc') // Explicitly set order here
             ->get();
 
         return DataTables::of($user_group)
