@@ -4,7 +4,7 @@
 
     @component('components.breadcrumb')
         @slot('li_1') ATM Monitoring @endslot
-        @slot('title') Head Office ATM Lists @endslot
+        @slot('title') Branch Office ATM Lists @endslot
     @endcomponent
 
     <div class="row">
@@ -16,7 +16,7 @@
                         <div class="col-md-8 text-start">
                             <h4 class="card-title">Branch Office ATM Lists</h4>
                             <p class="card-title-desc">
-                                A Centralized Record of all ATMs managed by the Branch office
+                                A Centralized Record of all ATMs managed by the branch office
                             </p>
                         </div>
                         {{-- <div class="col-md-4 text-end">
@@ -93,10 +93,10 @@
                 },
                 // Reference No
                 {
-                    data: 'id',
-                    name: 'id',
+                    data: 'transaction_number',
+                    name: 'transaction_number',
                     render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6 text-primary">' + data + '</span>';
+                        return '<span class="fw-bold h6">' + data + '</span>';
                     },
                     orderable: true,
                     searchable: true,

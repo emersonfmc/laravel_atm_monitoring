@@ -10,6 +10,6 @@ class ClientsInformationSeeder extends Seeder
     public function run()
     {
         // Create 10 clients, each with 2 ATMs
-        ClientInformation::factory()->count(40)->create();
+        ClientInformation::factory()->count(300)->create();
     }
 }

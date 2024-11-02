@@ -18,7 +18,7 @@ class AtmClientBanksFactory extends Factory
             'bank_account_no' => $this->faker->unique()->numerify('################'),
             'pin_no' => $this->faker->unique()->numerify('########'),
             'atm_status' => $this->faker->randomElement(['new']),
-            'expiration_date' => null,
+            'expiration_date' => date('Y-m-d', mktime(0, 0, 0, rand(1, 12), 1, 2030)),
             'collection_date' => $this->faker->randomElement(['1st', '8th', '16th', '1st and 8th', '1st and 16th']),
             'cash_box_no' => null,
             'safekeep_cash_box_no' => null,

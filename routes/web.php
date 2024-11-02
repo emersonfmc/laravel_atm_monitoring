@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\ATM\AtmBranchOfficeController;
-use App\Http\Controllers\ATM\AtmHeadOfficeController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -9,6 +7,9 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ATM\ClientContoller;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ATM\DefaultController;
+use App\Http\Controllers\ATM\AtmHeadOfficeController;
+use App\Http\Controllers\ATM\AtmTransactionController;
+use App\Http\Controllers\ATM\AtmBranchOfficeController;
 
 Auth::routes();
 
@@ -25,6 +26,7 @@ Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang'
 
 Route::controller(DefaultController::class)->group(function () {
     Route::get('/pension/types/fetch', 'PensionTypesFetch')->name('pension.types.fetch');
+    Route::get('/AtmClientFetch', 'AtmClientFetch')->name('AtmClientFetch');
 });
 
 
@@ -114,7 +116,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 });
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::controller(AtmHeadOfficeController::class)->group(function () {
+    Route::controller(AtmBranchOfficeController::class)->group(function () {
         Route::get('/BranchOfficePage', 'BranchOfficePage')->name('BranchOfficePage');
         Route::get('/BranchOfficeData', 'BranchOfficeData')->name('BranchOfficeData');
     });
@@ -133,3 +135,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         // Route::resource('products', ProductController::class);
     });
 });
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::controller(AtmTransactionController::class)->group(function () {
+        Route::post('/TransactionCreate', 'TransactionCreate')->name('TransactionCreate');
+        // Route::resource('products', ProductController::class);
+    });
+});
+
+

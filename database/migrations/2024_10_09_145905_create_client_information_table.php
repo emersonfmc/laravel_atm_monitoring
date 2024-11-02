@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('client_information', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('branch_id');
-            $table->string('pension_number')->unique();
+            $table->string('pension_number')->nullable();
             $table->enum('pension_type', ['SSS', 'GSIS'])->nullable();
             $table->string('pension_account_type')->nullable();
             $table->string('first_name')->nullable();

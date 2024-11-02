@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('client_banks_id')->nullable();
             $table->unsignedBigInteger('transaction_actions_id')->nullable();
-            $table->unsignedBigInteger('request_by_user_id')->nullable();
+            $table->string('request_by_employee_id')->nullable();
 
             $table->string('transaction_number')->nullable();
             $table->string('bank_account_no')->nullable();
@@ -29,12 +29,14 @@ return new class extends Migration
             $table->string('reason')->nullable();
             $table->string('reason_remarks')->nullable();
 
+            $table->enum('status',['ON GOING','CANCELLED','COMPLETED'])->nullable();
+
             $table->integer('yellow_copy')->nullable();
             $table->unsignedBigInteger('released_client_images_id')->nullable();
 
             $table->foreign('client_banks_id')->references('id')->on('atm_client_banks')->onDelete('set null')->onUpdate('cascade');
             $table->foreign('transaction_actions_id')->references('id')->on('atm_transaction_actions')->onDelete('set null')->onUpdate('cascade');
-            $table->foreign('request_by_user_id')->references('id')->on('users')->onDelete('set null')->onUpdate('cascade');
+            $table->foreign('request_by_employee_id')->references('employee_id')->on('users')->onDelete('set null')->onUpdate('cascade');
             $table->foreign('branch_id')->references('id')->on('branches')->onDelete('set null')->onUpdate('cascade');
             $table->foreign('released_client_images_id')->references('id')->on('atm_released_client_images')->onDelete('set null')->onUpdate('cascade');
 

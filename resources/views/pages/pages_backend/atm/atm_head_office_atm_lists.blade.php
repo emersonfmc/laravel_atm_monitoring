@@ -58,6 +58,216 @@
         </div> <!-- end col -->
     </div>
 
+    <div class="modal fade" id="createTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="createTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-uppercase">Create Transaction</h5>
+                    <button type="button" class="btn-close closeCreateModal" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form action="{{  route('TransactionCreate') }}" method="POST" id="TransactionCreateValidateForm">
+                        @csrf
+                        <div class="row">
+                            <input type="hidden" name="atm_id" id="create_atm_id">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <div id="create_fullname" class="fw-bold h4"></div>
+                                    <span id="create_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="create_pension_account_type" class="fw-bold h5"></span>
+                                </div>
+                                <hr>
+                                <div class="row mb-3">
+                                    <div class="form-group col-6">
+                                        <label class="fw-bold h6">Transaction Number</label>
+                                        <input type="text" class="form-control" id="create_transaction_number" readonly>
+                                    </div>
+
+                                    <div class="form-group col-6">
+                                        <label class="fw-bold h6">Birthdate</label>
+                                        <input type="text" class="form-control" id="create_birth_date" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="form-group col-6">
+                                        <label class="fw-bold h6">Bank Account Number</label>
+                                        <input type="text" class="form-control" id="create_bank_account_no" readonly>
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label class="fw-bold h6">Bank Name</label>
+                                        <input type="text" class="form-control" id="create_bank_name" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="form-group col-6">
+                                        <label class="fw-bold h6">Type</label>
+                                        <input type="text" class="form-control" id="create_atm_type" readonly>
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label class="fw-bold h6">Expiration Date</label>
+                                        <input type="text" class="form-control" id="create_expiration_date" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="form-group col-6">
+                                        <label class="fw-bold h6">Collection Date</label>
+                                        <input type="text" class="form-control" id="create_collection_date" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group mb-3">
+                                    <label class="fw-bold h6">Select Reason For Pullout</label>
+                                    <select name="reason_for_pull_out" id="reason_for_pull_out" class="form-select" required>
+                                        <option value="" selected disabled>Reason for Pullout</option>
+                                        @foreach ($AtmTransactionAction as $item)
+                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <span id="BorrowTransaction" style="display: none;">
+                                    <div class="form-group mb-3">
+                                        <label class="fw-bold h6">Select Reason</label>
+                                        <select name="borrow_reason" id="borrow_reason" class="form-select" required>
+                                            <option value="" selected disabled>Select Reason</option>
+                                            <option value="For SSS/GSIS Report">For SSS/GSIS Report</option>
+                                            <option value="For Emegency Loan">For Emegency Loan</option>
+                                            <option value="For Bank Report">For Bank Report</option>
+                                            <option value="For Requiremtns">For Requiremtns</option>
+                                        </select>
+                                    </div>
+                                </span>
+
+                                <span id="RemarksTransaction" style="display: none;">
+                                    <div class="form-group mb-3">
+                                        <label class="fw-bold h6">Remarks</label>
+                                        <textarea name="remarks" id="remarks" minlength="0" maxlength="300" placeholder="Enter Remarks"
+                                            class="form-control" rows="5" style="resize: none;" required></textarea>
+                                    </div>
+                                </span>
+
+                                <span id="ReleasingTransaction" style="display: none;">
+                                    <div class="form-group mb-3">
+                                        <label class="fw-bold h6">Select Releasing Reason</label>
+                                        <select name="release_reason" id="release_reason" class="form-select select2" required>
+                                            <option value="" selected disabled>Releasing Reason</option>
+                                            @foreach ($DataReleaseOption as $item)
+                                            <option value="{{ $item->reason }}">{{ $item->reason }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label class="fw-bold h6">APRB Number</label>
+                                        <input type="number" name="aprb_no" class="form-control"  placeholder="APRB Number" required>
+                                    </div>
+                                </span>
+                            </div>
+
+                            <div class="col-12" id="ReleasingTableSelect" style="display: none;">
+                                <hr>
+                                <div class="row mb-2 mt-3">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold h5 text-danger">Select ATM / Passbook / Simcard to Release</label>
+                                    </div>
+                                    <div class="col-md-6">
+
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-border dt-responsive wrap table-design">
+                                        <thead>
+                                            <th>Checkbox</th>
+                                            <th>Transaction Number</th>
+                                            <th>Bank Account No</th>
+                                            <th>Type / Status</th>
+                                            <th>Collection Date</th>
+                                            <th>Expiration Date</th>
+                                        </thead>
+
+                                        <tbody id="displayClientInformation">
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addAtmTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="createTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-uppercase">Add ATM Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                    <button type="submit" class="btn btn-success">Add ATM</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="transferBranchTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="createTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-uppercase">Transfer to Other Branch Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                    <button type="submit" class="btn btn-success">Transfer to Other Branch</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="EditInformationTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="createTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-uppercase">Edit Client / ATM Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                    <button type="submit" class="btn btn-success">Edit Information</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <script>
         $(document).ready(function () {
             var FetchingDatatableBody = $('#FetchingDatatable tbody');
@@ -83,8 +293,8 @@
                 },
                 // Transaction Type and Pending By
                 {
-                    data: 'id',
-                    name: 'id',
+                    data: 'pending_to',
+                    name: 'pending_to',
                     render: function(data, type, row, meta) {
                         return '<span class="fw-bold h6 text-primary">' + data + '</span>';
                     },
@@ -93,10 +303,10 @@
                 },
                 // Reference No
                 {
-                    data: 'id',
-                    name: 'id',
+                    data: 'transaction_number',
+                    name: 'transaction_number',
                     render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6 text-primary">' + data + '</span>';
+                        return '<span class="fw-bold h6">' + data + '</span>';
                     },
                     orderable: true,
                     searchable: true,
@@ -217,8 +427,6 @@
                     searchable: true,
                 },
 
-
-
                 {
                     data: 'pin_no',
                     name: 'pin_no',
@@ -256,6 +464,233 @@
 
             ];
             dataTable.initialize(url, columns);
+
+            $('#FetchingDatatable').on('click', '.createTransaction', function(e) {
+                e.preventDefault();
+                var new_atm_id = $(this).data('id');
+
+                $.ajax({
+                    url: "/AtmClientFetch",
+                    type: "GET",
+                    data: { new_atm_id : new_atm_id },
+                    success: function(data) {
+                        console.log(data);
+                        let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+
+                        $('#create_fullname').text(data.client_information.last_name +', '+ data.client_information.first_name +' '+ data.client_information.middle_name +' '+ data.client_information.suffix ?? '');
+
+                        $('#create_pension_number_display').text(data.client_information.pension_number ?? '');
+                        $('#create_pension_number_display').inputmask("99-9999999-99");
+
+                        $('#create_pension_number').val(data.client_information.pension_number);
+                        $('#create_pension_account_type').text(data.client_information.pension_account_type);
+                        $('#create_pension_type').val(data.client_information.pension_type);
+                        $('#create_birth_date').val(formattedBirthDate);
+                        $('#create_branch_location').val(data.branch.branch_location);
+
+                        $('#create_atm_id').val(data.id);
+                        $('#create_bank_account_no').val(data.bank_account_no ?? '');
+                        $('#create_collection_date').val(data.collection_date ?? '');
+                        $('#create_atm_type').val(data.atm_type ?? '');
+                        $('#create_bank_name').val(data.bank_name ?? '');
+                        $('#create_transaction_number').val(data.transaction_number ?? '');
+
+                        let expirationDate = '';
+                        if (data.expiration_date && data.expiration_date !== '0000-00-00') {
+                            expirationDate = new Date(data.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                        }
+                        $('#create_expiration_date').val((expirationDate || ''));
+
+
+                        $('#createTransactionModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("An error occurred: " + error);
+                    }
+                });
+            });
+
+            $('#FetchingDatatable').on('click', '.addAtmTransaction', function(e) {
+                e.preventDefault();
+                var new_atm_id = $(this).data('id');
+
+                $.ajax({
+                    url: "/AtmClientFetch",
+                    type: "GET",
+                    data: { new_atm_id : new_atm_id },
+                    success: function(data) {
+                        console.log(data);
+
+                        $('#addAtmTransactionModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("An error occurred: " + error);
+                    }
+                });
+            });
+
+            $('#FetchingDatatable').on('click', '.transferBranchTransaction', function(e) {
+                e.preventDefault();
+                var new_atm_id = $(this).data('id');
+
+                $.ajax({
+                    url: "/AtmClientFetch",
+                    type: "GET",
+                    data: { new_atm_id : new_atm_id },
+                    success: function(data) {
+                        console.log(data);
+
+                        $('#transferBranchTransactionModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("An error occurred: " + error);
+                    }
+                });
+            });
+
+            $('#FetchingDatatable').on('click', '.EditInformationTransaction', function(e) {
+                e.preventDefault();
+                var new_atm_id = $(this).data('id');
+
+                $.ajax({
+                    url: "/AtmClientFetch",
+                    type: "GET",
+                    data: { new_atm_id : new_atm_id },
+                    success: function(data) {
+                        console.log(data);
+
+                        $('#EditInformationTransactionModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("An error occurred: " + error);
+                    }
+                });
+            });
+
+            $('#TransactionCreateValidateForm').validate({
+                rules: {
+                    reason_for_pull_out: { required: true }
+                },
+                errorElement: 'span',
+                errorPlacement: function(error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                },
+                submitHandler: function(form) {
+                    var hasRows = FetchingDatatableBody.children('tr').length > 0;
+                    if (hasRows) {
+                        Swal.fire({
+                            title: 'Confirmation',
+                            text: 'Are you sure you want to save this?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: "#007BFF",
+                            cancelButtonColor: "#6C757D",
+                            confirmButtonText: "Yes, Save it!"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                const currentPage = dataTable.table.page();
+                                $.ajax({
+                                    url: form.action,
+                                    type: form.method,
+                                    data: $(form).serialize(),
+                                    success: function(response) {
+
+                                        if (typeof response === 'string') {
+                                            var res = JSON.parse(response);
+                                        } else {
+                                            var res = response; // If it's already an object
+                                        }
+
+                                        if (res.status === 'success')
+                                        {
+                                            closeTransactionModal();
+                                            Swal.fire({
+                                                title: 'Successfully Created!',
+                                                text: 'Transaction is successfully Created!',
+                                                icon: 'success',
+                                                showCancelButton: false,
+                                                showConfirmButton: true,
+                                                confirmButtonText: 'OK',
+                                                preConfirm: () => {
+                                                    return new Promise(( resolve
+                                                    ) => {
+                                                        Swal.fire({
+                                                            title: 'Please Wait...',
+                                                            allowOutsideClick: false,
+                                                            allowEscapeKey: false,
+                                                            showConfirmButton: false,
+                                                            showCancelButton: false,
+                                                            didOpen: () => {
+                                                                Swal.showLoading();
+                                                                // here the reload of datatable
+                                                                dataTable.table.ajax.reload( () =>
+                                                                {
+                                                                    Swal.close();
+                                                                    $(form)[0].reset();
+                                                                    dataTable.table.page(currentPage).draw( false );
+                                                                },
+                                                                false );
+                                                            }
+                                                        })
+                                                    });
+                                                }
+                                            });
+                                        }
+                                        else if (res.status === 'error')
+                                        {
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: res.message,
+                                                icon: 'error',
+                                            });
+                                        }
+                                        else
+                                        {
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: 'Error Occurred Please Try Again',
+                                                icon: 'error',
+                                            });
+                                        }
+                                    },
+                                    error: function(xhr, status, error) {
+                                        var errorMessage =
+                                            'An error occurred. Please try again later.';
+                                        if (xhr.responseJSON && xhr.responseJSON
+                                            .error) {
+                                            errorMessage = xhr.responseJSON.error;
+                                        }
+                                        Swal.fire({
+                                            title: 'Error!',
+                                            text: errorMessage,
+                                            icon: 'error',
+                                        });
+                                    }
+                                })
+                            }
+                        })
+                    } else {
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Empty Record!',
+                            text: 'Table is empty, add row to proceed!',
+                        });
+                    }
+                }
+            });
+
+            function closeTransactionModal() {
+                $('#createTransactionModal').modal('hide');
+                $('#FetchingDatatable tbody').empty();
+            }
         });
 
         $(document).on('click', '.view_pin_code', function(e) {
@@ -284,6 +719,68 @@
                         confirmButtonText: 'Okay'
                     });
                 }
+            });
+        });
+
+        $(document).ready(function () {
+            $('#createTransactionModal').on('shown.bs.modal', function () {
+                $('#release_reason').select2({ dropdownParent: $('#createTransactionModal'), });
+            });
+
+            $('#reason_for_pull_out').on('change', function() {
+                var ReasonToPullout = $(this).val();
+
+                if(ReasonToPullout == 1 )
+                {
+                    $('#BorrowTransaction').show();
+                    $('#RemarksTransaction').hide();
+                    $('#ReleasingTransaction').hide();
+                    $('#ReleasingTableSelect').hide();
+                }
+                else if(ReasonToPullout == 11 || ReasonToPullout == 13)
+                {
+                    $('#BorrowTransaction').hide();
+                    $('#RemarksTransaction').show();
+                    $('#ReleasingTransaction').hide();
+                    $('#ReleasingTableSelect').hide();
+                }
+                else if(ReasonToPullout == 3 || ReasonToPullout == 16)
+                {
+                    $('#BorrowTransaction').hide();
+                    $('#ReleasingTransaction').show();
+                    $('#RemarksTransaction').show();
+                    $('#ReleasingTableSelect').show();
+                }
+                else
+                {
+                    $('#BorrowTransaction').hide();
+                    $('#RemarksTransaction').show();
+                    $('#ReleasingTransaction').hide();
+                    $('#ReleasingTableSelect').hide();
+                }
+                // else if(selectedUserType === 'Area')
+                // {
+                //     $('#HeadOfficeDisplay').hide();
+                //     $('#DistrictDisplay').hide();
+                //     $('#AreaDisplay').show();
+                //     $('#BranchDisplay').hide();
+                // }
+                // else if(selectedUserType === 'Branch')
+                // {
+                //     $('#HeadOfficeDisplay').hide();
+                //     $('#DistrictDisplay').hide();
+                //     $('#AreaDisplay').hide();
+                //     $('#BranchDisplay').show();
+                // }
+                // else
+                // {
+                //     $('#HeadOfficeDisplay').hide();
+                //     $('#DistrictDisplay').hide();
+                //     $('#AreaDisplay').hide();
+                //     $('#BranchDisplay').hide();
+                // }
+
+
             });
         });
 
