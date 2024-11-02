@@ -27,6 +27,8 @@ class AtmTransactionController extends Controller
         $borrow_reason        = $request->borrow_reason ?? NULL;
 
         $AtmClientBanks = AtmClientBanks::with('ClientInformation','Branch')->findOrFail($atm_id);
+        $AtmClientBanks->update([ 'updated_at' => Carbon::now(), ]);
+
         $BankAccountNo = $AtmClientBanks->bank_account_no;
         $BankType = $AtmClientBanks->atm_type;
         $PensionNumber = $AtmClientBanks->ClientInformation->pension_number;

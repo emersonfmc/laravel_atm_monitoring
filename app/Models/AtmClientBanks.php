@@ -24,7 +24,7 @@ class AtmClientBanks extends Model
 
     public function AtmBanksTransaction()
     {
-        return $this->belongsTo(AtmBanksTransaction::class, 'client_banks_id','id');
+        return $this->hasMany(AtmBanksTransaction::class, 'client_banks_id','id');
     }
 
 }

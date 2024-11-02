@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->enum('type',['Going to Head Office','Going to Branch Office'])->nullable();
+            $table->integer('transaction')->nullable();
             $table->enum('status',['Active','Inactive'])->nullable();
             $table->softDeletes();
             $table->timestamps();

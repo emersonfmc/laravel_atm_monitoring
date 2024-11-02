@@ -71,7 +71,7 @@
                     <form action="{{  route('TransactionCreate') }}" method="POST" id="TransactionCreateValidateForm">
                         @csrf
                         <div class="row">
-                            <input type="text" name="atm_id" id="create_atm_id">
+                            <input type="hidden" name="atm_id" id="create_atm_id">
                             <div class="col-6">
                                 <div class="form-group">
                                     <div id="create_fullname" class="fw-bold h4"></div>
@@ -208,6 +208,66 @@
         </div>
     </div>
 
+    <div class="modal fade" id="addAtmTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="createTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-uppercase">Add ATM Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                    <button type="submit" class="btn btn-success">Add ATM</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="transferBranchTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="createTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-uppercase">Transfer to Other Branch Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                    <button type="submit" class="btn btn-success">Transfer to Other Branch</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="EditInformationTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="createTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-uppercase">Edit Client / ATM Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                    <button type="submit" class="btn btn-success">Edit Information</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <script>
         $(document).ready(function () {
             var FetchingDatatableBody = $('#FetchingDatatable tbody');
@@ -233,8 +293,8 @@
                 },
                 // Transaction Type and Pending By
                 {
-                    data: 'id',
-                    name: 'id',
+                    data: 'pending_to',
+                    name: 'pending_to',
                     render: function(data, type, row, meta) {
                         return '<span class="fw-bold h6 text-primary">' + data + '</span>';
                     },
@@ -367,8 +427,6 @@
                     searchable: true,
                 },
 
-
-
                 {
                     data: 'pin_no',
                     name: 'pin_no',
@@ -445,6 +503,63 @@
 
 
                         $('#createTransactionModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("An error occurred: " + error);
+                    }
+                });
+            });
+
+            $('#FetchingDatatable').on('click', '.addAtmTransaction', function(e) {
+                e.preventDefault();
+                var new_atm_id = $(this).data('id');
+
+                $.ajax({
+                    url: "/AtmClientFetch",
+                    type: "GET",
+                    data: { new_atm_id : new_atm_id },
+                    success: function(data) {
+                        console.log(data);
+
+                        $('#addAtmTransactionModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("An error occurred: " + error);
+                    }
+                });
+            });
+
+            $('#FetchingDatatable').on('click', '.transferBranchTransaction', function(e) {
+                e.preventDefault();
+                var new_atm_id = $(this).data('id');
+
+                $.ajax({
+                    url: "/AtmClientFetch",
+                    type: "GET",
+                    data: { new_atm_id : new_atm_id },
+                    success: function(data) {
+                        console.log(data);
+
+                        $('#transferBranchTransactionModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("An error occurred: " + error);
+                    }
+                });
+            });
+
+            $('#FetchingDatatable').on('click', '.EditInformationTransaction', function(e) {
+                e.preventDefault();
+                var new_atm_id = $(this).data('id');
+
+                $.ajax({
+                    url: "/AtmClientFetch",
+                    type: "GET",
+                    data: { new_atm_id : new_atm_id },
+                    success: function(data) {
+                        console.log(data);
+
+                        $('#EditInformationTransactionModal').modal('show');
                     },
                     error: function(xhr, status, error) {
                         console.error("An error occurred: " + error);

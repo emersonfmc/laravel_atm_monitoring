@@ -11,4 +11,9 @@ class AtmBanksTransactionApproval extends Model
     use HasFactory, SoftDeletes;
 
     protected $guarded = [];
+
+    public function DataUserGroup()
+    {
+        return $this->belongsTo(DataUserGroup::class, 'user_groups_id','id');
+    }
 }
