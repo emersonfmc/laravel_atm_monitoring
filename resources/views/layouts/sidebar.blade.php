@@ -134,7 +134,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" key="atm_branch_transaction">
+                            <a href="{{ route('TransactionPage') }}" key="atm_branch_transaction">
                                 <span class="badge rounded-pill float-start me-2 text-white" style="background: #000000;">20</span>
                                 Branch Transaction
                             </a>
