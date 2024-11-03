@@ -12,6 +12,16 @@ class AtmBanksTransaction extends Model
 
     protected $guarded = [];
 
+    public function AtmClientBanks()
+    {
+        return $this->hasOne(AtmClientBanks::class, 'id','client_banks_id');
+    }
+
+    public function Branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id','id');
+    }
+
     public function AtmTransactionAction()
     {
         return $this->belongsTo(AtmTransactionAction::class, 'transaction_actions_id','id');
