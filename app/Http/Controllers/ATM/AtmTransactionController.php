@@ -3,35 +3,126 @@
 namespace App\Http\Controllers\ATM;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
-use App\Http\Controllers\Controller;
 use Yajra\DataTables\Facades\DataTables;
 
-use App\Models\SystemLogs;
-use App\Models\AtmClientBanks;
 use App\Models\AtmTransactionSequence;
-use App\Models\AtmBanksTransaction;
+use App\Models\AtmClientBanks;
 use App\Models\AtmTransactionBalanceLogs;
 use App\Models\AtmBanksTransactionApproval;
+use App\Models\AtmBanksTransaction;
+use App\Models\AtmTransactionAction;
+use App\Models\Branch;
+use App\Models\SystemLogs;
 
 class AtmTransactionController extends Controller
 {
     public function TransactionPage()
     {
-        return view('pages.pages_backend.atm.atm_transactions');
+
+        $Branches = Branch::where('status', 'Active')->get();
+        $AtmTransactionAction = AtmTransactionAction::where('status', 'Active')->get();
+
+        return view('pages.pages_backend.atm.atm_transactions', compact('Branches','AtmTransactionAction'));
     }
 
     public function TransactionData()
     {
-        $AtmBanksTransaction = AtmBanksTransaction::with('AtmClientBanks','AtmClientBanks.ClientInformation','AtmTransactionAction',    'AtmBanksTransactionApproval','Branch')
+        $userGroup = Auth::user()->UserGroup->group_name;
+
+        $AtmBanksTransaction = AtmBanksTransaction::with([
+                'AtmClientBanks',
+                'AtmClientBanks.ClientInformation',
+                'AtmTransactionAction',
+                'AtmBanksTransactionApproval.DataUserGroup', // Include DataUserGroup for efficient loading
+                'Branch'
+            ])
             ->latest('updated_at')
             ->get();
 
         return DataTables::of($AtmBanksTransaction)
             ->setRowId('id')
+            ->addColumn('action', function($row) use ($userGroup) {
+                $action = ''; // Initialize a variable to hold the buttons
+
+                // Only show the button for users in specific groups
+                if (in_array($userGroup, ['Developer', 'Admin', 'Branch Head', 'Everfirst Admin'])) {
+                    // Add button for creating a transaction
+                    $action .= '<a href="#" class="text-info viewTransaction me-2 mb-2"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="View Transaction"
+                                    data-id="' . $row->id . '">
+                                    <i class="fas fa-eye fs-5"></i>
+                                 </a>';
+
+                    // Check conditions for additional action buttons
+                    if ($row->transaction_actions_id == 5 && $row->status === 'ON GOING') {
+                        $action .= '<a href="#" class="text-warning editClientTransaction me-2 mb-2"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="Edit Client Information"
+                                        data-id="' . $row->id . '">
+                                    <i class="fas fa-edit fs-5"></i>
+                                 </a>';
+                    }
+
+                    if ($row->status === 'ON GOING') {
+                        $action .= '<a href="#" class="text-danger cancelledTransaction me-2 mb-2"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="Cancel Transaction"
+                                        data-id="' . $row->id . '">
+                                    <i class="fas fa-times-circle fs-5"></i>
+                                 </a>';
+                    }
+                }
+                return $action; // Return all the accumulated buttons
+            })
+            ->addColumn('pending_to', function ($row) {
+                $groupName = ''; // Variable to hold the group name
+                $atmTransactionActionName = ''; // Variable to hold the ATM transaction action name
+
+                // Get the latest transaction with 'Pending' status
+                $latestPendingTransaction = $row->AtmBanksTransactionApproval
+                    ->where('status', 'Pending')
+                    ->sortByDesc('id') // Sort by descending ID
+                    ->first(); // Get the first one, which is the latest 'Pending'
+
+                if ($latestPendingTransaction) {
+                    // Get the group name from the latest pending approval if it exists
+                    $groupName = optional($latestPendingTransaction->DataUserGroup)->group_name;
+                }
+
+                // Get the ATM transaction action name directly
+                $atmTransactionActionName = optional($row->AtmTransactionAction)->name;
+
+                // Return the ATM transaction action name and group name
+                return $atmTransactionActionName . ' <div class="text-dark"> ' . $groupName . '</div>';
+            })
+            ->rawColumns(['action','pending_to']) // Render HTML in the pending_to column
             ->make(true);
+    }
+
+    public function TransactionGet(Request $request)
+    {
+        $transaction_id = $request->transaction_id;
+
+        $AtmBanksTransaction = AtmBanksTransaction::with([
+                'AtmClientBanks',
+                'AtmClientBanks.ClientInformation',
+                'AtmTransactionAction',
+                'AtmBanksTransactionApproval.DataUserGroup', // Include DataUserGroup for efficient loading
+                'Branch'
+            ])->findOrFail($transaction_id);
+
+        return response()->json($AtmBanksTransaction);
+
+            // $TblArea = DataArea::findOrFail($id);
+            // return response()->json($TblArea);
     }
 
 
