@@ -83,10 +83,10 @@
                 },
                 // Transaction Type and Pending By
                 {
-                    data: 'id',
-                    name: 'id',
+                    data: 'pending_to',
+                    name: 'pending_to',
                     render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6 text-primary">' + data + '</span>';
+                        return '<span class="fw-bold h6 text-primary">' + row.pending_to + '</span>';
                     },
                     orderable: true,
                     searchable: true,

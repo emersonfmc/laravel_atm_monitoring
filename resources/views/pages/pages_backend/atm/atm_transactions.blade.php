@@ -93,7 +93,7 @@
 
     <div class="modal fade" id="viewTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="createTransactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
+        <div class="modal-dialog" style="max-width: 60%;" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-uppercase">View Transaction</h5>
@@ -112,7 +112,7 @@
 
     <div class="modal fade" id="EditClientInformationModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="createTransactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
+        <div class="modal-dialog" style="max-width: 60%;" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-uppercase">Edit Client Information</h5>
@@ -132,7 +132,7 @@
 
     <div class="modal fade" id="cancelledTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="createTransactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
+        <div class="modal-dialog" style="max-width: 60%;" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-uppercase">Transfer to Other Branch Transaction</h5>
