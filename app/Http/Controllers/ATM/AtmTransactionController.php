@@ -162,7 +162,7 @@ class AtmTransactionController extends Controller
         else
         {
             // Releasing
-            if($reason_for_pull_out == '3' || $reason_for_pull_out == '16')
+            if($reason_for_pull_out == '20' || $reason_for_pull_out == '25')
             {
                 // Releasing with Balance
                 if($reason_for_pull_out == '16') {
