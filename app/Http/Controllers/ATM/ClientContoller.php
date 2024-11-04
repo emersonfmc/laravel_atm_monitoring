@@ -187,7 +187,7 @@ class ClientContoller extends Controller
                         $AtmBanksTransaction = AtmBanksTransaction::create([
                             'client_banks_id' => $AtmClientBanks->id,
                             'transaction_actions_id' => 5,
-                            'request_by_user_id' => Auth::user()->id,
+                            'request_by_employee_id' => Auth::user()->employee_id,
                             'transaction_number' => $TransactionNumber,
                             'atm_type' => $value,
                             'branch_id' => $branch_id,
