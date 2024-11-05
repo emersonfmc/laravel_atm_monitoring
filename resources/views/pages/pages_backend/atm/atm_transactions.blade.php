@@ -93,13 +93,32 @@
 
     <div class="modal fade" id="viewTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="createTransactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog" style="max-width: 60%;" role="document">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 70%;" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-uppercase">View Transaction</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+
+                    <div class="table-responsive mt-3">
+                        <table class="table table-design">
+                            <thead>
+                                <th>ID</th>
+                                <th>Employee ID</th>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Sequence</th>
+                                <th>Balance Amount</th>
+                                <th>Remarks</th>
+                                <th>Image</th>
+                                <th>Date Received</th>
+                            </thead>
+                            <tbody id="TransactionApprovalBody">
+
+                            </tbody>
+                        </table>
+                    </div>
 
                 </div>
                 <div class="modal-footer">
@@ -112,7 +131,7 @@
 
     <div class="modal fade" id="EditClientInformationModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="createTransactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog" style="max-width: 60%;" role="document">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-uppercase">Edit Client Information</h5>
@@ -132,7 +151,7 @@
 
     <div class="modal fade" id="cancelledTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="createTransactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog" style="max-width: 60%;" role="document">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-uppercase">Transfer to Other Branch Transaction</h5>
@@ -398,7 +417,6 @@
                 });
             });
 
-
             $('#FetchingDatatable').on('click', '.viewTransaction', function(e) {
                 e.preventDefault();
                 var transaction_id = $(this).data('id');
@@ -408,6 +426,48 @@
                     type: "GET",
                     data: { transaction_id : transaction_id },
                     success: function(data) {
+
+                        $('#TransactionApprovalBody').empty();
+
+                        data.atm_banks_transaction_approval.forEach(function (rows) {
+                            var employee_id = rows.employee_id !== null ? rows.employee_id : '';
+                            var employee_name = rows.employee && rows.employee.name ? rows.employee.name : '';
+
+                            var balance = rows.atm_transaction_approvals_balance_logs && rows.atm_transaction_approvals_balance_logs.balance !== null
+                                        ? new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(rows.atm_transaction_approvals_balance_logs.balance)
+                                        : '';
+                            balance = balance ? balance.replace('PHP', '₱ ') : '';
+
+                            var remarks = rows.atm_transaction_approvals_balance_logs && rows.atm_transaction_approvals_balance_logs.remarks !== null
+                                        ? rows.atm_transaction_approvals_balance_logs.remarks
+                                        : '';
+
+                            // Format the date_approved if it's not null
+                            var dateApproved = rows.date_approved ? new Date(rows.date_approved).toLocaleString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true
+                            }) : ''; // Leave blank if null
+
+                            var newRow = '<tr>' +
+                                '<td>' + rows.id + '</td>' +
+                                '<td>' + employee_id + '</td>' +
+                                '<td>' + employee_name + '</td>' +
+                                '<td>' + rows.data_user_group.group_name + '</td>' +
+                                '<td>' + rows.sequence_no + '</td>' +
+                                '<td>' + balance + '</td>' +
+                                '<td>' + remarks + '</td>' +
+                                '<td>' + '' + '</td>' +
+                                '<td>' + dateApproved + '</td>' + // Use formatted date here
+                                '</tr>';
+
+                            $('#TransactionApprovalBody').append(newRow);
+                        });
+
+
                         $('#viewTransactionModal').modal('show');
                     },
                     error: function(xhr, status, error) {
