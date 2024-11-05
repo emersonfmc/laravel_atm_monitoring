@@ -513,7 +513,6 @@
                 });
             });
 
-
             $('#FetchingDatatable').on('click', '.cancelledTransaction', function(e) {
                 e.preventDefault();
                 var transaction_id = $(this).data('id');
