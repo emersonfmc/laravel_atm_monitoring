@@ -93,7 +93,7 @@
 
     <div class="modal fade" id="viewTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="createTransactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 70%;" role="document">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 75%;" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-uppercase">View Transaction</h5>
@@ -112,6 +112,7 @@
                                 <th>Balance Amount</th>
                                 <th>Remarks</th>
                                 <th>Image</th>
+                                <th>Status</th>
                                 <th>Date Received</th>
                             </thead>
                             <tbody id="TransactionApprovalBody">
@@ -442,6 +443,8 @@
                                         ? rows.atm_transaction_approvals_balance_logs.remarks
                                         : '';
 
+                            var status = rows.status === 'Others Account' ? 'Completed' : rows.status;
+
                             // Format the date_approved if it's not null
                             var dateApproved = rows.date_approved ? new Date(rows.date_approved).toLocaleString('en-US', {
                                 year: 'numeric',
@@ -461,12 +464,12 @@
                                 '<td>' + balance + '</td>' +
                                 '<td>' + remarks + '</td>' +
                                 '<td>' + '' + '</td>' +
+                                '<td>' + status + '</td>' + // Use formatted date here
                                 '<td>' + dateApproved + '</td>' + // Use formatted date here
                                 '</tr>';
 
                             $('#TransactionApprovalBody').append(newRow);
                         });
-
 
                         $('#viewTransactionModal').modal('show');
                     },
