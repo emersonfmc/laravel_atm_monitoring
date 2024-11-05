@@ -40,7 +40,7 @@ class AtmTransactionController extends Controller
                 'AtmBanksTransactionApproval.DataUserGroup',
                 'Branch'
             ])
-            ->latest('updated_at')
+            ->latest('created_at')
             ->get();
 
         return DataTables::of($AtmBanksTransaction)
