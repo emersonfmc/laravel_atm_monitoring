@@ -37,6 +37,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/users/get/{id}', 'users_get')->name('users.get');
         Route::post('/users/create', 'users_create')->name('users.create');
         Route::post('/users/update', 'users_update')->name('users.update');
+
+        Route::get('/users/profile/{employee_id}', 'users_profile')->name('users.profile');
+        Route::post('/users/profile/update/{employee_id}', 'users_profile_update')->name('users.profile.update');
     });
 });
 
@@ -112,6 +115,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(AtmHeadOfficeController::class)->group(function () {
         Route::get('/HeadOfficePage', 'HeadOfficePage')->name('HeadOfficePage');
         Route::get('/HeadOfficeData', 'HeadOfficeData')->name('HeadOfficeData');
+
+        Route::post('/PassbookForCollectionSetup', 'PassbookForCollectionSetup')->name('PassbookForCollectionSetup');
     });
 });
 
