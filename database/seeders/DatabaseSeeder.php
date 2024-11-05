@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             AtmTrasanctionSequenceSeeder::class,
             DataCollectionDateSeeder::class,
-            // ClientsInformationSeeder::class,
+            ClientsInformationSeeder::class,
             DataReleaseReasonSeeder::class,
         ]);
     }

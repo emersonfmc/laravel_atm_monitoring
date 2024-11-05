@@ -16,4 +16,15 @@ class AtmBanksTransactionApproval extends Model
     {
         return $this->belongsTo(DataUserGroup::class, 'user_groups_id','id');
     }
+
+    public function Employee()
+    {
+        return $this->belongsTo(User::class, 'employee_id','employee_id');
+    }
+
+    public function AtmTransactionApprovalsBalanceLogs()
+    {
+        return $this->hasOne(AtmTransactionApprovalsBalanceLogs::class, 'trans_approvals_id','id');
+    }
+
 }
