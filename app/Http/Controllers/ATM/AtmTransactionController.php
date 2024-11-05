@@ -37,7 +37,7 @@ class AtmTransactionController extends Controller
                 'AtmClientBanks',
                 'AtmClientBanks.ClientInformation',
                 'AtmTransactionAction',
-                'AtmBanksTransactionApproval.DataUserGroup', // Include DataUserGroup for efficient loading
+                'AtmBanksTransactionApproval.DataUserGroup',
                 'Branch'
             ])
             ->latest('updated_at')
@@ -116,6 +116,8 @@ class AtmTransactionController extends Controller
                 'AtmClientBanks.ClientInformation',
                 'AtmTransactionAction',
                 'AtmBanksTransactionApproval.DataUserGroup', // Include DataUserGroup for efficient loading
+                'AtmBanksTransactionApproval.Employee',
+                'AtmBanksTransactionApproval.AtmTransactionApprovalsBalanceLogs',
                 'Branch'
             ])->findOrFail($transaction_id);
 

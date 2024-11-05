@@ -125,9 +125,9 @@ class ClientContoller extends Controller
                 $branch_abbreviation = $BranchGet->branch_abbreviation;
 
                 // Fetch the last transaction number based on the branch_id and branch_code
-                $lastTransaction = AtmBanksTransaction::where('branch_id', $branch_id)
-                    ->orderBy('transaction_number', 'desc') // Order by transaction_number in descending order
-                    ->first();
+                $lastTransaction = AtmClientBanks::where('branch_id', $branch_id)
+                ->orderBy('transaction_number', 'desc') // Order by transaction_number in descending order
+                ->first();
 
                 if ($lastTransaction) {
                     $lastPart = substr($lastTransaction->transaction_number, strrpos($lastTransaction->transaction_number, '-') + 1);
@@ -136,10 +136,7 @@ class ClientContoller extends Controller
                     $lastadded = 0;
                 }
 
-                // Create the new transaction number
-                $TransactionNumber = $branch_abbreviation . '-' . date('mdy') . '-' . str_pad(($lastadded + 1), 5, '0', STR_PAD_LEFT);
-
-                $pension_number = floatval(preg_replace('/[^\d]/', '', $request->pension_number));
+                $pension_number = str_replace('-', '', $request->pension_number);
 
                 $ClientInformation = ClientInformation::create([
                     'pension_number' => $pension_number ?? NULL,
@@ -157,7 +154,10 @@ class ClientContoller extends Controller
                 if (is_array($request->atm_type) && !empty($request->atm_type)) {
                     foreach ($request->atm_type as $key => $value)
                     {
-                        $BankAccountNo = floatval(preg_replace('/[^\d]/', '', $request->atm_number[$key]));
+                        $transactionCounter = $lastadded + $key + 1;
+                        $TransactionNumber = $branch_abbreviation . '-' . date('mdy') . '-' . str_pad($transactionCounter, 5, '0', STR_PAD_LEFT);
+
+                        $BankAccountNo = str_replace('-', '', $request->atm_number[$key]);
 
                         $expirationDate = $request->expiration_date[$key];
 
@@ -167,6 +167,8 @@ class ClientContoller extends Controller
                         } else {
                             $expirationDate = null; // or handle the case when expiration_date is not provided
                         }
+
+                        // dd($TransactionNumber);
 
                         $AtmClientBanks = AtmClientBanks::create([
                             'client_information_id' => $ClientInformation->id,
@@ -190,8 +192,10 @@ class ClientContoller extends Controller
                             'request_by_employee_id' => Auth::user()->employee_id,
                             'transaction_number' => $TransactionNumber,
                             'atm_type' => $value,
+                            'bank_account_no' => $BankAccountNo ?? NULL,
                             'branch_id' => $branch_id,
                             'aprb_no' => NULL,
+                            'status' => 'ON GOING',
                             'reason' => 'New Client',
                             'reason_remarks' => NULL,
                             'yellow_copy' => NULL,

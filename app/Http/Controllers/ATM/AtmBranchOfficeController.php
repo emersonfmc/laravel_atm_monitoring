@@ -44,15 +44,22 @@ class AtmBranchOfficeController extends Controller
                 $action = ''; // Initialize a variable to hold the buttons
 
                 if ($row->AtmBanksTransaction) {
-                    // Filter for completed transactions and sort them by 'id' in descending order
+                    // Filter for ongoing transactions
+                    $ongoingTransactions = $row->AtmBanksTransaction->filter(function ($transaction) {
+                        return $transaction->status === 'ON GOING';
+                    });
+
+                    // Check if there is at least one ongoing transaction
+                    if ($ongoingTransactions->isNotEmpty()) {
+                        $hasOngoingTransaction = true;
+                    }
+
+                    // Check for completed transactions and get the latest one
                     $completedTransactions = $row->AtmBanksTransaction->filter(function ($transaction) {
                         return $transaction->status === 'COMPLETED';
                     })->sortByDesc('id'); // Sort by id in descending order
 
-                    // Check if there is at least one completed transaction
                     if ($completedTransactions->isNotEmpty()) {
-                        $hasOngoingTransaction = true;
-                        // Get the latest completed transaction's ID
                         $latestTransaction = $completedTransactions->first();
                         $latestTransactionId = $latestTransaction->id;
                     }
@@ -60,7 +67,14 @@ class AtmBranchOfficeController extends Controller
 
                 // Only show the button for users in specific groups
                 if (in_array($userGroup, ['Developer', 'Admin', 'Branch Head', 'Everfirst Admin'])) {
-                    if ($hasOngoingTransaction) {
+                    if ($hasOngoingTransaction)
+                    {
+                        // Display the spinning icon if there is any ongoing transaction
+                        $action = '<i class="fas fa-spinner fa-spin fs-3 text-success"></i>';
+                    }
+                    else if ($latestTransaction && $latestTransaction->transaction_actions_id)
+                    {
+                        // Generate buttons based on `transaction_actions_id`
                         if ($latestTransaction->transaction_actions_id == 3 || $latestTransaction->transaction_actions_id == 9) {
                             $action = '<button type="button" class="btn btn-success release_transaction"
                                             data-atm_id="'.$row->id.'"
@@ -102,20 +116,14 @@ class AtmBranchOfficeController extends Controller
                                             data-atm_id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="right"
-                                            title="Release with Oustanding Balance Transaction">
+                                            title="Release with Outstanding Balance Transaction">
                                           <i class="fas fa-sign-in-alt"></i>
                                         </button>';
                         }
-                        else if ($latestTransaction->transaction_actions_id == NULL || !$latestTransaction->transaction_actions_id) {
-                            $action = '';
-                        }
-                        else {
-                            // Show spinning gear icon if there are ongoing transactions
-                            $action = '<i class="fas fa-spinner fa-spin fs-3 text-success"></i>';
-                        }
                     }
                 }
-                return $action; // Return all the accumulated buttons
+
+                return $action; // Return the action content
             })
             ->addColumn('pending_to', function($row) {
                 $groupName = ''; // Variable to hold the group name

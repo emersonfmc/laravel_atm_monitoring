@@ -116,7 +116,7 @@
                             <div class="col-md-3">
                                 <div class="form-group mb-3">
                                     <label class="fw-bold h6">Pension Number Type</label>
-                                    <select name="pension_type" id="pension_number_type" class="form-select" required>
+                                    <select name="pension_type" id="pension_type" class="form-select" required>
                                         <option value="" selected disabled>Pension Number Type</option>
                                         <option value="SSS">SSS</option>
                                         <option value="GSIS">GSIS</option>
@@ -127,7 +127,7 @@
                             <div class="col-md-3">
                                 <div class="form-group mb-3">
                                     <label class="fw-bold h6">Pension Account Type</label>
-                                    <select name="pension_account_type" id="pension_type" class="form-select select2" required disabled>
+                                    <select name="pension_account_type" id="pension_account_type" class="form-select select2" required disabled>
                                         <option value="" selected disabled>Pension Account Type</option>
                                     </select>
                                 </div>
@@ -139,7 +139,7 @@
                                     <select name="collection_date" id="collection_date" class="form-select" required>
                                         <option value="" selected disabled>Collection Date</option>
                                         @foreach ($DataCollectionDates as $DataCollectionDate)
-                                            <option value="{{ $DataCollectionDate->id }}">{{ $DataCollectionDate->collection_date }}</option>
+                                            <option value="{{ $DataCollectionDate->collection_date }}">{{ $DataCollectionDate->collection_date }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -810,7 +810,7 @@
                 }
             });
 
-            $('#pension_number_type').on('change', function() {
+            $('#pension_type').on('change', function() {
                 var selected_pension_types = $(this).val();
 
                 // Make the AJAX GET request
@@ -823,10 +823,10 @@
                     success: function(response) {
                         var options = '<option value="" selected disabled>Pension Types</option>';
                         $.each(response, function(index, item) {
-                            options += `<option value="${item.id}">${item.pension_name}</option>`;
+                            options += `<option value="${item.pension_name}">${item.pension_name}</option>`;
                         });
-                        $('#pension_type').prop('disabled', false); // Remove disabled attribute
-                        $('#pension_type').html(options); // Set the dropdown options
+                        $('#pension_account_type').prop('disabled', false); // Remove disabled attribute
+                        $('#pension_account_type').html(options); // Set the dropdown options
                     },
                     error: function(xhr, status, error) {
                         // Handle any errors
@@ -837,7 +837,7 @@
 
             $('#createClientModal').on('shown.bs.modal', function () {
                 $('#branch_id').select2({ dropdownParent: $('#createClientModal'), });
-                $('#pension_type').select2({  dropdownParent: $('#createClientModal') });
+                $('#pension_account_type').select2({  dropdownParent: $('#createClientModal') });
             });
 
             function closeCreateClientModal() {
