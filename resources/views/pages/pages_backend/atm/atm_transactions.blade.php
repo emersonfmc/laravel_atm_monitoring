@@ -434,10 +434,25 @@
                             var employee_id = rows.employee_id !== null ? rows.employee_id : '';
                             var employee_name = rows.employee && rows.employee.name ? rows.employee.name : '';
 
-                            var balance = rows.atm_transaction_approvals_balance_logs && rows.atm_transaction_approvals_balance_logs.balance !== null
-                                        ? new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(rows.atm_transaction_approvals_balance_logs.balance)
-                                        : '';
-                            balance = balance ? balance.replace('PHP', '₱ ') : '';
+                            // Load Inputmask if not already included in your environment
+                            if (typeof Inputmask !== 'undefined') {
+                                var balance = rows.atm_transaction_approvals_balance_logs && rows.atm_transaction_approvals_balance_logs.balance !== null
+                                    ? rows.atm_transaction_approvals_balance_logs.balance
+                                    : '';
+
+                                // Apply Inputmask to format the balance if it's not empty
+                                if (balance !== '') {
+                                    balance = Inputmask.format(balance, {
+                                        alias: 'numeric',
+                                        prefix: '₱ ',
+                                        groupSeparator: ',',
+                                        autoGroup: true,
+                                        digits: 2,
+                                        digitsOptional: false,
+                                        placeholder: '0'
+                                    });
+                                }
+                            }
 
                             var remarks = rows.atm_transaction_approvals_balance_logs && rows.atm_transaction_approvals_balance_logs.remarks !== null
                                         ? rows.atm_transaction_approvals_balance_logs.remarks

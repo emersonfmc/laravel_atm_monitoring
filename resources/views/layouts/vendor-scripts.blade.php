@@ -46,12 +46,6 @@
     });
 </script>
 
-<script>
-    $(document).ready(function(){
-        $('.select2_dropdown').select2();
-    });
-</script>
-
 @yield('script')
 
 <!-- App js -->
@@ -69,49 +63,33 @@
 <script src="{{ URL::asset('assets/libs/jquery-validation/jquery-validation.min.js') }}"></script>
 <script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js') }}"></script>
 
-
-
 <script src="{{ URL::asset('/assets/js/pages/ecommerce-select2.init.js') }}"></script>
 <script src="{{ URL::asset('/assets/js/pages/add_script.js') }}"></script>
 
-
-
-
-@if (session('success'))
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: '{{ session('success') }}',
+    $(document).ready(function() {
+        $(".contactnumber").inputmask({
+            mask: '+6399-99-999-999',
+            placeholder: '0',
+        });
+
+        $('.balance_input_mask').inputmask({
+            'alias': 'currency',
+            allowMinus: false,
+            'prefix': "₱ ",
+            max: 999999999999.99,
+        });
+
+        $(".atm_card_input_mask").inputmask({
+            mask: '9999-9999-9999-9999-9999', // Custom mask for the card number
+            placeholder: '', // Placeholder to show the expected format
+            showMaskOnHover: false,  // Hide the mask when the user is not interacting with the field
+            showMaskOnFocus: true,   // Show the mask when the field is focused
+            rightAlign: false       // Align the input to the left
         });
     });
 </script>
-@endif
 
-@if (session('message'))
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: '{{ session('message') }}',
-        });
-    });
-</script>
-@endif
-
-@if (session('error'))
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        Swal.fire({
-            icon: 'error',
-            title: 'Something Wrong',
-            text: '{{ session('error') }}',
-        });
-    });
-</script>
-@endif
 
 
 @yield('script-bottom')
