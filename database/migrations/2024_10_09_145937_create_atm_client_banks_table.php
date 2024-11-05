@@ -32,6 +32,8 @@ return new class extends Migration
             $table->integer('replacement_count')->default(0);
 
             $table->enum('location',['Branch','Head Office','Released','Safekeep'])->nullable();
+            $table->enum('status',['0','1','2','3','4','5','6','7','8','9','10','11'])->nullable();
+            $table->enum('passbook_for_collection',['yes','no'])->nullable();
 
             $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('client_information_id')->references('id')->on('client_information')->onDelete('set null')->onUpdate('cascade');

@@ -232,12 +232,32 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'atm_status',
                     name: 'atm_status',
                     render: function(data, type, row, meta) {
-                        return data ? `<span>${data}</span>` : '';
+                        let BankStatus = ''; // Define BankStatus outside the if block with a default value
+                        let atmTypeClass = ''; // Variable to hold the class based on atm_type
+
+                        BankStatus = row.atm_status;
+
+                        // Determine the text color based on atm_type
+                        switch (row.atm_type) {
+                            case 'ATM':
+                                atmTypeClass = 'text-primary';
+                                break;
+                            case 'Passbook':
+                                atmTypeClass = 'text-danger';
+                                break;
+                            case 'Sim Card':
+                                atmTypeClass = 'text-info';
+                                break;
+                            default:
+                                atmTypeClass = 'text-secondary'; // Default color if none match
+                        }
+
+                        return `<span class="${atmTypeClass}">${row.atm_type}</span><br>
+                                <span class="fw-bold h6">${BankStatus}</span>`;
                     },
                     orderable: true,
                     searchable: true,

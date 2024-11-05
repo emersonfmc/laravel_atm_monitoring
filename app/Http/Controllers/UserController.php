@@ -248,6 +248,77 @@ class UserController extends Controller
         // }
     }
 
+    public function users_profile($employee_id)
+    {
+        $user = User::with('Branch','District','Area','UserGroup')->findOrFail($employee_id);
+
+        return view('auth.profile',compact('user'));
+    }
+
+    public function users_profile_update(Request $request, $employee_id)
+    {
+        $User = User::findOrFail($request->item_id);
+        // Check if the password and confirm password match
+        if ($request->password !== $request->confirm_password) {
+            $notification = [
+                'error' => 'Passwords do not match!',
+                'alert-type' => 'error',
+            ];
+            return redirect()
+                ->route('users.profile',$employee_id)
+                ->with($notification);
+        }
+        else
+        {
+            if (User::where('email', $request->email)->where('id', '!=', $User->id)->exists()) {
+                $notification = [
+                    'error' => 'Email already exists!',
+                    'alert-type' => 'error',
+                ];
+                return redirect()
+                    ->route('users.profile',$employee_id)
+                    ->with($notification);
+            }
+
+            // Check if the employee number already exists but exclude the current user's employee number
+            if (User::where('employee_id', $request->employee_id)->where('id', '!=', $User->id)->exists()) {
+                $notification = [
+                    'error' => 'Employee number already exists!',
+                    'alert-type' => 'error',
+                ];
+                return redirect()
+                    ->route('users.profile',$employee_id)
+                    ->with($notification);
+            }
+
+            $contact_no = preg_replace('/[^0-9]/', '', $request->contact_no);
+
+            // If password is provided, hash and update it; otherwise, keep the old password
+            $passwordUpdate = $request->password ? Hash::make($request->password) : $User->password;
+
+            // Update the user
+            $User->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'employee_id' => $request->employee_id,
+                'contact_no' => $contact_no,
+                'address' => $request->address,
+                'username' => $request->username,
+                'password' => $passwordUpdate, // Update with the hashed new password or keep the old one
+                'updated_at' => Carbon::now(),
+            ]);
+
+            $notification = [
+                'success' => 'Profile Updated successfully.',
+                'alert-type' => 'success',
+            ];
+            return redirect()
+                ->route('users.profile',$employee_id)
+                ->with($notification);
+
+        }
+    }
+
 
 
 

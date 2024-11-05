@@ -635,7 +635,28 @@
                     data: 'atm_status',
                     name: 'atm_status',
                     render: function(data, type, row, meta) {
-                        return data ? `<span>${data}</span>` : '';
+                        let BankStatus = ''; // Define BankStatus outside the if block with a default value
+                        let atmTypeClass = ''; // Variable to hold the class based on atm_type
+
+                        BankStatus = row.atm_status;
+
+                        // Determine the text color based on atm_type
+                        switch (row.atm_type) {
+                            case 'ATM':
+                                atmTypeClass = 'text-primary';
+                                break;
+                            case 'Passbook':
+                                atmTypeClass = 'text-danger';
+                                break;
+                            case 'Sim Card':
+                                atmTypeClass = 'text-info';
+                                break;
+                            default:
+                                atmTypeClass = 'text-secondary'; // Default color if none match
+                        }
+
+                        return `<span class="${atmTypeClass}">${row.atm_type}</span><br>
+                                <span class="fw-bold h6">${BankStatus}</span>`;
                     },
                     orderable: true,
                     searchable: true,
@@ -664,10 +685,12 @@
                     type: "GET",
                     data: { new_atm_id : new_atm_id },
                     success: function(data) {
-                        console.log(data);
                         let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
 
-                        $('#create_fullname').text(data.client_information.last_name +', '+ data.client_information.first_name +' '+ data.client_information.middle_name +' '+ data.client_information.suffix ?? '');
+                        $('#create_fullname').text(data.client_information.last_name +', '
+                                                    + data.client_information.first_name +' '
+                                                    +(data.client_information.middle_name ?? '') +' '
+                                                    + (data.client_information.suffix ?? ''));
 
                         $('#create_pension_number_display').text(data.client_information.pension_number ?? '');
                         $('#create_pension_number_display').inputmask("99-9999999-99");
@@ -711,7 +734,10 @@
                     success: function(data) {
                         let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
 
-                        $('#add_atm_fullname').text(data.client_information.last_name +', '+ data.client_information.first_name +' '+ data.client_information.middle_name +' '+ data.client_information.suffix ?? '');
+                        $('#add_atm_fullname').text(data.client_information.last_name +', '
+                                                    + data.client_information.first_name +' '
+                                                    +(data.client_information.middle_name ?? '') +' '
+                                                    + (data.client_information.suffix ?? ''));
 
                         $('#add_atm_pension_number_display').text(data.client_information.pension_number ?? '');
                         $('#add_atm_pension_number_display').inputmask("99-9999999-99");
@@ -758,7 +784,10 @@
                     success: function(data) {
                         let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
 
-                        $('#transfer_fullname').text(data.client_information.last_name +', '+ data.client_information.first_name +' '+ data.client_information.middle_name +' '+ data.client_information.suffix ?? '');
+                        $('#transfer_fullname').text(data.client_information.last_name +', '
+                                                    + data.client_information.first_name +' '
+                                                    +(data.client_information.middle_name ?? '') +' '
+                                                    + (data.client_information.suffix ?? ''));
 
                         $('#transfer_branch_id').val(data.branch_id ?? '').trigger('change');
 
@@ -930,6 +959,108 @@
                     }
                 }
             });
+
+            $(document).on('click', '.passbookForCollection', function(e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+
+                const atm_id = $(this).data('id'); // Get the ATM ID from the data attribute
+                const csrfToken = $('meta[name="csrf-token"]').attr('content'); // Get CSRF token
+
+                // SweetAlert confirmation
+                Swal.fire({
+                    icon: "question",
+                    title: 'Do you want to Add to Setup for Passbook for Collection?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('PassbookForCollectionSetup') }}",
+                            type: "POST",
+                            data: {
+                                atm_id: atm_id,
+                                _token: csrfToken // Include CSRF token in the request
+                            },
+                            success: function(response)
+                            {
+                                if (typeof response === 'string') {
+                                    var res = JSON.parse(response);
+                                } else {
+                                    var res = response; // If it's already an object
+                                }
+
+                                if (res.status === 'success')
+                                {
+                                    closeTransactionModal();
+                                    Swal.fire({
+                                        title: 'Successfully Updated!',
+                                        text:  res.message,
+                                        icon: 'success',
+                                        showCancelButton: false,
+                                        showConfirmButton: true,
+                                        confirmButtonText: 'OK',
+                                        preConfirm: () => {
+                                            return new Promise(( resolve
+                                            ) => {
+                                                Swal.fire({
+                                                    title: 'Please Wait...',
+                                                    allowOutsideClick: false,
+                                                    allowEscapeKey: false,
+                                                    showConfirmButton: false,
+                                                    showCancelButton: false,
+                                                    didOpen: () => {
+                                                        Swal.showLoading();
+                                                        // here the reload of datatable
+                                                        dataTable.table.ajax.reload( () =>
+                                                        {
+                                                            Swal.close();
+                                                            $(form)[0].reset();
+                                                            dataTable.table.page(currentPage).draw( false );
+                                                        },
+                                                        false );
+                                                    }
+                                                })
+                                            });
+                                        }
+                                    });
+                                }
+                                else if (res.status === 'error')
+                                {
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: res.message,
+                                        icon: 'error',
+                                    });
+                                }
+                                else
+                                {
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: 'Error Occurred Please Try Again',
+                                        icon: 'error',
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error)
+                            {
+                                var errorMessage ='An error occurred. Please try again later.';
+                                if (xhr.responseJSON && xhr.responseJSON
+                                    .error) {
+                                    errorMessage = xhr.responseJSON.error;
+                                }
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: errorMessage,
+                                    icon: 'error',
+                                });
+                            }
+                        });
+                    }
+
+                });
+            });
+
 
             function closeTransactionModal() {
                 $('#createTransactionModal').modal('hide');
