@@ -11,9 +11,11 @@ class AtmClientBanksFactory extends Factory
 
     public function definition()
     {
+        $atmType = $this->faker->randomElement(['ATM', 'Passbook']);
+
         return [
             'client_information_id' => null, // This will be filled in by ClientInformationFactory
-            'atm_type' => $this->faker->randomElement(['ATM', 'Passbook']),
+            'atm_type' => $atmType,
             'bank_name' => $this->faker->randomElement(['BDO', 'BPI', 'RCBC']),
             'bank_account_no' => $this->faker->unique()->numerify('################'),
             'pin_no' => $this->faker->unique()->numerify('########'),
@@ -24,6 +26,8 @@ class AtmClientBanksFactory extends Factory
             'safekeep_cash_box_no' => null,
             'location' => 'Head Office',
             'branch_id' => null, // This will be set to the client's branch_id in ClientInformationFactory
+            'status' => 1,
+            'passbook_for_collection' => $atmType === 'Passbook' ? 'no' : null,
         ];
     }
 }
