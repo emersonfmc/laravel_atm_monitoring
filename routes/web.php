@@ -116,6 +116,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/HeadOfficePage', 'HeadOfficePage')->name('HeadOfficePage');
         Route::get('/HeadOfficeData', 'HeadOfficeData')->name('HeadOfficeData');
 
+        Route::get('/SafekeepPage', 'SafekeepPage')->name('SafekeepPage');
+        Route::get('/SafekeepData', 'SafekeepData')->name('SafekeepData');
+
+        Route::get('/ReleasedPage', 'ReleasedPage')->name('ReleasedPage');
+        Route::get('/ReleasedData', 'ReleasedData')->name('ReleasedData');
+
         Route::post('/PassbookForCollectionSetup', 'PassbookForCollectionSetup')->name('PassbookForCollectionSetup');
     });
 });

@@ -26,7 +26,7 @@ class AtmClientBanksFactory extends Factory
             'safekeep_cash_box_no' => null,
             'location' => 'Head Office',
             'branch_id' => null, // This will be set to the client's branch_id in ClientInformationFactory
-            'status' => 1,
+            'status' => '1',
             'passbook_for_collection' => $atmType === 'Passbook' ? 'no' : null,
         ];
     }
