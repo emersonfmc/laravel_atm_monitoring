@@ -458,7 +458,32 @@
                                         ? rows.atm_transaction_approvals_balance_logs.remarks
                                         : '';
 
-                            var status = rows.status === 'Others Account' ? 'Completed' : rows.status;
+                            var badgeClass = '';
+                            var StatusName = '';
+
+                            switch (rows.status) {
+                                case 'Completed':
+                                case 'Others Account':
+                                    badgeClass = 'badge bg-success';
+                                    StatusName = 'Completed';
+                                    break;
+                                case 'Pending':
+                                    badgeClass = 'badge bg-warning';
+                                    StatusName = 'Pending';
+                                    break;
+                                case 'Stand By':
+                                    badgeClass = 'badge bg-primary';
+                                    StatusName = 'Stand By';
+                                    break;
+                                case 'Cancelled':
+                                    badgeClass = 'badge bg-danger';
+                                    StatusName = 'Cancelled';
+                                    break;
+                                default:
+                                    badgeClass = 'badge bg-secondary'; // Default badge in case of unexpected status
+                                    StatusName = status;
+                                    break;
+                            }
 
                             // Format the date_approved if it's not null
                             var dateApproved = rows.date_approved ? new Date(rows.date_approved).toLocaleString('en-US', {
@@ -470,6 +495,7 @@
                                 hour12: true
                             }) : ''; // Leave blank if null
 
+                            // Construct the new row with the status badge
                             var newRow = '<tr>' +
                                 '<td>' + rows.id + '</td>' +
                                 '<td>' + employee_id + '</td>' +
@@ -479,9 +505,10 @@
                                 '<td>' + balance + '</td>' +
                                 '<td>' + remarks + '</td>' +
                                 '<td>' + '' + '</td>' +
-                                '<td>' + status + '</td>' + // Use formatted date here
-                                '<td>' + dateApproved + '</td>' + // Use formatted date here
+                                '<td><span class="' + badgeClass + '">' + StatusName + '</span></td>' + // Display status with badge
+                                '<td>' + dateApproved + '</td>' +
                                 '</tr>';
+
 
                             $('#TransactionApprovalBody').append(newRow);
                         });
