@@ -140,13 +140,13 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" key="atm_released_atm">
+                            <a href="{{  route('ReleasedPage') }}" key="atm_released_atm">
                                 <span class="badge rounded-pill float-start me-2 text-dark" style="background: #00CC99;">20</span>
                                 Released ATM
                             </a>
                         </li>
                         <li>
-                            <a href="#" key="atm_safekeep_atm">
+                            <a href="{{ route('SafekeepPage') }}" key="atm_safekeep_atm">
                                 <span class="badge rounded-pill float-start me-2" style="background: #00008B;">20</span>
                                 Safekeep ATM
                             </a>

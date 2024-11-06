@@ -32,7 +32,16 @@ return new class extends Migration
             $table->integer('replacement_count')->default(0);
 
             $table->enum('location',['Branch','Head Office','Released','Safekeep'])->nullable();
-            $table->enum('status',['0','1','2','3','4','5','6','7','8','9','10','11'])->nullable();
+            $table->enum('status',['0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18'])
+                    ->default('1')
+                    ->comment('0 = Release
+                               1 = Active
+                               2 = Release to Client
+                               3 = Released ATM to client and Become Return Client but in Another ATM
+                               4 = Return Client Same ATM
+                               5 = Old ATM Did Not Return by Bank
+                               6 = Safekeep');
+
             $table->enum('passbook_for_collection',['yes','no'])->nullable();
 
             $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade')->onUpdate('cascade');
