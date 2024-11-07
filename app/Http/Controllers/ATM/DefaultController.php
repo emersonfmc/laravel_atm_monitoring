@@ -23,7 +23,7 @@ class DefaultController extends Controller
     public function AtmClientFetch(Request $request)
     {
         $new_atm_id = $request->new_atm_id;
-        $AtmClientBanks = AtmClientBanks::with('ClientInformation','Branch')->findOrFail($new_atm_id);
+        $AtmClientBanks = AtmClientBanks::with('ClientInformation','ClientInformation.AtmClientBanks','Branch')->findOrFail($new_atm_id);
         return response()->json($AtmClientBanks);
     }
 }
