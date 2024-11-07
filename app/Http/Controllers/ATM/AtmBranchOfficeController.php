@@ -77,7 +77,7 @@ class AtmBranchOfficeController extends Controller
                         // Generate buttons based on `transaction_actions_id`
                         if ($latestTransaction->transaction_actions_id == 3 || $latestTransaction->transaction_actions_id == 9) {
                             $action = '<button type="button" class="btn btn-success release_transaction"
-                                            data-atm_id="'.$row->id.'"
+                                            data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="right"
                                             title="Releasing of Transaction">
@@ -86,7 +86,7 @@ class AtmBranchOfficeController extends Controller
                         }
                         else if ($latestTransaction->transaction_actions_id == 1) {
                             $action = '<button type="button" class="btn btn-warning borrow_transaction"
-                                            data-atm_id="'.$row->id.'"
+                                            data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="right"
                                             title="Returning of Borrow Transaction">
@@ -95,7 +95,7 @@ class AtmBranchOfficeController extends Controller
                         }
                         else if ($latestTransaction->transaction_actions_id == 11) {
                             $action = '<button type="button" class="btn btn-primary replacement_atm_transaction"
-                                            data-atm_id="'.$row->id.'"
+                                            data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="right"
                                             title="Replacement of ATM / Passbook Transaction">
@@ -104,7 +104,7 @@ class AtmBranchOfficeController extends Controller
                         }
                         else if ($latestTransaction->transaction_actions_id == 13) {
                             $action = '<button type="button" class="btn btn-danger cancelled_loan_transaction"
-                                            data-atm_id="'.$row->id.'"
+                                            data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="right"
                                             title="Cancelled Loan Transaction">
@@ -113,7 +113,7 @@ class AtmBranchOfficeController extends Controller
                         }
                         else if ($latestTransaction->transaction_actions_id == 16) {
                             $action = '<button type="button" class="btn btn-danger release_balance_transaction"
-                                            data-atm_id="'.$row->id.'"
+                                            data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="right"
                                             title="Release with Outstanding Balance Transaction">

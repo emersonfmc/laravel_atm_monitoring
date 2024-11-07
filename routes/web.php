@@ -10,6 +10,7 @@ use App\Http\Controllers\ATM\DefaultController;
 use App\Http\Controllers\ATM\AtmHeadOfficeController;
 use App\Http\Controllers\ATM\AtmTransactionController;
 use App\Http\Controllers\ATM\AtmBranchOfficeController;
+use App\Http\Controllers\ATM\PassbookCollectionController;
 
 Auth::routes();
 
@@ -156,5 +157,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         // Route::resource('products', ProductController::class);
     });
 });
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::controller(PassbookCollectionController::class)->group(function () {
+        Route::get('/PassbookCollectionSetUpPage', 'PassbookCollectionSetUpPage')->name('PassbookCollectionSetUpPage');
+        Route::get('/PassbookCollectionData', 'PassbookCollectionData')->name('PassbookCollectionData');
+    });
+});
+
+
 
 

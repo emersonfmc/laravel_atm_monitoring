@@ -178,7 +178,7 @@
                                 key="pb_for_collection"><i class="fas fa-book" style="color: #cc2424;"></i>PB For Collection</a>
                             <ul class="sub-menu" aria-expanded="true">
                                 <li>
-                                    <a href="#" key="pb_setup">
+                                    <a href="{{ route('PassbookCollectionSetUpPage') }}" key="pb_setup">
                                         <i class="fas fa-plus-circle fs-6 text-primary"></i>SETUP
                                     </a>
                                 </li>

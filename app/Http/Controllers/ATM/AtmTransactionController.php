@@ -40,7 +40,7 @@ class AtmTransactionController extends Controller
                 'AtmBanksTransactionApproval.DataUserGroup',
                 'Branch'
             ])
-            ->latest('created_at')
+            ->latest('updated_at')
             ->get();
 
         return DataTables::of($AtmBanksTransaction)
@@ -79,6 +79,17 @@ class AtmTransactionController extends Controller
                                     <i class="fas fa-times-circle fs-5"></i>
                                  </a>';
                     }
+                }
+
+                if (in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin'])) {
+                    // Add button for creating a transaction
+                    $action .= '<a href="#" class="text-success editAdminTransaction me-2 mb-2"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Edit Transaction"
+                                    data-id="' . $row->id . '">
+                                    <i class="fas fa-edit fs-5"></i>
+                                 </a>';
                 }
                 return $action; // Return all the accumulated buttons
             })
@@ -164,19 +175,86 @@ class AtmTransactionController extends Controller
         else
         {
             // Releasing
-            if($reason_for_pull_out == '20' || $reason_for_pull_out == '25')
+            if($reason_for_pull_out == 3 || $reason_for_pull_out == 16)
             {
                 // Releasing with Balance
                 if($reason_for_pull_out == '16') {
-                    $reason = 'Releasing of ATM/PB/Simcard With Outstanding Balance';
+                    $reason = 'Release With Balance';
                 } else {
-                    $reason = $release_reason;
+                    $reason = 'Release';
+                }
+
+                $selected_atm_ids = $request->atm_checkboxes; // Array of checked ATM IDs
+
+                if (is_array($selected_atm_ids) && count($selected_atm_ids) > 0) {
+                    foreach ($selected_atm_ids as $selected_atm_id) {
+                        // Fetch the ATM client bank with status 1
+                        $SelectedAtmClientBanks = AtmClientBanks::findOrFail($selected_atm_id);
+                        $SelectedAtmClientBanks->update([ 'updated_at' => Carbon::now(), ]);
+
+                        // Retrieve details from the selected ATM client bank
+                        $FetchTransactionNumber = $SelectedAtmClientBanks->transaction_number;
+                        $FetchBankAccountNumber = $SelectedAtmClientBanks->bank_account_no;
+                        $FetchBankAtmType = $SelectedAtmClientBanks->atm_type;
+                        $FetchBranchId = $SelectedAtmClientBanks->branch_id;
+
+                        // Create a new AtmBanksTransaction entry
+                        $AtmBanksTransaction = AtmBanksTransaction::create([
+                            'client_banks_id' => $selected_atm_id,
+                            'transaction_actions_id' => $reason_for_pull_out,
+                            'request_by_employee_id' => Auth::user()->employee_id,
+                            'transaction_number' => $FetchTransactionNumber,
+                            'atm_type' => $FetchBankAtmType,
+                            'bank_account_no' => $FetchBankAccountNumber ?? NULL,
+                            'branch_id' => $FetchBranchId,
+                            'aprb_no' => $aprb_no ?? NULL,
+                            'status' => 'ON GOING',
+                            'reason' => $reason ?? NULL,
+                            'reason_remarks' => $release_reason ?? NULL,
+                            'yellow_copy' => NULL,
+                            'released_client_images_id' => NULL,
+                            'created_at' => Carbon::now(),
+                        ]);
+
+                        // Retrieve transaction sequences for approvals
+                        $AtmTransactionSequences = AtmTransactionSequence::where('atm_transaction_actions_id', $reason_for_pull_out)
+                            ->orderBy('sequence_no')
+                            ->get();
+
+                        foreach ($AtmTransactionSequences as $transactionSequence) {
+                            // Set the status based on the sequence number
+                            $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
+
+                            // Create approval entries for the transaction
+                            AtmBanksTransactionApproval::create([
+                                'banks_transactions_id' => $AtmBanksTransaction->id,
+                                'transaction_actions_id' => 5,
+                                'employee_id' => NULL,
+                                'date_approved' => NULL,
+                                'user_groups_id' => $transactionSequence->user_group_id,
+                                'sequence_no' => $transactionSequence->sequence_no,
+                                'status' => $status,
+                                'type' => $transactionSequence->type,
+                                'created_at' => Carbon::now(),
+                            ]);
+                        }
+
+                        // Create a balance log entry for the transaction
+                        AtmTransactionBalanceLogs::create([
+                            'banks_transactions_id' => $AtmBanksTransaction->id,
+                            'check_by_user_id' => Auth::user()->id,
+                            'balance' => 0,
+                            'remarks' => $remarks ?? NULL,
+                            'created_at' => Carbon::now(),
+                        ]);
+                    }
                 }
             }
             else
             {
                 if($reason_for_pull_out == '1') {
                     $reason = 'Borrow ATM/PB';
+                    $remarks = $borrow_reason;
                 } else if($reason_for_pull_out == '13')
                 {
                     $reason = 'Cancelled Loan';
