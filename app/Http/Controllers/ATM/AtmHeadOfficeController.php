@@ -93,7 +93,8 @@ class AtmHeadOfficeController extends Controller
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="top"
                                             title="Create Transaction"
-                                            data-id="' . $row->id . '">
+                                            data-id="' . $row->id . '
+                                            data-client_id="' . $row->ClientInformation->id . '">
                                         <i class="fas fa-plus-circle"></i>
                                      </a>
                                      <a href="#" class="btn btn-success addAtmTransaction me-2 mb-2"
