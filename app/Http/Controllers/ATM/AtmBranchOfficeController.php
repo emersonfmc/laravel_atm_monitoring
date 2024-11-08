@@ -4,8 +4,10 @@ namespace App\Http\Controllers\ATM;
 
 use Illuminate\Http\Request;
 use App\Models\AtmClientBanks;
+use App\Models\DataCollectionDate;
 use App\Http\Controllers\Controller;
 use App\Models\AtmTransactionAction;
+use App\Models\DataBankLists;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -13,7 +15,10 @@ class AtmBranchOfficeController extends Controller
 {
     public function BranchOfficePage()
     {
-        return view('pages.pages_backend.atm.atm_branch_office_atm_lists');
+        $DataCollectionDate = DataCollectionDate::where('status','Active')->get();
+        $DataBankLists = DataBankLists::where('status','Active')->get();
+
+        return view('pages.pages_backend.atm.atm_branch_office_atm_lists', compact('DataCollectionDate','DataBankLists'));
     }
 
     public function BranchOfficeData()

@@ -22,28 +22,44 @@ class AtmTransactionController extends Controller
 {
     public function TransactionPage()
     {
+        $branch_id = Auth::user()->branch_id;
 
         $Branches = Branch::where('status', 'Active')->get();
         $AtmTransactionAction = AtmTransactionAction::where('status', 'Active')->get();
 
-        return view('pages.pages_backend.atm.atm_transactions', compact('Branches','AtmTransactionAction'));
+        return view('pages.pages_backend.atm.atm_transactions', compact('Branches','AtmTransactionAction','branch_id'));
     }
 
-    public function TransactionData()
+    public function TransactionData(Request $request)
     {
         $userGroup = Auth::user()->UserGroup->group_name;
+        $branch_id = Auth::user()->branch_id;
 
-        $AtmBanksTransaction = AtmBanksTransaction::with([
-                'AtmClientBanks',
-                'AtmClientBanks.ClientInformation',
-                'AtmTransactionAction',
-                'AtmBanksTransactionApproval.DataUserGroup',
-                'Branch'
-            ])
-            ->latest('updated_at')
-            ->get();
+        // Start building the query with conditional branch, transaction, and status filters
+        $query = AtmBanksTransaction::with([
+            'AtmClientBanks',
+            'AtmClientBanks.ClientInformation',
+            'AtmTransactionAction',
+            'AtmBanksTransactionApproval.DataUserGroup',
+            'Branch'
+        ])->latest('updated_at');
 
-        return DataTables::of($AtmBanksTransaction)
+        // Apply branch filter based on user branch_id or request input
+        if ($branch_id) {
+            $query->where('branch_id', $branch_id);
+        } elseif ($request->filled('branch_id')) {
+            $query->where('branch_id', $request->branch_id);
+        }
+
+        if ($request->filled('transaction_actions_id')) {
+            $query->where('transaction_actions_id', $request->transaction_actions_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        return DataTables::of($query)
             ->setRowId('id')
             ->addColumn('action', function($row) use ($userGroup) {
                 $action = ''; // Initialize a variable to hold the buttons

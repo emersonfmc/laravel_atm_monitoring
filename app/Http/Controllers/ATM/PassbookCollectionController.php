@@ -41,6 +41,7 @@ class PassbookCollectionController extends Controller
         $PassbookCollectionData = $query->get();
 
         return DataTables::of($PassbookCollectionData)
-            ->setRowId('id');
+            ->setRowId('id')
+            ->make(true);
     }
 }
