@@ -1078,6 +1078,8 @@
                             district_id: selectedDistrict
                         },
                         success: function(response) {
+                            console.log('AJAX Response:', response); // Log the response
+
                             var options = '<option value="">Select Area Supervisor</option>'; // Default option
 
                             $.each(response, function(index, item) {

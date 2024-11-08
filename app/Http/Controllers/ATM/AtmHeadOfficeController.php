@@ -15,7 +15,6 @@ use App\Models\DataCollectionDate;
 use App\Http\Controllers\Controller;
 use App\Models\AtmTransactionAction;
 use Illuminate\Support\Facades\Auth;
-use App\Models\DataPensionTypesLists;
 use Yajra\DataTables\Facades\DataTables;
 
 class AtmHeadOfficeController extends Controller
@@ -32,17 +31,15 @@ class AtmHeadOfficeController extends Controller
         $DataBankLists = DataBankLists::where('status','Active')->get();
         $DataCollectionDate = DataCollectionDate::where('status','Active')->get();
         $Branches = Branch::where('status','Active')->get();
-        $AtmTransactionAction = AtmTransactionAction::where('transaction','1')->where('status','Active')->get();
-        $DataReleaseOption = DataReleaseOption::where('status','Active')->get();
-        $DataPensionTypesLists = DataPensionTypesLists::where('status','Active')->get();
 
-        return view('pages.pages_backend.atm.atm_head_office_atm_lists',
-                    compact('AtmTransactionAction',
-                            'DataReleaseOption',
-                            'DataBankLists',
-                            'DataCollectionDate',
-                            'Branches',
-                            'DataPensionTypesLists'));
+        $AtmTransactionAction = AtmTransactionAction::where('transaction','1')
+            ->where('status','Active')
+            ->get();
+
+        $DataReleaseOption = DataReleaseOption::where('status','Active')
+            ->get();
+
+        return view('pages.pages_backend.atm.atm_head_office_atm_lists', compact('AtmTransactionAction','DataReleaseOption','DataBankLists','DataCollectionDate','Branches'));
     }
 
     public function HeadOfficeData()
