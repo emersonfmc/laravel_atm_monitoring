@@ -29,7 +29,7 @@
                     </div>
                     <hr>
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-3">
                                 <div class="form-group">
                                     <label class="fw-bold h6">Branch</label>
                                     <select name="branch_id" id="branch_id" class="form-select select2">
@@ -43,13 +43,14 @@
                                 <div class="form-group">
                                     <label class="fw-bold h6">Transaction</label>
                                     <select name="transaction_id" id="transaction_id" class="form-select select2">
+                                        <option value="">Select Transaction</option>
                                         @foreach ($AtmTransactionAction as $transaction)
                                             <option value="{{ $transaction->id }}">{{ $transaction->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label class="fw-bold h6">Status</label>
                                     <select name="status" id="status_select" class="form-select">
@@ -57,6 +58,13 @@
                                         <option value="CANCELLED">CANCELLED</option>
                                         <option value="COMPLETED">COMPLETED</option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2" style="margin-top: 25px;">
+                                <div class="form-group">
+                                    <a href="#" class="btn btn-primary">
+                                        Filter
+                                    </a>
                                 </div>
                             </div>
                         </div>

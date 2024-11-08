@@ -40,6 +40,7 @@ class AtmBranchOfficeController extends Controller
             ->setRowId('id')
             ->addColumn('action', function($row) use ($userGroup) {
                 $hasOngoingTransaction = false;
+                $latestTransaction = null;
                 $latestTransactionId = null;
                 $action = ''; // Initialize a variable to hold the buttons
 
@@ -119,6 +120,9 @@ class AtmBranchOfficeController extends Controller
                                             title="Release with Outstanding Balance Transaction">
                                           <i class="fas fa-sign-in-alt"></i>
                                         </button>';
+                        }
+                        else {
+                            $action = '';
                         }
                     }
                 }
