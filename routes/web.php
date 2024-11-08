@@ -97,6 +97,11 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'settings'], functio
         Route::post('/release/reason/create', 'release_reason_create')->name('settings.release.reason.create');
         Route::post('/release/reason/update', 'release_reason_update')->name('settings.release.reason.update');
 
+        Route::get('/collection_date/page', 'collection_date_page')->name('settings.collection.date.page');
+        Route::get('/collection_date/data', 'collection_date_data')->name('settings.collection.date.data');
+        Route::get('/collection/date/get/{id}', 'collection_date_get')->name('settings.collection.date.get');
+        Route::post('/collection/date/create', 'collection_date_create')->name('settings.collection.date.create');
+        Route::post('/collection/date/update', 'collection_date_update')->name('settings.collection.date.update');
         Route::get('/login_get_test', 'login_page')->name('login.page.test');
     });
 });

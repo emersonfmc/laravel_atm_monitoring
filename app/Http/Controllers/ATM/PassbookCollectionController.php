@@ -12,12 +12,12 @@ class PassbookCollectionController extends Controller
 {
     public function PassbookCollectionSetUpPage()
     {
-        $AtmClientBanks = AtmClientBanks::with('ClientInformation', 'Branch', 'AtmBanksTransaction')
-        ->where('passbook_for_collection', 'yes')
-        ->latest('updated_at')
-        ->get();
+        // $AtmClientBanks = AtmClientBanks::with('ClientInformation', 'Branch', 'AtmBanksTransaction')
+        // ->where('passbook_for_collection', 'yes')
+        // ->latest('updated_at')
+        // ->get();
 
-        dd($AtmClientBanks);
+        // dd($AtmClientBanks);
         return view('pages.pages_backend.passbook.passbook_setup');
     }
 

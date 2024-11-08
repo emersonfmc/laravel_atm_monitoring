@@ -9,7 +9,7 @@
 
     @component('components.breadcrumb')
         @slot('li_1') Settings @endslot
-        @slot('title') Bank @endslot
+        @slot('title') Collection Date @endslot
     @endcomponent
 
     <div class="row">
@@ -19,15 +19,16 @@
 
                     <div class="row">
                         <div class="col-md-8 text-start">
-                            <h4 class="card-title">Bank</h4>
+                            <h4 class="card-title">Collection</h4>
                             <p class="card-title-desc">
-                                A list of banks and their details, providing easy access to
-                                information for financial management and services
+                                The Collection Date refers to the scheduled date when funds or payments are collected.
+                                This date is essential for ensuring timely transactions, It allows recipients and institutions to
+                                manage finances accurately and maintain records efficiently.
                             </p>
                         </div>
                         <div class="col-md-4 text-end">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createBankModal"><i
-                                class="fas fa-plus-circle me-1"></i> Create Banks</button>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCollectionDateModal"><i
+                                class="fas fa-plus-circle me-1"></i> Create Collection Date</button>
                         </div>
                     </div>
                     <hr>
@@ -57,26 +58,26 @@
     </div> <!-- end row -->
 
 
-    <div class="modal fade" id="createBankModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    <div class="modal fade" id="createCollectionDateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="createBankLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-uppercase" id="createBankLabel">Create Bank</h5>
-                    <button type="button" class="btn-close closeCreateBankModal" data-bs-dismiss="modal"
+                    <h5 class="modal-title fw-bold text-uppercase" id="createBankLabel">Create Collection Date</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" action="{{ route('settings.bank.create') }}" id="addBankForm">
+                    <form method="post" action="{{ route('settings.collection.date.create') }}" id="createCollectionDateForm">
                         @csrf
 
                         <div class="form-group mb-2">
-                            <label class="fw-bold h6">Bank Name</label>
-                            <input type="text" name="bank_name" id="bank_name" class="form-control" placeholder="Bank Name" minlength="0" maxlength="50" required>
+                            <label class="fw-bold h6">Collection Date</label>
+                            <input type="text" name="collection_date" id="collection_date" class="form-control" placeholder="Collection Date" minlength="0" maxlength="50" required>
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary closeCreateBankModal" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </form>
@@ -85,27 +86,35 @@
         </div>
     </div>
 
-    <div class="modal fade" id="updateBankModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    <div class="modal fade" id="updateCollectionDateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="createBankLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-uppercase">Update Bank</h5>
-                    <button type="button" class="btn-close closeUpdateBankModal" data-bs-dismiss="modal"
+                    <h5 class="modal-title fw-bold text-uppercase">Update Collection Date</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" action="{{ route('settings.bank.update')  }}" id="updateBankForm">
+                    <form method="post" action="{{ route('settings.collection.date.update')  }}" id="updateCollectionDateForm">
                         @csrf
                         <input type="hidden" id="item_id" name="item_id">
 
                         <div class="form-group mb-2">
-                            <label class="fw-bold h6">Bank Name</label>
-                            <input type="text" name="bank_name" id="bank_name_update" class="form-control" placeholder="Bank Name" minlength="0" maxlength="50" required>
+                            <label class="fw-bold h6">Collection Date</label>
+                            <input type="text" name="collection_date" id="collection_date_update" class="form-control" placeholder="Collection Date" minlength="0" maxlength="50" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="fw-bold h6">Status</label>
+                            <select name="status" id="status_update" class="form-select" required>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary closeUpdateBankModal" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-success">Update</button>
                         </div>
                     </form>
@@ -119,7 +128,7 @@
             var SettingsBanksTableBody = $('#FetchingDatatable tbody');
 
             const dataTable = new ServerSideDataTable('#FetchingDatatable');
-            var url = '{!! route('settings.bank.data') !!}';
+            var url = '{!! route('settings.collection.date.data') !!}';
             const buttons = [{
                 text: 'Delete',
                 action: function(e, dt, node, config) {
@@ -138,8 +147,8 @@
                     searchable: true,
                 },
                 {
-                    data: 'bank_name',
-                    name: 'bank_name',
+                    data: 'collection_date',
+                    name: 'collection_date',
                     render: function(data, type, row, meta) {
                         return '<span class="fw-bold h6 text-primary">' + data + '</span>';
                     },
@@ -194,22 +203,22 @@
             ];
             dataTable.initialize(url, columns);
 
-            function closeAddBankModal() {
-                $('#createBankModal').modal('hide');
+            function closeCreateModal() {
+                $('#createCollectionDateModal').modal('hide');
                 $('#FetchingDatatable tbody').empty();
             }
 
-            function closeUpdateBankModal() {
-                $('#updateBankModal').modal('hide');
+            function closeUpdateModal() {
+                $('#updateCollectionDateModal').modal('hide');
                 $('#FetchingDatatable tbody').empty();
             }
 
-            $('#addBankForm').validate({
+            $('#createCollectionDateForm').validate({
                 rules: {
-                    bank_name: { required: true },
+                    collection_data: { required: true },
                 },
                 messages: {
-                    bank_name: { required: 'Please Enter Bank Name' },
+                    collection_data: { required: 'Please Enter Collection Date' },
                 },
                 errorElement: 'span',
                 errorPlacement: function(error, element) {
@@ -241,10 +250,10 @@
                                     type: form.method,
                                     data: $(form).serialize(),
                                     success: function(response) {
-                                        closeAddBankModal();
+                                        closeCreateModal();
                                         Swal.fire({
                                             title: 'Successfully Added!',
-                                            text: 'Bank is successfully Updated!',
+                                            text: 'Collection Date is successfully Updated!',
                                             icon: 'success',
                                             showCancelButton: false,
                                             showConfirmButton: true,
@@ -304,25 +313,24 @@
             $('#FetchingDatatable').on('click', '.editBtn', function(e) {
                 e.preventDefault();
                 var itemID = $(this).data('id');
-                console.log(itemID);
 
-                var url = "/settings/bank/get/" + itemID;
+                var url = "/settings/collection/date/get/" + itemID;
 
                 $.get(url, function(data) {
-                    console.log(data);
                     $('#item_id').val(data.id);
-                    $('#bank_name_update').val(data.bank_name);
+                    $('#status_update').val(data.status).trigger('change');
+                    $('#collection_date_update').val(data.collection_date);
 
-                    $('#updateBankModal').modal('show');
+                    $('#updateCollectionDateModal').modal('show');
                 });
             });
 
-            $('#updateBankForm').validate({
+            $('#updateCollectionDateForm').validate({
                 rules: {
-                    bank_name: { required: true },
+                    collection_date: { required: true },
                 },
                 messages: {
-                    bank_name: { required: 'Please Enter Bank Name' },
+                    collection_date: { required: 'Please Enter Collection Date' },
                 },
                 errorElement: 'span',
                 errorPlacement: function(error, element) {
@@ -354,10 +362,10 @@
                                     type: form.method,
                                     data: $(form).serialize(),
                                     success: function(response) {
-                                        closeUpdateBankModal();
+                                        closeUpdateModal();
                                         Swal.fire({
                                             title: 'Successfully Updated!',
-                                            text: 'Bank is successfully Updated!',
+                                            text: 'Collection Date is successfully Updated!',
                                             icon: 'success',
                                             showCancelButton: false,
                                             showConfirmButton: true,
