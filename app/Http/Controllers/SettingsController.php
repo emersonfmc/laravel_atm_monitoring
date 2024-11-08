@@ -14,11 +14,12 @@ use App\Models\DataUserGroup;
 use Illuminate\Support\Carbon;
 
 use App\Models\DataReleaseOption;
+use App\Models\DataCollectionDate;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\AtmTransactionAction;
-use Illuminate\Support\Facades\Auth;
 
+use Illuminate\Support\Facades\Auth;
 use App\Models\DataPensionTypesLists;
 use App\Models\AtmTransactionSequence;
 use Yajra\DataTables\Facades\DataTables;
@@ -740,6 +741,85 @@ class SettingsController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Release Reason Updated Successfully!'  // Changed message to reflect update action
+        ]);
+    }
+
+    public function collection_date_page()
+    {
+        return view('pages.pages_backend.settings.collection_date');
+    }
+
+    public function collection_date_data()
+    {
+       $DataReleaseOption = DataCollectionDate::latest('updated_at')
+            ->whereNull('deleted_at')
+            ->get();
+
+        return DataTables::of($DataReleaseOption)
+            ->setRowId('id')
+            ->make(true);
+    }
+
+    public function collection_date_get($id)
+    {
+        $DataCollectionDate = DataCollectionDate::findOrFail($id);
+        return response()->json($DataCollectionDate);
+    }
+
+    public function collection_date_create(Request $request)
+    {
+        DataCollectionDate::create([
+            'collection_date' => $request->collection_date,
+            'status' => 'Active',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // Create System Logs used for Auditing of Logs
+        SystemLogs::create([
+            'system' => 'ATM Monitoring',
+            'action' => 'Create',
+            'title' => 'Create Collection Date',
+            'description' => 'Creation of Collection Date' .  $request->collection_date,
+            'employee_id' => Auth::user()->employee_id,
+            'ip_address' => $request->ip(),
+            'created_at' => Carbon::now(),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Collection Date Created successfully!'
+        ]);
+    }
+
+    public function collection_date_update(Request $request)
+    {
+        // Find the user group by ID
+        $DataCollectionDate = DataCollectionDate::findOrFail($request->item_id);
+
+        // Proceed with update if validation passes
+        $DataCollectionDate->update([  // Update the instance instead of using the class method
+            'collection_date' => $request->collection_date,
+            'status' => $request->status,
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // Create System Logs used for Auditing of Logs
+        SystemLogs::create([
+            'system' => 'ATM Monitoring',
+            'action' => 'Update',
+            'title' => 'Update Collection Date',
+            'description' => 'Updating of Collection Date' .  $DataCollectionDate->collection_date .' into '. $request->collection_date,
+            'employee_id' => Auth::user()->employee_id,
+            'ip_address' => $request->ip(),
+            'created_at' => Carbon::now(),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Collection Date Updated Successfully!'  // Changed message to reflect update action
         ]);
     }
 

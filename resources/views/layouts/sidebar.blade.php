@@ -276,6 +276,9 @@
                                 <li>
                                     <a href="{{ route('settings.release.reason.page') }}" key="settings_atm_release_reason">Release Reason</a>
                                 </li>
+                                <li>
+                                    <a href="{{ route('settings.collection.date.page') }}" key="settings_atm_collection_date">Collection Date</a>
+                                </li>
                             </ul>
                         </li>
                         <li>

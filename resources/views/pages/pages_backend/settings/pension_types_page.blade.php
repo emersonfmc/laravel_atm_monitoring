@@ -128,7 +128,6 @@
                         <div class="form-group mb-3">
                             <label class="fw-bold h6">Status</label>
                             <select name="status" id="update_status" class="form-select" required>
-                                <option value="" selected disabled>Pension Number Types</option>
                                 <option value="Active">Active</option>
                                 <option value="Inactive">Inactive</option>
                             </select>
