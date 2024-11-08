@@ -28,18 +28,13 @@
                         </div> --}}
                     </div>
                     <hr>
-                    <form id="filterForm">
-                        @csrf
                         <div class="row">
                             <div class="col-3">
                                 <div class="form-group">
                                     <label class="fw-bold h6">Branch</label>
-                                    <select name="branch_id" id="branch_id_select" class="form-select select2">
-                                        <option value="">Select Branches</option>
-                                        @foreach($Branches as $branch)
-                                            <option value="{{ $branch->id }}" {{ $branch->id == $branch_id ? 'selected' : '' }}>
-                                                {{ $branch->branch_location }}
-                                            </option>
+                                    <select name="branch_id" id="branch_id" class="form-select select2">
+                                        @foreach ($Branches as $branch)
+                                            <option value="{{ $branch->id }}">{{ $branch->branch_location }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -47,7 +42,7 @@
                             <div class="col-3">
                                 <div class="form-group">
                                     <label class="fw-bold h6">Transaction</label>
-                                    <select name="transaction_id" id="transaction_id_select" class="form-select select2">
+                                    <select name="transaction_id" id="transaction_id" class="form-select select2">
                                         <option value="">Select Transaction</option>
                                         @foreach ($AtmTransactionAction as $transaction)
                                             <option value="{{ $transaction->id }}">{{ $transaction->name }}</option>
@@ -59,8 +54,7 @@
                                 <div class="form-group">
                                     <label class="fw-bold h6">Status</label>
                                     <select name="status" id="status_select" class="form-select">
-                                        <option value="">Select Status</option>
-                                        <option value="ON GOING" selected>ON GOING</option>
+                                        <option value="ON GOING">ON GOING</option>
                                         <option value="CANCELLED">CANCELLED</option>
                                         <option value="COMPLETED">COMPLETED</option>
                                     </select>
@@ -68,12 +62,12 @@
                             </div>
                             <div class="col-md-2" style="margin-top: 25px;">
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-primary">Filter</button>
-                                    <button type="button" class="btn btn-success">Generate Reports</button>
+                                    <a href="#" class="btn btn-primary">
+                                        Filter
+                                    </a>
                                 </div>
                             </div>
                         </div>
-                    </form>
                     <hr>
 
 
@@ -573,38 +567,107 @@
                 });
             });
 
-            // Filtering of Transaction
-                var branchId = @json($branch_id);
-                var userHasBranchId = {!! Auth::user()->branch_id ? 'true' : 'false' !!};
+            // $('#FetchingDatatable').on('click', '.createTransaction', function(e) {
+            //     e.preventDefault();
+            //     var new_atm_id = $(this).data('id');
 
-                if (userHasBranchId) {
-                    $('#branch_id_select').val(branchId).prop('disabled', true);
-                }
+            //     $.ajax({
+            //         url: "/AtmClientFetch",
+            //         type: "GET",
+            //         data: { new_atm_id : new_atm_id },
+            //         success: function(data) {
+            //             console.log(data);
+            //             let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
 
-                $('#filterForm').submit(function(e) {
-                    e.preventDefault();
+            //             $('#create_fullname').text(data.client_information.last_name +', '+ data.client_information.first_name +' '+ data.client_information.middle_name +' '+ data.client_information.suffix ?? '');
 
-                    // Get selected filter values
-                    var selectedBranch = $('#branch_id_select').val();
-                    var selectedTransaction = $('#transaction_id_select').val();
-                    var selectedStatus = $('#status_select').val();
+            //             $('#create_pension_number_display').text(data.client_information.pension_number ?? '');
+            //             $('#create_pension_number_display').inputmask("99-9999999-99");
 
-                    console.log(selectedBranch);
+            //             $('#create_pension_number').val(data.client_information.pension_number);
+            //             $('#create_pension_account_type').text(data.client_information.pension_account_type);
+            //             $('#create_pension_type').val(data.client_information.pension_type);
+            //             $('#create_birth_date').val(formattedBirthDate);
+            //             $('#create_branch_location').val(data.branch.branch_location);
 
-                    // Construct the URL with required query parameters
-                    var targetUrl = '{!! route('TransactionData') !!}';
-                    targetUrl += '?transaction_actions_id=' + selectedTransaction + '&status=' + selectedStatus;
+            //             $('#create_atm_id').val(data.id);
+            //             $('#create_bank_account_no').val(data.bank_account_no ?? '');
+            //             $('#create_collection_date').val(data.collection_date ?? '');
+            //             $('#create_atm_type').val(data.atm_type ?? '');
+            //             $('#create_bank_name').val(data.bank_name ?? '');
+            //             $('#create_transaction_number').val(data.transaction_number ?? '');
 
-                    // If the user does not have a branch ID, add the branch_id parameter
-                    if (!userHasBranchId && selectedBranch) {
-                        targetUrl += '&branch_id=' + selectedBranch;
-                    }
+            //             let expirationDate = '';
+            //             if (data.expiration_date && data.expiration_date !== '0000-00-00') {
+            //                 expirationDate = new Date(data.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            //             }
+            //             $('#create_expiration_date').val((expirationDate || ''));
 
-                    // Update the DataTable with the filtered data
-                    dataTable.table.ajax.url(targetUrl).load();
-                });
-            // Filtering of Transaction
 
+            //             $('#createTransactionModal').modal('show');
+            //         },
+            //         error: function(xhr, status, error) {
+            //             console.error("An error occurred: " + error);
+            //         }
+            //     });
+            // });
+
+            // $('#FetchingDatatable').on('click', '.addAtmTransaction', function(e) {
+            //     e.preventDefault();
+            //     var new_atm_id = $(this).data('id');
+
+            //     $.ajax({
+            //         url: "/AtmClientFetch",
+            //         type: "GET",
+            //         data: { new_atm_id : new_atm_id },
+            //         success: function(data) {
+            //             console.log(data);
+
+            //             $('#addAtmTransactionModal').modal('show');
+            //         },
+            //         error: function(xhr, status, error) {
+            //             console.error("An error occurred: " + error);
+            //         }
+            //     });
+            // });
+
+            // $('#FetchingDatatable').on('click', '.transferBranchTransaction', function(e) {
+            //     e.preventDefault();
+            //     var new_atm_id = $(this).data('id');
+
+            //     $.ajax({
+            //         url: "/AtmClientFetch",
+            //         type: "GET",
+            //         data: { new_atm_id : new_atm_id },
+            //         success: function(data) {
+            //             console.log(data);
+
+            //             $('#transferBranchTransactionModal').modal('show');
+            //         },
+            //         error: function(xhr, status, error) {
+            //             console.error("An error occurred: " + error);
+            //         }
+            //     });
+            // });
+
+            // $('#FetchingDatatable').on('click', '.EditInformationTransaction', function(e) {
+            //     e.preventDefault();
+            //     var new_atm_id = $(this).data('id');
+
+            //     $.ajax({
+            //         url: "/AtmClientFetch",
+            //         type: "GET",
+            //         data: { new_atm_id : new_atm_id },
+            //         success: function(data) {
+            //             console.log(data);
+
+            //             $('#EditInformationTransactionModal').modal('show');
+            //         },
+            //         error: function(xhr, status, error) {
+            //             console.error("An error occurred: " + error);
+            //         }
+            //     });
+            // });
 
         });
 
