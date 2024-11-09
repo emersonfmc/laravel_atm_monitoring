@@ -98,7 +98,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'client_information_id',
                     name: 'client_information.first_name',
@@ -115,7 +114,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'branch_id',
                     name: 'branch.branch_location',
@@ -125,8 +123,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
-
                 {
                     data: 'client_information_id',
                     name: 'client_information.pension_number',
@@ -145,9 +141,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
-
-
                 {
                     data: 'client_information_id',
                     name: 'client_information.created_at',
@@ -169,8 +162,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
-
                 {
                     data: 'client_information_id',
                     name: 'client_information.birth_date',
@@ -192,8 +183,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
-
                 {
                     data: 'bank_account_no',
                     name: 'bank_account_no',

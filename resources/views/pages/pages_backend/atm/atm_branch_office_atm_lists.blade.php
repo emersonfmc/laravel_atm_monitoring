@@ -154,7 +154,7 @@
                                 <span id="ReleasingImage" style="display: none;">
                                     <div class="form-group mb-3">
                                         <label class="fw-bold h6">Yellow Copy and Client Image</label> <span class="text-danger">( Proof of Release to Client )</span>
-                                        <input type="file" name="yellow_copy_image" class="form-control" accept=".jpg, .jpeg, .png">
+                                        <input type="file" name="image_upload" id="imageReleaseUpload" class="form-control" accept=".jpg, .jpeg, .png" required>
                                     </div>
                                 </span>
                             </div>
@@ -256,7 +256,7 @@
 
                                 <div class="form-group mb-3">
                                     <label class="fw-bold h6">Yellow Copy and Client Image</label> <span class="text-danger">( Proof of Release to Client )</span>
-                                    <input type="file" name="cancelled_loan" class="form-control">
+                                    <input type="file" name="image_upload" id="imageReleaseBalanceUpload" class="form-control" accept=".jpg, .jpeg, .png" required>
                                 </div>
                             </div>
                         </div>
@@ -982,6 +982,49 @@
 
                     });
 
+                    document.getElementById('imageReleaseUpload').addEventListener('change', function (event) {
+                        const file = event.target.files[0];
+                        const preview = document.getElementById('image_release_preview');
+
+                        // Reset the preview image if no file is selected
+                        if (!file) {
+                            preview.src = "{{ asset('images/no_image.jpg') }}";
+                            return;
+                        }
+
+                        // Validate file type
+                        const validTypes = ['image/jpeg', 'image/png'];
+                        if (!validTypes.includes(file.type)) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Invalid file type',
+                                text: 'Only JPG, JPEG, and PNG files are allowed.'
+                            });
+                            event.target.value = ''; // Clear the input
+                            preview.src = "{{ asset('images/no_image.jpg') }}"; // Reset preview
+                            return;
+                        }
+
+                        // Validate file size (3 MB = 3 * 1024 * 1024 bytes)
+                        const maxSize = 3 * 1024 * 1024;
+                        if (file.size > maxSize) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'File size exceeds 3 MB',
+                                text: 'Please choose a smaller file.'
+                            });
+                            event.target.value = ''; // Clear the input
+                            preview.src = "{{ asset('images/no_image.jpg') }}"; // Reset preview
+                            return;
+                        }
+
+                        // Display the preview of the uploaded image
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            preview.src = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    });
 
                     $('#releasingValidateForm').validate({
                         rules: {
@@ -1157,6 +1200,50 @@
                         $('#ReleasingWithBalanceTransactionModal').modal('hide');
                         $('#FetchingDatatable tbody').empty();
                     }
+
+                    document.getElementById('imageReleaseBalanceUpload').addEventListener('change', function (event) {
+                        const file = event.target.files[0];
+                        const preview = document.getElementById('image_release_balance_preview');
+
+                        // Reset the preview image if no file is selected
+                        if (!file) {
+                            preview.src = "{{ asset('images/no_image.jpg') }}";
+                            return;
+                        }
+
+                        // Validate file type
+                        const validTypes = ['image/jpeg', 'image/png'];
+                        if (!validTypes.includes(file.type)) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Invalid file type',
+                                text: 'Only JPG, JPEG, and PNG files are allowed.'
+                            });
+                            event.target.value = ''; // Clear the input
+                            preview.src = "{{ asset('images/no_image.jpg') }}"; // Reset preview
+                            return;
+                        }
+
+                        // Validate file size (3 MB = 3 * 1024 * 1024 bytes)
+                        const maxSize = 3 * 1024 * 1024;
+                        if (file.size > maxSize) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'File size exceeds 3 MB',
+                                text: 'Please choose a smaller file.'
+                            });
+                            event.target.value = ''; // Clear the input
+                            preview.src = "{{ asset('images/no_image.jpg') }}"; // Reset preview
+                            return;
+                        }
+
+                        // Display the preview of the uploaded image
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            preview.src = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    });
 
                     $('#releasingBalanceValidateForm').validate({
                         rules: {

@@ -213,12 +213,19 @@
                                     <div class="col-md-6">
                                         <div class="form-group mb-2 row align-items-center">
                                             <label class="col-form-label col-sm-4 fw-bold">Type</label>
-                                            <div class="col-8">
+                                            <div class="col-5">
                                                 <select name="atm_type[]" class="form-select" required>
                                                     <option value="" selected disabled>Type</option>
                                                     <option value="ATM">ATM</option>
                                                     <option value="Passbook">Passbook</option>
                                                     <option value="Sim Card">Sim Card</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <select name="atm_status[]" id="atm_status" class="form-select" required>
+                                                  <option value="">ATM Status</option>
+                                                  <option value="New" selected>New</option>
+                                                  <option value="Old">Old</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -238,7 +245,7 @@
                                             <label class="font-size col-form-label col-4 fw-bold">Banks</label>
                                             <div class="col-8">
                                                 <div class="form-group">
-                                                <select name="bank_id[]" id="bank_id" class="form-select">
+                                                <select name="bank_id[]" id="bank_id" class="form-select select2">
                                                     <option value="" selected disabled>Banks</option>
                                                     @foreach ($DataBankLists as $bank)
                                                             <option value="{{ $bank->bank_name }}">{{ $bank->bank_name }}</option>

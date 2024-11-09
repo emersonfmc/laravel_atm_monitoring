@@ -19,13 +19,38 @@
                                 A Centralized Record of all ATMs managed by the head office
                             </p>
                         </div>
-                        {{-- <div class="col-md-4 text-end">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAreaModal"><i
-                                class="fas fa-plus-circle me-1"></i> Create Area</button>
-                        </div> --}}
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddOldNewClientModal"><i
+                                class="fas fa-plus-circle me-1"></i> Add Old / New Client</button>
+                        </div>
                     </div>
                     <hr>
-
+                        @if(in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin','Branch Head']))
+                        <form id="filterForm">
+                            @csrf
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group mb-3">
+                                        <label class="fw-bold h6">Branch</label>
+                                        <select name="branch_id" id="branch_id_select" class="form-select select2" required>
+                                            <option value="">Select Branches</option>
+                                            @foreach($Branches as $branch)
+                                                <option value="{{ $branch->id }}" {{ $branch->id == $branch_id ? 'selected' : '' }}>
+                                                    {{ $branch->branch_location }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2" style="margin-top: 25px;">
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-primary">Filter</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        @endif
+                    <hr>
 
                     <div class="table-responsive">
                         <table id="FetchingDatatable" class="table table-border dt-responsive wrap table-design" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -36,11 +61,13 @@
                                     <th>Reference No</th>
                                     <th>Client</th>
                                     <th>Branch</th>
-                                    <th>Pension No. / Type</th>
+                                    {{-- <th>Pension No. / Type</th> --}}
+                                    <th>Pension No</th>
                                     <th>Created Date</th>
                                     <th>Birthdate</th>
                                     <th>Box</th>
-                                    <th>ATM / Passbook / Simcard No & Bank</th>
+                                    <th>Bank Account No</th>
+                                    {{-- <th>ATM / Passbook / Simcard No & Bank</th> --}}
                                     <th>PIN Code</th>
                                     <th>Status</th>
                                     <th>QR</th>
@@ -654,11 +681,12 @@
                     data: null,
                     name: 'action', // This matches the name you used in your server-side code
                     render: function(data, type, row) {
-                        return row.action; // Use the action rendered from the server
+                        return row.action + ' ' + row.passbook_for_collection; // Concatenate action and passbook_for_collection
                     },
                     orderable: false,
                     searchable: false,
                 },
+
                 // Transaction Type and Pending By
                 {
                     data: 'pending_to',
@@ -853,6 +881,32 @@
 
             ];
             dataTable.initialize(url, columns);
+
+            // Filtering of Transaction
+            var branchId = @json($branch_id);
+            var userHasBranchId = {!! Auth::user()->branch_id ? 'true' : 'false' !!};
+
+            if (userHasBranchId) {
+                $('#branch_id_select').val(branchId).prop('disabled', true);
+            }
+
+            $('#filterForm').submit(function(e) {
+                e.preventDefault();
+                var selectedBranch = $('#branch_id_select').val();
+
+                // Get the base URL for filtering
+                var targetUrl = '{!! route('HeadOfficeData') !!}';
+
+                // Add branch_id as a query parameter if user doesn't have a fixed branch and has selected a branch
+                if (!userHasBranchId && selectedBranch) {
+                    targetUrl += '?branch_id=' + selectedBranch;
+                }
+
+                // Update the DataTable with the filtered data
+                dataTable.table.ajax.url(targetUrl).load();
+            });
+            // End Filtering of Transaction
+
 
             $('#FetchingDatatable').on('click', '.createTransaction', function(e) {
                 e.preventDefault();
@@ -1417,7 +1471,7 @@
 
             function closeTransactionModal() {
                 $('#createTransactionModal').modal('hide');
-                $('#FetchingDatatable tbody').empty();
+                // $('#FetchingDatatable tbody').empty();
             }
         });
 

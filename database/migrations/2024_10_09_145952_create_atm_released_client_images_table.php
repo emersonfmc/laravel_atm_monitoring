@@ -15,6 +15,10 @@ return new class extends Migration
     {
         Schema::create('atm_released_client_images', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('banks_transactions_id')->nullable();
+            $table->string('filename')->nullable();
+            $table->string('image_name')->nullable();
+            $table->foreign('banks_transactions_id')->references('id')->on('atm_banks_transactions')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

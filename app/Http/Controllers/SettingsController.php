@@ -650,7 +650,7 @@ class SettingsController extends Controller
             'action' => 'Update',
             'title' => 'Update Transaction Action',
             'description' => 'Updating of Transaction Action' .  $AtmTransactionAction->name,
-            'user_id' => Auth::user()->id,
+            'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
             'company_id' => Auth::user()->company_id,

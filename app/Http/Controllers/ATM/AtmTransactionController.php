@@ -240,7 +240,6 @@ class AtmTransactionController extends Controller
                             'reason' => $reason ?? NULL,
                             'reason_remarks' => $release_reason ?? NULL,
                             'yellow_copy' => NULL,
-                            'released_client_images_id' => NULL,
                             'created_at' => Carbon::now(),
                         ]);
 
