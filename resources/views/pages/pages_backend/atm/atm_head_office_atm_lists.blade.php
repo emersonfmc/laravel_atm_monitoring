@@ -1304,19 +1304,6 @@
                             $('#edit_suffix').val(data.client_information.suffix ?? '').trigger('change');
                             $('#edit_birth_date').val(data.client_information.birth_date ?? '');
 
-
-                            // $('#transfer_bank_account_no').val(data.bank_account_no ?? '');
-                            // $('#transfer_collection_date').val(data.collection_date ?? '').trigger('change');
-                            // $('#transfer_atm_type').val(data.atm_type ?? '');
-                            // $('#transfer_bank_name').val(data.bank_name ?? '');
-                            // $('#transfer_transaction_number').val(data.transaction_number ?? '');
-
-                            // let expirationDate = '';
-                            // if (data.expiration_date && data.expiration_date !== '0000-00-00') {
-                            //     expirationDate = new Date(data.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                            // }
-                            // $('#transfer_expiration_date').val((expirationDate || ''));
-
                             $('#EditInformationTransactionModal').modal('show');
                         },
                         error: function(xhr, status, error) {

@@ -2,21 +2,26 @@
 
 namespace App\Http\Controllers\ATM;
 
+use App\Models\Branch;
+use App\Models\DataArea;
+use App\Models\SystemLogs;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 
-use Yajra\DataTables\Facades\DataTables;
+use App\Models\DataBankLists;
 
-use App\Models\AtmTransactionSequence;
 use App\Models\AtmClientBanks;
+use Illuminate\Support\Carbon;
+use App\Models\DataReleaseOption;
+use App\Models\DataCollectionDate;
+use App\Models\AtmBanksTransaction;
+use App\Http\Controllers\Controller;
+use App\Models\AtmTransactionAction;
+use Illuminate\Support\Facades\Auth;
+use App\Models\DataPensionTypesLists;
+use App\Models\AtmTransactionSequence;
+use Yajra\DataTables\Facades\DataTables;
 use App\Models\AtmTransactionBalanceLogs;
 use App\Models\AtmBanksTransactionApproval;
-use App\Models\AtmBanksTransaction;
-use App\Models\AtmTransactionAction;
-use App\Models\Branch;
-use App\Models\SystemLogs;
 
 class AtmTransactionController extends Controller
 {
@@ -27,7 +32,14 @@ class AtmTransactionController extends Controller
         $Branches = Branch::where('status', 'Active')->get();
         $AtmTransactionAction = AtmTransactionAction::where('status', 'Active')->get();
 
-        return view('pages.pages_backend.atm.atm_transactions', compact('Branches','AtmTransactionAction','branch_id'));
+        $DataBankLists = DataBankLists::where('status','Active')->get();
+        $DataReleaseOption = DataReleaseOption::where('status','Active')->get();
+        $DataPensionTypesLists = DataPensionTypesLists::where('status','Active')->get();
+        $DataCollectionDate = DataCollectionDate::where('status','Active')->get();
+
+        return view('pages.pages_backend.atm.atm_transactions',
+                    compact('Branches','AtmTransactionAction','branch_id',
+                            'DataBankLists','DataPensionTypesLists','DataCollectionDate'));
     }
 
     public function TransactionData(Request $request)
