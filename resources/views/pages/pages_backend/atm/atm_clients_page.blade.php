@@ -212,60 +212,67 @@
                                     <hr>
                                     <div class="col-md-6">
                                         <div class="form-group mb-2 row align-items-center">
-                                        <label class="col-form-label col-sm-4 fw-bold">Type</label>
-                                        <div class="col-8">
-                                            <select name="atm_type[]" class="form-select" required>
-                                            <option value="" selected disabled>Type</option>
-                                            <option value="ATM">ATM</option>
-                                            <option value="Passbook">Passbook</option>
-                                            <option value="Sim Card">Sim Card</option>
-                                            </select>
-                                        </div>
+                                            <label class="col-form-label col-sm-4 fw-bold">Type</label>
+                                            <div class="col-5">
+                                                <select name="atm_type[]" class="form-select" required>
+                                                    <option value="" selected disabled>Type</option>
+                                                    <option value="ATM">ATM</option>
+                                                    <option value="Passbook">Passbook</option>
+                                                    <option value="Sim Card">Sim Card</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <select name="atm_status[]" id="atm_status" class="form-select" required>
+                                                  <option value="">ATM Status</option>
+                                                  <option value="New" selected>New</option>
+                                                  <option value="Old">Old</option>
+                                                </select>
+                                            </div>
                                         </div>
                                         <div class="form-group mb-2 row align-items-center">
-                                        <label class="col-form-label col-sm-4 fw-bold">ATM / Passbook / Sim No.</label>
-                                        <div class="col-8">
-                                            <input type="text" name="atm_number[]" class="atm_card_input_mask form-control" placeholder="ATM / Passbook / Sim No." required>
-                                        </div>
+                                            <label class="col-form-label col-sm-4 fw-bold">ATM / Passbook / Sim No.</label>
+                                            <div class="col-8">
+                                                <input type="text" name="atm_number[]" class="atm_card_input_mask form-control" placeholder="ATM / Passbook / Sim No." required>
+                                            </div>
                                         </div>
                                         <div class="form-group mb-3 row align-items-center">
-                                        <label class="col-form-label col-4 fw-bold">Balance</label>
-                                        <div class="col-8">
-                                            <input type="text" name="atm_balance[]" class="balanceCurrency form-control" value="0" placeholder="Balance" required>
-                                        </div>
+                                            <label class="col-form-label col-4 fw-bold">Balance</label>
+                                            <div class="col-8">
+                                                <input type="text" name="atm_balance[]" class="balanceCurrency form-control" value="0" placeholder="Balance" required>
+                                            </div>
                                         </div>
                                         <div class="form-group mb-2 row align-items-center">
-                                        <label class="font-size col-form-label col-4 fw-bold">Banks</label>
-                                        <div class="col-8">
-                                            <div class="form-group">
-                                            <select name="bank_id[]" id="bank_id" class="form-select">
-                                                <option value="" selected disabled>Banks</option>
-                                                @foreach ($DataBankLists as $bank)
-                                                        <option value="{{ $bank->bank_name }}">{{ $bank->bank_name }}</option>
-                                                @endforeach
-                                            </select>
+                                            <label class="font-size col-form-label col-4 fw-bold">Banks</label>
+                                            <div class="col-8">
+                                                <div class="form-group">
+                                                <select name="bank_id[]" id="bank_id" class="form-select select2">
+                                                    <option value="" selected disabled>Banks</option>
+                                                    @foreach ($DataBankLists as $bank)
+                                                            <option value="{{ $bank->bank_name }}">{{ $bank->bank_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    </div>
                                     <div class="col-md-6">
                                         <div class="form-group mb-3 row align-items-center">
-                                        <label class="col-form-label col-4 fw-bold">Pin Code</label>
-                                        <div class="col-8">
-                                            <input type="number" name="pin_code[]" class="form-control" placeholder="PIN Code">
-                                        </div>
-                                        </div>
-                                        <div class="form-group mb-3 row align-items-center">
-                                        <label class="col-form-label col-4 fw-bold">Expiration Date</label>
-                                        <div class="col-8">
-                                            <input type="month" name="expiration_date[]" class="form-control">
-                                        </div>
+                                            <label class="col-form-label col-4 fw-bold">Pin Code</label>
+                                            <div class="col-8">
+                                                <input type="number" name="pin_code[]" class="form-control" placeholder="PIN Code">
+                                            </div>
                                         </div>
                                         <div class="form-group mb-3 row align-items-center">
-                                        <label class="col-form-label col-4 fw-bold">Remarks</label>
-                                        <div class="col-8">
-                                            <input type="text" name="remarks[]" class="form-control" placeholder="Remarks" minlength="0" maxlength="100">
+                                            <label class="col-form-label col-4 fw-bold">Expiration Date</label>
+                                            <div class="col-8">
+                                                <input type="month" name="expiration_date[]" class="form-control">
+                                            </div>
                                         </div>
+                                        <div class="form-group mb-3 row align-items-center">
+                                            <label class="col-form-label col-4 fw-bold">Remarks</label>
+                                            <div class="col-8">
+                                                <input type="text" name="remarks[]" class="form-control" placeholder="Remarks" minlength="0" maxlength="100">
+                                            </div>
                                         </div>
                                         <!-- <div class="form-group mb-2 row align-items-center">
                                         <label class="col-form-label col-4 fw-bold">Remove</label>

@@ -19,13 +19,38 @@
                                 A Centralized Record of all ATMs managed by the head office
                             </p>
                         </div>
-                        {{-- <div class="col-md-4 text-end">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAreaModal"><i
-                                class="fas fa-plus-circle me-1"></i> Create Area</button>
-                        </div> --}}
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddOldNewClientModal">
+                                <i class="fas fa-plus-circle me-1"></i> Add Old / New Client</button>
+                        </div>
                     </div>
                     <hr>
-
+                        @if(in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin','Branch Head']))
+                            <form id="filterForm">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group mb-3">
+                                            <label class="fw-bold h6">Branch</label>
+                                            <select name="branch_id" id="branch_id_select" class="form-select select2" required>
+                                                <option value="">Select Branches</option>
+                                                @foreach($Branches as $branch)
+                                                    <option value="{{ $branch->id }}" {{ $branch->id == $branch_id ? 'selected' : '' }}>
+                                                        {{ $branch->branch_location }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2" style="margin-top: 25px;">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-primary">Filter</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        @endif
+                    <hr>
 
                     <div class="table-responsive">
                         <table id="FetchingDatatable" class="table table-border dt-responsive wrap table-design" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -36,11 +61,13 @@
                                     <th>Reference No</th>
                                     <th>Client</th>
                                     <th>Branch</th>
-                                    <th>Pension No. / Type</th>
+                                    {{-- <th>Pension No. / Type</th> --}}
+                                    <th>Pension No</th>
                                     <th>Created Date</th>
                                     <th>Birthdate</th>
                                     <th>Box</th>
-                                    <th>ATM / Passbook / Simcard No & Bank</th>
+                                    <th>Bank Account No</th>
+                                    {{-- <th>ATM / Passbook / Simcard No & Bank</th> --}}
                                     <th>PIN Code</th>
                                     <th>Status</th>
                                     <th>QR</th>
@@ -211,7 +238,7 @@
 
     <div class="modal fade" id="addAtmTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="createTransactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 55%;" role="document">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-uppercase">Add ATM Transaction</h5>
@@ -280,7 +307,7 @@
                                     <div class="col-md-6">
                                       <div class="form-group mb-2 row align-items-center">
                                         <label class="col-form-label col-sm-4 fw-bold">Type</label>
-                                        <div class="col-sm-8">
+                                        <div class="col-sm-5">
                                           <select name="atm_type" id="atm_type_add_atm" class="form-select" required>
                                             <option value="" selected disabled>Type</option>
                                             <option value="ATM">ATM</option>
@@ -288,6 +315,13 @@
                                             <option value="Sim Card">Sim Card</option>
                                           </select>
                                         </div>
+                                        <div class="col-sm-3">
+                                            <select name="atm_status" id="atm_status" class="form-select" required>
+                                              <option value="">ATM Status</option>
+                                              <option value="New" selected>New</option>
+                                              <option value="Old">Old</option>
+                                            </select>
+                                          </div>
                                       </div>
 
                                       <div class="form-group mb-2 row align-items-center">
@@ -447,13 +481,183 @@
                     <h5 class="modal-title fw-bold text-uppercase">Edit Client / ATM Transaction</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <form action="#">
+                    <div class="modal-body">
+                        <input type="hidden" name="atm_id" id="edit_atm_id">
+                        <div class="form-group">
+                            <div id="edit_fullname" class="fw-bold h4"></div>
+                            <span id="edit_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="edit_pension_account_type" class="fw-bold h5"></span>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-3 form-group mb-3">
+                                <label class="fw-bold h6">Transaction Number</label>
+                                <input type="text" name="transaction_number" id="edit_transaction_number" class="form-control" readonly>
+                            </div>
+                            <div class="col-3 form-group mb-3">
+                                <label class="fw-bold h6">Branch</label>
+                                <select name="branch_id" id="edit_branch_id" class="form-select select2">
+                                    @foreach ($Branches as $branch)
+                                        <option value="{{ $branch->id }}">{{ $branch->branch_location }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-3 form-group mb-3">
+                                <label class="fw-bold h6">Pension Type</label>
+                                <select name="pension_type" id="edit_pension_type" class="form-select">
+                                    <option value="SSS">SSS</option>
+                                    <option value="GSIS">GSIS</option>
+                                </select>
+                            </div>
+                            <div class="col-3 form-group mb-3">
+                                <input type="hidden" id="edit_pension_account_type_value">
+                                <label class="fw-bold h6">Pension Account Type</label>
+                                <select name="pension_account_type" id="edit_pension_account_type_fetch" class="form-select select2">
+                                </select>
+                            </div>
+                            <hr>
 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                    <button type="submit" class="btn btn-success">Edit Information</button>
-                </div>
+                            <div class="col-3 form-group mb-3">
+                                <label class="fw-bold h6">Firstname</label>
+                                <input type="text" name="first_name" id="edit_first_name" class="form-control"
+                                       minlength="0" maxlength="50" placeholder="Firstname" required>
+                            </div>
+
+                            <div class="col-3 form-group mb-3">
+                                <label class="fw-bold h6">Middlename</label>
+                                <input type="text" name="middle_name" id="edit_middle_name" class="form-control"
+                                       minlength="0" maxlength="50" placeholder="Middlename" required>
+                            </div>
+
+                            <div class="col-3 form-group mb-3">
+                                <label class="fw-bold h6">Lastname</label>
+                                <input type="text" name="last_name" id="edit_last_name" class="form-control"
+                                       minlength="0" maxlength="50" placeholder="Lastname" required>
+                            </div>
+
+                            <div class="col-3 form-group mb-3">
+                                <label class="fw-bold h6">Suffix</label>
+                                <select name="suffix" id="edit_suffix" class="form-select">
+                                    <option value="Jr.">Jr.</option>
+                                    <option value="Sr.">Sr.</option>
+                                    <option value="Ma.">Ma.</option>
+                                    <option value="I">I</option>
+                                    <option value="II">II</option>
+                                    <option value="III">III</option>
+                                    <option value="IV">IV</option>
+                                </select>
+                            </div>
+
+                            <div class="col-3 form-group mb-3">
+                                <label class="fw-bold h6">Birthdate</label>
+                                <input type="date" name="birth_date" id="edit_birth_date" class="form-control" required>
+                            </div>
+
+                            <div class="col-3 form-group mb-3">
+                                <label class="fw-bold h6">Collection Date</label>
+                                <select name="collection_date" id="edit_collection_date" class="form-select" required>
+                                    @foreach ($DataCollectionDate as $collection_date)
+                                        <option value="{{ $collection_date->collection_date }}">{{ $collection_date->collection_date }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <hr>
+                            <div class="col-12">
+                                <div class="row mt-2">
+                                    <hr>
+                                    <label class="fw-bold h6 text-center mb-3 text-primary">
+                                      ATM / Passsbook / Simcard Details
+                                    </label>
+                                    <hr>
+
+                                        <div class="form-group mb-2 row">
+                                            <div class="col-auto">
+                                                <input type="checkbox" name="replacement_atm" id="hide_atm_details" value="replacement_atm" class="form-check-input ms-1 me-1">
+                                            </div>
+                                            <div class="col">
+                                                <label class="fw-bold h6">
+                                                    Is this a Replacement ATM with the same Bank Number? Check if Yes Select Checkbox.
+                                                </label>
+                                            </div>
+                                        </div>
+                                    <hr>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3 row">
+                                            <label class="col-form-label col-sm-4 fw-bold">Type</label>
+                                            <div class="col-sm-5">
+                                                <select name="atm_type" id="edit_atm_type" class="form-select" required>
+                                                    <option value="ATM">ATM</option>
+                                                    <option value="Passbook">Passbook</option>
+                                                    <option value="Sim Card">Sim Card</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-sm-3">
+                                                <select name="atm_status" id="edit_atm_status" class="form-select" required>
+                                                    <option value="">ATM Status</option>
+                                                    <option value="new">New</option>
+                                                    <option value="old">Old</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        {{-- <div class="row" id="replaceBankAccountNo" style="display:block;"> --}}
+
+                                        <div class="row mb-2 replaceBankAccountNo">
+                                            <label class="col-4 fw-bold">ATM / Passbook / Sim No.</label>
+                                            <div class="form-group col-8">
+                                                <input type="text" name="atm_number" class="atm_card_input_mask form-control" id="edit_bank_account_no" placeholder="ATM / Passbook / Sim No." required>
+                                            </div>
+                                        </div>
+                                        {{-- <div class="row mb-3" id="replaceBankName" style="display:block;"> --}}
+
+                                        <div class="row mb-2 replaceBankName">
+                                            <label class="col-4 fw-bold">Banks</label>
+                                            <div class="form-group col-8">
+                                                <select name="bank_name" id="edit_bank_name" class="form-select select2" required>
+                                                    @foreach ($DataBankLists as $bank)
+                                                        <option value="{{ $bank->bank_name }}">{{ $bank->bank_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                      <div class="form-group mb-3 row align-items-center">
+                                        <label class="col-form-label col-4 fw-bold">Pin Code</label>
+                                        <div class="col-8">
+                                          <input type="number" name="pin_code" class="form-control" id="edit_pin_no" placeholder="PIN Code">
+                                        </div>
+                                      </div>
+
+                                      <div class="form-group mb-3 row align-items-center">
+                                        <label class="col-form-label col-4 fw-bold">Expiration Date</label>
+                                        <div class="col-8">
+                                          <input type="month" name="expiration_date" id="edit_expiration_date" class="form-control">
+                                        </div>
+                                      </div>
+
+                                      <div class="form-group mb-3 row align-items-center">
+                                        <label class="col-form-label col-4 fw-bold">Cash Box No.</label>
+                                        <div class="col-8">
+                                          <input type="number" name="cash_box_no" id="edit_cash_box_no" class="form-control" placeholder="Cash Box No.">
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <hr class="mt-2 mb-2">
+                                  </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                        <button type="submit" class="btn btn-success">Edit Information</button>
+                    </div>
+                </form>
 
             </div>
         </div>
@@ -477,11 +681,12 @@
                     data: null,
                     name: 'action', // This matches the name you used in your server-side code
                     render: function(data, type, row) {
-                        return row.action; // Use the action rendered from the server
+                        return row.action + ' ' + row.passbook_for_collection; // Concatenate action and passbook_for_collection
                     },
                     orderable: false,
                     searchable: false,
                 },
+
                 // Transaction Type and Pending By
                 {
                     data: 'pending_to',
@@ -676,6 +881,32 @@
 
             ];
             dataTable.initialize(url, columns);
+
+            // Filtering of Transaction
+                var branchId = @json($branch_id);
+                var userHasBranchId = {!! Auth::user()->branch_id ? 'true' : 'false' !!};
+
+                if (userHasBranchId) {
+                    $('#branch_id_select').val(branchId).prop('disabled', true);
+                }
+
+                $('#filterForm').submit(function(e) {
+                    e.preventDefault();
+                    var selectedBranch = $('#branch_id_select').val();
+
+                    // Get the base URL for filtering
+                    var targetUrl = '{!! route('HeadOfficeData') !!}';
+
+                    // Add branch_id as a query parameter if user doesn't have a fixed branch and has selected a branch
+                    if (!userHasBranchId && selectedBranch) {
+                        targetUrl += '?branch_id=' + selectedBranch;
+                    }
+
+                    // Update the DataTable with the filtered data
+                    dataTable.table.ajax.url(targetUrl).load();
+                });
+            // End Filtering of Transaction
+
 
             $('#FetchingDatatable').on('click', '.createTransaction', function(e) {
                 e.preventDefault();
@@ -1017,24 +1248,124 @@
                 });
             });
 
-            $('#FetchingDatatable').on('click', '.EditInformationTransaction', function(e) {
-                e.preventDefault();
-                var new_atm_id = $(this).data('id');
 
-                $.ajax({
-                    url: "/AtmClientFetch",
-                    type: "GET",
-                    data: { new_atm_id : new_atm_id },
-                    success: function(data) {
-                        console.log(data);
+            // Edit Transaction
+                $('#EditInformationTransactionModal').on('shown.bs.modal', function () {
+                    $('#edit_branch_id').select2({ dropdownParent: $('#EditInformationTransactionModal'), });
+                    $('#edit_pension_account_type_fetch').select2({ dropdownParent: $('#EditInformationTransactionModal'), });
+                    $('#edit_bank_name').select2({ dropdownParent: $('#EditInformationTransactionModal'), });
+                });
 
-                        $('#EditInformationTransactionModal').modal('show');
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("An error occurred: " + error);
+                $('#edit_pension_type').on('change', function() {
+                    var selected_pension_types = $(this).val();
+
+                    setTimeout(function() {
+                        // Ensure we have the previous value for Pension Account Type
+                        var PreviousPensionAccountTypeValue = $('#edit_pension_account_type_value').val();
+
+                        console.log(PreviousPensionAccountTypeValue);
+
+                        $.ajax({
+                            url: '/pension/types/fetch',
+                            type: 'GET',
+                            data: {
+                                selected_pension_types: selected_pension_types
+                            },
+                            success: function(response) {
+                                // Start with the default option
+                                var options = '<option value="">Select Pension Account Type</option>';
+
+                                // Populate options with the response data
+                                $.each(response, function(index, item) {
+                                    // Mark as selected if it matches the previous value
+                                    var selected = (item.pension_name === PreviousPensionAccountTypeValue) ? 'selected' : '';
+                                    options += `<option value="${item.pension_name}" ${selected}>${item.pension_name}</option>`;
+                                });
+
+                                // Update the dropdown and trigger change to show selected
+                                $('#edit_pension_account_type_fetch').html(options).trigger('change');
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('AJAX Error:', status, error);
+                            }
+                        });
+
+                    }, 100);
+                });
+
+                $("#hide_atm_details").change(function() {
+                    if ($(this).is(':checked')){
+                        $(".replaceBankAccountNo").hide();
+                        $(".replaceBankName").hide();
+                    } else {
+                        $(".replaceBankAccountNo").show();
+                        $(".replaceBankName").show();
                     }
                 });
-            });
+
+                $('#FetchingDatatable').on('click', '.EditInformationTransaction', function(e) {
+                    e.preventDefault();
+                    var new_atm_id = $(this).data('id');
+
+                    $.ajax({
+                        url: "/AtmClientFetch",
+                        type: "GET",
+                        data: { new_atm_id : new_atm_id },
+                        success: function(data) {
+                            let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+
+                            $('#edit_fullname').text(data.client_information.last_name +', '
+                                                        + data.client_information.first_name +' '
+                                                        +(data.client_information.middle_name ?? '') +' '
+                                                        + (data.client_information.suffix ?? ''));
+
+                            $('#edit_branch_id').val(data.branch_id ?? '').trigger('change');
+
+                            $('#edit_pension_number_display').text(data.client_information.pension_number ?? '');
+                            $('#edit_pension_number_display').inputmask("99-9999999-99");
+                            $('#edit_atm_id').val(data.id);
+
+                            $('#edit_collection_date').val(data.collection_date ?? '').trigger('change');
+                            $('#edit_branch_id').val(data.branch_id ?? '').trigger('change');
+                            $('#edit_atm_type').val(data.atm_type ?? '').trigger('change');
+                            $('#edit_bank_name').val(data.bank_name ?? '').trigger('change');
+                            $('#edit_atm_status').val(data.atm_status ?? '').trigger('change');
+                            $('#edit_bank_account_no').val(data.bank_account_no ?? '');
+                            $('#edit_pin_no').val(data.pin_no ?? '');
+                            $('#edit_cash_box_no').val(data.cash_box_no ?? '');
+
+                            $('#edit_expiration_date').val(formatExpirationDate(data.expiration_date));
+                            function formatExpirationDate(expirationDate) {
+                                // If the expiration date exists and is in a valid format (YYYY-MM-DD)
+                                if (expirationDate) {
+                                    var date = new Date(expirationDate);
+                                    var month = date.getMonth() + 1; // Get the month (0-11)
+                                    var year = date.getFullYear(); // Get the year
+                                    // Format as YYYY-MM
+                                    return year + '-' + (month < 10 ? '0' + month : month);
+                                }
+                                return ''; // Return an empty string if no expiration date
+                            }
+
+                            $('#edit_transaction_number').val(data.transaction_number ?? '');
+
+                            $('#edit_pension_type').val(data.client_information.pension_type).trigger('change');
+                            $('#edit_pension_account_type_value').val(data.client_information.pension_account_type);
+                            $('#edit_pension_account_type_fetch').val(data.client_information.pension_account_type).trigger('change');
+                            $('#edit_first_name').val(data.client_information.first_name ?? '');
+                            $('#edit_middle_name').val(data.client_information.middle_name ?? '');
+                            $('#edit_last_name').val(data.client_information.last_name ?? '');
+                            $('#edit_suffix').val(data.client_information.suffix ?? '').trigger('change');
+                            $('#edit_birth_date').val(data.client_information.birth_date ?? '');
+
+                            $('#EditInformationTransactionModal').modal('show');
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("An error occurred: " + error);
+                        }
+                    });
+                });
+            // Edit Transaction
 
             $(document).on('click', '.passbookForCollection', function(e) {
                 e.preventDefault(); // Prevent the default anchor behavior
@@ -1140,7 +1471,7 @@
 
             function closeTransactionModal() {
                 $('#createTransactionModal').modal('hide');
-                $('#FetchingDatatable tbody').empty();
+                // $('#FetchingDatatable tbody').empty();
             }
         });
 
