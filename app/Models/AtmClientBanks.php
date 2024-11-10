@@ -27,4 +27,9 @@ class AtmClientBanks extends Model
         return $this->hasMany(AtmBanksTransaction::class, 'client_banks_id','id');
     }
 
+    public function PassbookForCollectionTransaction()
+    {
+        return $this->hasMany(PassbookForCollectionTransaction::class, 'client_banks_id','id');
+    }
+
 }

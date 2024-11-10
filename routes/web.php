@@ -28,6 +28,7 @@ Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang'
 Route::controller(DefaultController::class)->group(function () {
     Route::get('/pension/types/fetch', 'PensionTypesFetch')->name('pension.types.fetch');
     Route::get('/AtmClientFetch', 'AtmClientFetch')->name('AtmClientFetch');
+    Route::get('/UserSelect', 'UserSelect')->name('UserSelect');
 });
 
 
@@ -167,6 +168,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(PassbookCollectionController::class)->group(function () {
         Route::get('/PassbookCollectionSetUpPage', 'PassbookCollectionSetUpPage')->name('PassbookCollectionSetUpPage');
         Route::get('/PassbookCollectionData', 'PassbookCollectionData')->name('PassbookCollectionData');
+
+        Route::post('/PassbookForCollectionCreate', 'PassbookForCollectionCreate')->name('PassbookForCollectionCreate');
     });
 });
 

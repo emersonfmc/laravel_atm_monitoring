@@ -15,34 +15,33 @@ use App\Models\DataCollectionDate;
 use App\Http\Controllers\Controller;
 use App\Models\AtmTransactionAction;
 use Illuminate\Support\Facades\Auth;
+use App\Models\DataPensionTypesLists;
 use Yajra\DataTables\Facades\DataTables;
 
 class AtmHeadOfficeController extends Controller
 {
     public function HeadOfficePage()
     {
-        // // Start the query with the necessary relationships
-        // $HeadOfficeData = AtmClientBanks::with('ClientInformation', 'Branch', 'AtmBanksTransaction')
-        //     ->where('location', 'Head Office')
-        //     ->latest('updated_at')
-        //     ->get();
+        $userGroup = Auth::user()->UserGroup->group_name;
+        $branch_id = Auth::user()->branch_id;
 
-        // dd($HeadOfficeData);
         $DataBankLists = DataBankLists::where('status','Active')->get();
         $DataCollectionDate = DataCollectionDate::where('status','Active')->get();
         $Branches = Branch::where('status','Active')->get();
+        $AtmTransactionAction = AtmTransactionAction::where('transaction','1')->where('status','Active')->get();
+        $DataReleaseOption = DataReleaseOption::where('status','Active')->get();
+        $DataPensionTypesLists = DataPensionTypesLists::where('status','Active')->get();
 
-        $AtmTransactionAction = AtmTransactionAction::where('transaction','1')
-            ->where('status','Active')
-            ->get();
-
-        $DataReleaseOption = DataReleaseOption::where('status','Active')
-            ->get();
-
-        return view('pages.pages_backend.atm.atm_head_office_atm_lists', compact('AtmTransactionAction','DataReleaseOption','DataBankLists','DataCollectionDate','Branches'));
+        return view('pages.pages_backend.atm.atm_head_office_atm_lists',
+                    compact('AtmTransactionAction',
+                            'DataReleaseOption',
+                            'DataBankLists',
+                            'DataCollectionDate',
+                            'Branches',
+                            'DataPensionTypesLists','userGroup','branch_id'));
     }
 
-    public function HeadOfficeData()
+    public function HeadOfficeData(Request $request)
     {
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
@@ -52,10 +51,11 @@ class AtmHeadOfficeController extends Controller
             ->where('location', 'Head Office')
             ->latest('updated_at');
 
-        // Check if the user has a valid branch_id
-        if ($userBranchId !== null && $userBranchId !== 0) {
-            // Filter by branch_id if it's set and valid
+        // Apply branch filter based on user branch_id or request input
+        if ($userBranchId) {
             $query->where('branch_id', $userBranchId);
+        } elseif ($request->filled('branch_id')) {
+            $query->where('branch_id', $request->branch_id);
         }
 
         // Get the filtered data
@@ -125,22 +125,6 @@ class AtmHeadOfficeController extends Controller
                                     <i class="fas fa-edit"></i>
                                  </a>';
                 }
-
-                // Add buttons for users in Collection Staff and others
-                if (in_array($userGroup, ['Collection Staff', 'Developer', 'Admin', 'Everfirst Admin'])) {
-                    // Show the button to transfer branch transaction and edit information
-                    if($row->atm_type === 'Passbook' && $row->passbook_for_collection === 'no')
-                    {
-                        $action .= '<a href="#" class="btn btn-info passbookForCollection me-2 mb-2"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="Passbook For Collection"
-                                    data-id="' . $row->id . '">
-                                    <i class="fas fa-book"></i>
-                                </a>';
-                    }
-                }
-
                 // // Only show the button for users in specific groups
                 // if (in_array($userGroup, ['Developer', 'Admin', 'Branch Head', 'Everfirst Admin'])) {
                 //     if ($hasOngoingTransaction) {
@@ -201,6 +185,24 @@ class AtmHeadOfficeController extends Controller
 
                 return $action; // Return all the accumulated buttons
             })
+            ->addColumn('passbook_for_collection', function($row) use ($userGroup) {
+                $passbook_for_collection = ''; // Initialize a variable to hold the buttons
+
+                // Add buttons for users in Collection Staff and others
+                if (in_array($userGroup, ['Collection Staff', 'Developer', 'Admin', 'Everfirst Admin','Branch Head'])) {
+                    if($row->atm_type === 'Passbook' && $row->passbook_for_collection === 'no')
+                    {
+                        $passbook_for_collection .= '<a href="#" class="btn btn-info passbookForCollection ms-3 me-2 mb-2"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Passbook For Collection"
+                                    data-id="' . $row->id . '">
+                                    <i class="fas fa-book"></i>
+                                </a>';
+                    }
+                }
+                return $passbook_for_collection; // Return all the accumulated buttons
+            })
             ->addColumn('pending_to', function($row) {
                 $groupName = ''; // Variable to hold the group name
                 $atmTransactionActionName = ''; // Variable to hold the ATM transaction action name
@@ -239,7 +241,7 @@ class AtmHeadOfficeController extends Controller
                 // Prepare the output
                 return $atmTransactionActionName . ' <div class="text-dark"> ' . $groupName .'</div>'; // Combine the group name and action name
             })
-            ->rawColumns(['action', 'pending_to']) // Render HTML in both the action and pending_to columns
+            ->rawColumns(['action', 'pending_to','passbook_for_collection']) // Render HTML in both the action and pending_to columns
             ->make(true);
     }
 
@@ -388,7 +390,9 @@ class AtmHeadOfficeController extends Controller
 
     public function ReleasedPage()
     {
-        return view('pages.pages_backend.atm.atm_released_lists');
+        $DataBankLists = DataBankLists::where('status','Active')->get();
+
+        return view('pages.pages_backend.atm.atm_released_lists', compact('DataBankLists'));
     }
 
     public function ReleasedData()

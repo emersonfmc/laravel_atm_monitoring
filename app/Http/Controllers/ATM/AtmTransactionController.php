@@ -2,48 +2,76 @@
 
 namespace App\Http\Controllers\ATM;
 
+use App\Models\Branch;
+use App\Models\DataArea;
+use App\Models\SystemLogs;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 
-use Yajra\DataTables\Facades\DataTables;
+use App\Models\DataBankLists;
 
-use App\Models\AtmTransactionSequence;
 use App\Models\AtmClientBanks;
+use Illuminate\Support\Carbon;
+use App\Models\DataReleaseOption;
+use App\Models\DataCollectionDate;
+use App\Models\AtmBanksTransaction;
+use App\Http\Controllers\Controller;
+use App\Models\AtmTransactionAction;
+use Illuminate\Support\Facades\Auth;
+use App\Models\DataPensionTypesLists;
+use App\Models\AtmTransactionSequence;
+use Yajra\DataTables\Facades\DataTables;
 use App\Models\AtmTransactionBalanceLogs;
 use App\Models\AtmBanksTransactionApproval;
-use App\Models\AtmBanksTransaction;
-use App\Models\AtmTransactionAction;
-use App\Models\Branch;
-use App\Models\SystemLogs;
 
 class AtmTransactionController extends Controller
 {
     public function TransactionPage()
     {
+        $branch_id = Auth::user()->branch_id;
 
         $Branches = Branch::where('status', 'Active')->get();
         $AtmTransactionAction = AtmTransactionAction::where('status', 'Active')->get();
 
-        return view('pages.pages_backend.atm.atm_transactions', compact('Branches','AtmTransactionAction'));
+        $DataBankLists = DataBankLists::where('status','Active')->get();
+        $DataReleaseOption = DataReleaseOption::where('status','Active')->get();
+        $DataPensionTypesLists = DataPensionTypesLists::where('status','Active')->get();
+        $DataCollectionDate = DataCollectionDate::where('status','Active')->get();
+
+        return view('pages.pages_backend.atm.atm_transactions',
+                    compact('Branches','AtmTransactionAction','branch_id',
+                            'DataBankLists','DataPensionTypesLists','DataCollectionDate'));
     }
 
-    public function TransactionData()
+    public function TransactionData(Request $request)
     {
         $userGroup = Auth::user()->UserGroup->group_name;
+        $branch_id = Auth::user()->branch_id;
 
-        $AtmBanksTransaction = AtmBanksTransaction::with([
-                'AtmClientBanks',
-                'AtmClientBanks.ClientInformation',
-                'AtmTransactionAction',
-                'AtmBanksTransactionApproval.DataUserGroup',
-                'Branch'
-            ])
-            ->latest('updated_at')
-            ->get();
+        // Start building the query with conditional branch, transaction, and status filters
+        $query = AtmBanksTransaction::with([
+            'AtmClientBanks',
+            'AtmClientBanks.ClientInformation',
+            'AtmTransactionAction',
+            'AtmBanksTransactionApproval.DataUserGroup',
+            'Branch'
+        ])->latest('updated_at');
 
-        return DataTables::of($AtmBanksTransaction)
+        // Apply branch filter based on user branch_id or request input
+        if ($branch_id) {
+            $query->where('branch_id', $branch_id);
+        } elseif ($request->filled('branch_id')) {
+            $query->where('branch_id', $request->branch_id);
+        }
+
+        if ($request->filled('transaction_actions_id')) {
+            $query->where('transaction_actions_id', $request->transaction_actions_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        return DataTables::of($query)
             ->setRowId('id')
             ->addColumn('action', function($row) use ($userGroup) {
                 $action = ''; // Initialize a variable to hold the buttons
@@ -212,7 +240,6 @@ class AtmTransactionController extends Controller
                             'reason' => $reason ?? NULL,
                             'reason_remarks' => $release_reason ?? NULL,
                             'yellow_copy' => NULL,
-                            'released_client_images_id' => NULL,
                             'created_at' => Carbon::now(),
                         ]);
 

@@ -60,7 +60,7 @@
 
     <div class="modal fade" id="returnClientTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="pulloutBranchTransactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 30%;" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-uppercase">Return Client / Balik Loob Transaction</h5>
@@ -72,64 +72,188 @@
                         <div class="row">
                             <input type="hidden" name="atm_id" id="return_atm_id">
                             <input type="hidden" name="reason_for_pull_out" value="9">
-                            <div class="col-12">
+                            <div class="col-12 mb-3">
                                 <div class="form-group">
                                     <div id="return_fullname" class="fw-bold h4"></div>
                                     <span id="return_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="return_pension_account_type" class="fw-bold h5"></span>
                                 </div>
-                                <hr>
+                            </div>
 
-                                <div class="row">
-                                    <div class="form-group col-12 mb-3">
-                                        <label class="fw-bold h6">Remarks</label>
-                                        <textarea name="remarks" cols="30" rows="3" class="form-control" style="resize: none;"
-                                                  placeholder="Remarks" minlength="0" maxlength="100" required></textarea>
-                                    </div>
+                            <hr>
+
+                            <div class="form-group col-3 mb-3">
+                                <label class="fw-bold h6">Birthdate</label>
+                                <input type="text" class="form-control" id="return_birth_date" readonly>
+                            </div>
+
+                            <div class="form-group col-3 mb-3">
+                                <label class="fw-bold h6">Transaction Number</label>
+                                <input type="text" class="form-control" id="return_transaction_number" readonly>
+                            </div>
+
+                            <div class="form-group col-3 mb-3">
+                                <label class="fw-bold h6">Bank Account Number</label>
+                                <input type="text" class="form-control" id="return_bank_account_no" readonly>
+                            </div>
+
+                            <div class="form-group col-3 mb-3">
+                                <label class="fw-bold h6">Bank Name</label>
+                                <input type="text" class="form-control" id="return_bank_name" readonly>
+                            </div>
+
+                            <div class="form-group col-3 mb-3">
+                                <label class="fw-bold h6">Type</label>
+                                <input type="text" class="form-control" id="return_atm_type" readonly>
+                            </div>
+
+                            <div class="form-group col-3 mb-3">
+                                <label class="fw-bold h6">Expiration Date</label>
+                                <input type="text" class="form-control" id="return_expiration_date" readonly>
+                            </div>
+
+                            <div class="form-group col-3 mb-3">
+                                <label class="fw-bold h6">Collection Date</label>
+                                <input type="text" class="form-control" id="return_collection_date" readonly>
+                            </div>
+
+                            <hr>
+                            <div class="col-md-12">
+                                <div class="form-group col-4 mb-3">
+                                    <label class="fw-bold h6">Transaction</label>
+                                    <select name="client_transaction" class="form-select" id="client_transaction" required>
+                                        <option value="" selected disabled>Select Transaction</option>
+                                        <option value="return_old">Return Same Information</option>
+                                        <option value="return_new">Return New Information</option>
+                                    </select>
                                 </div>
                                 <hr>
 
-                                <div class="row mb-3">
-                                    <div class="form-group col-6">
-                                        <label class="fw-bold h6">Transaction Number</label>
-                                        <input type="text" class="form-control" id="return_transaction_number" readonly>
+                                <span id="same_information" style="display:none;">
+                                    <div class="row">
+                                      <div class="col-md-3">
+                                        <div class="form-group mb-3">
+                                            <label class="fw-bold h6 mt-3">PIN Code <span class="text-danger">*</span></label>
+                                            <input type="text" id="pin_code"
+                                                  name="old_pin_code" class="form-control" placeholder="PIN Code">
+                                        </div>
+                                      </div>
+
+                                      <div class="col-md-3">
+                                        <div class="form-group mb-3">
+                                            <label class="fw-bold h6 mt-3">Balance <span class="text-danger">*</span></label>
+                                              <div class="input-group">
+                                                  <div class="input-group-prepend">
+                                                      <span class="input-group-text">₱</span>
+                                                  </div>
+                                                  <input type="text" name="old_balance" id="atm_balance" class="balance_input_mask form-control"
+                                                         placeholder="ATM / Passbook Balance" required>
+                                              </div>
+                                        </div>
+                                      </div>
+
+                                      <div class="col-md-3">
+                                        <div class="form-group mb-3">
+                                            <label class="fw-bold h6 mt-3">Remarks<span class="text-danger"> *</span></label>
+                                            <input type="text" id="remarks" name="old_remarks" class="form-control" placeholder="Remarks" minlength="0" maxlength="100">
+                                        </div>
+                                      </div>
+                                    </div>
+                                </span>
+
+                                <span id="new_information" style="display:none;">
+                                    <div class="text-start">
+                                        <a href="#" class="btn btn-primary" id="addMoreAtmBtn">Add More</a>
                                     </div>
 
-                                    <div class="form-group col-6">
-                                        <label class="fw-bold h6">Birthdate</label>
-                                        <input type="text" class="form-control" id="return_birth_date" readonly>
-                                    </div>
-                                </div>
+                                    <div class="atm-details-wrapper">
+                                        <div id="AddMoreAtmContainer" class="mb-3">
+                                            <div class="row atm-details mt-2">
+                                                <hr>
+                                                <label class="fw-bold h6 text-center mb-3 text-primary">
+                                                    Add ATM / Passbook / Simcard No.
+                                                </label>
 
-                                <div class="row mb-3">
-                                    <div class="form-group col-6">
-                                        <label class="fw-bold h6">Bank Account Number</label>
-                                        <input type="text" class="form-control" id="return_bank_account_no" readonly>
+                                                <hr>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-2 row align-items-center">
+                                                        <label class="col-form-label col-sm-4 fw-bold">Type</label>
+                                                        <div class="col-5">
+                                                            <select name="atm_type[]" class="form-select" required>
+                                                                <option value="" selected disabled>Type</option>
+                                                                <option value="ATM">ATM</option>
+                                                                <option value="Passbook">Passbook</option>
+                                                                <option value="Sim Card">Sim Card</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-sm-3">
+                                                            <select name="atm_status[]" id="atm_status" class="form-select" required>
+                                                              <option value="">ATM Status</option>
+                                                              <option value="New" selected>New</option>
+                                                              <option value="Old">Old</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group mb-2 row align-items-center">
+                                                        <label class="col-form-label col-sm-4 fw-bold">ATM / Passbook / Sim No.</label>
+                                                        <div class="col-8">
+                                                            <input type="text" name="atm_number[]" class="atm_card_input_mask form-control" placeholder="ATM / Passbook / Sim No." required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group mb-3 row align-items-center">
+                                                        <label class="col-form-label col-4 fw-bold">Balance</label>
+                                                        <div class="col-8">
+                                                            <input type="text" name="atm_balance[]" class="balance_input_mask form-control" placeholder="Balance" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group mb-2 row align-items-center">
+                                                        <label class="font-size col-form-label col-4 fw-bold">Banks</label>
+                                                        <div class="col-8">
+                                                            <div class="form-group">
+                                                            <select name="bank_id[]" id="bank_id" class="form-select select2">
+                                                                <option value="" selected disabled>Banks</option>
+                                                                @foreach ($DataBankLists as $bank)
+                                                                        <option value="{{ $bank->bank_name }}">{{ $bank->bank_name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group mb-3 row align-items-center">
+                                                        <label class="col-form-label col-4 fw-bold">Pin Code</label>
+                                                        <div class="col-8">
+                                                            <input type="number" name="pin_code[]" class="form-control" placeholder="PIN Code">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group mb-3 row align-items-center">
+                                                        <label class="col-form-label col-4 fw-bold">Expiration Date</label>
+                                                        <div class="col-8">
+                                                            <input type="month" name="expiration_date[]" class="form-control">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group mb-3 row align-items-center">
+                                                        <label class="col-form-label col-4 fw-bold">Remarks</label>
+                                                        <div class="col-8">
+                                                            <input type="text" name="remarks[]" class="form-control" placeholder="Remarks" minlength="0" maxlength="100">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group mb-2 row align-items-center">
+                                                        <label class="col-form-label col-4 fw-bold">Remove</label>
+                                                        <div class="col-8">
+                                                            <a href="#" class="btn btn-danger remove-atm-row"><i class="fas fa-trash"></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr class="mt-2 mb-2">
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="form-group col-6">
-                                        <label class="fw-bold h6">Bank Name</label>
-                                        <input type="text" class="form-control" id="return_bank_name" readonly>
-                                    </div>
-                                </div>
+                                </span>
 
-                                <div class="row mb-3">
-                                    <div class="form-group col-6">
-                                        <label class="fw-bold h6">Type</label>
-                                        <input type="text" class="form-control" id="return_atm_type" readonly>
-                                    </div>
-                                    <div class="form-group col-6">
-                                        <label class="fw-bold h6">Expiration Date</label>
-                                        <input type="text" class="form-control" id="return_expiration_date" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="form-group col-6">
-                                        <label class="fw-bold h6">Collection Date</label>
-                                        <input type="text" class="form-control" id="return_collection_date" readonly>
-                                    </div>
-                                </div>
                             </div>
                         </div>
+
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
                             <button type="submit" class="btn btn-success">Return Client</button>
@@ -335,173 +459,307 @@
             ];
             dataTable.initialize(url, columns);
 
-            $('#FetchingDatatable').on('click', '.returnClientTransaction', function(e) {
-                e.preventDefault();
-                var new_atm_id = $(this).data('id');
 
-                $.ajax({
-                    url: "/AtmClientFetch",
-                    type: "GET",
-                    data: { new_atm_id : new_atm_id },
-                    success: function(data) {
-                        let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+            // Returning Client Transaction
+                $("#client_transaction").on("change", function() {
+                    const transaction_type = $("#client_transaction").val();
 
-                        $('#return_fullname').text(data.client_information.last_name +', '
-                                                    + data.client_information.first_name +' '
-                                                    +(data.client_information.middle_name ?? '') +' '
-                                                    + (data.client_information.suffix ?? ''));
-
-                        $('#return_branch_id').val(data.branch_id ?? '').trigger('change');
-
-                        $('#return_pension_number_display').text(data.client_information.pension_number ?? '');
-                        $('#return_pension_number_display').inputmask("99-9999999-99");
-
-                        $('#return_pension_number').val(data.client_information.pension_number);
-                        $('#return_pension_account_type').text(data.client_information.pension_account_type);
-                        $('#return_pension_type').val(data.client_information.pension_type);
-                        $('#return_birth_date').val(formattedBirthDate);
-                        $('#return_branch_location').val(data.branch.branch_location);
-
-                        $('#return_atm_id').val(data.id);
-                        $('#return_bank_account_no').val(data.bank_account_no ?? '');
-                        $('#return_collection_date').val(data.collection_date ?? '').trigger('change');
-                        $('#return_atm_type').val(data.atm_type ?? '');
-                        $('#return_bank_name').val(data.bank_name ?? '');
-                        $('#return_transaction_number').val(data.transaction_number ?? '');
-
-                        let expirationDate = '';
-                        if (data.expiration_date && data.expiration_date !== '0000-00-00') {
-                            expirationDate = new Date(data.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                        }
-                        $('#return_expiration_date').val((expirationDate || ''));
-
-                        $('#returnClientTransactionModal').modal('show');
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("An error occurred: " + error);
+                    if (transaction_type === "return_old") {
+                        $('#same_information').show();
+                        $('#new_information').hide();
+                    }
+                    else {
+                        $('#same_information').hide();
+                        $('#new_information').show();
                     }
                 });
-            });
 
-            $('#TransactionReturnClientValidateForm').validate({
-                rules: {
-                    remarks: { required: true }
-                },
-                errorElement: 'span',
-                errorPlacement: function(error, element) {
-                    error.addClass('invalid-feedback');
-                    element.closest('.form-group').append(error);
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).removeClass('is-invalid');
-                },
-                submitHandler: function(form) {
-                    var hasRows = FetchingDatatableBody.children('tr').length > 0;
-                    if (hasRows) {
-                        Swal.fire({
-                            title: 'Confirmation',
-                            text: 'Are you sure you want to save this?',
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonColor: "#007BFF",
-                            cancelButtonColor: "#6C757D",
-                            confirmButtonText: "Yes, Save it!"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                const currentPage = dataTable.table.page();
-                                $.ajax({
-                                    url: form.action,
-                                    type: form.method,
-                                    data: $(form).serialize(),
-                                    success: function(response) {
+                $('#returnClientTransactionModal').on('shown.bs.modal', function () {
+                    $('#bank_id').select2({ dropdownParent: $('#returnClientTransactionModal'), });
+                });
 
-                                        if (typeof response === 'string') {
-                                            var res = JSON.parse(response);
-                                        } else {
-                                            var res = response; // If it's already an object
-                                        }
+                $(function() {
+                    const maxRows = 5;
 
-                                        if (res.status === 'success')
-                                        {
-                                            closeTransactionModal();
-                                            Swal.fire({
-                                                title: 'Successfully Created!',
-                                                text: 'Transaction is successfully Created!',
-                                                icon: 'success',
-                                                showCancelButton: false,
-                                                showConfirmButton: true,
-                                                confirmButtonText: 'OK',
-                                                preConfirm: () => {
-                                                    return new Promise(( resolve
-                                                    ) => {
-                                                        Swal.fire({
-                                                            title: 'Please Wait...',
-                                                            allowOutsideClick: false,
-                                                            allowEscapeKey: false,
-                                                            showConfirmButton: false,
-                                                            showCancelButton: false,
-                                                            didOpen: () => {
-                                                                Swal.showLoading();
-                                                                // here the reload of datatable
-                                                                dataTable.table.ajax.reload( () =>
-                                                                {
-                                                                    Swal.close();
-                                                                    $(form)[0].reset();
-                                                                    dataTable.table.page(currentPage).draw( false );
-                                                                },
-                                                                false );
-                                                            }
-                                                        })
-                                                    });
-                                                }
-                                            });
-                                        }
-                                        else if (res.status === 'error')
-                                        {
-                                            Swal.fire({
-                                                title: 'Error!',
-                                                text: res.message,
-                                                icon: 'error',
-                                            });
-                                        }
-                                        else
-                                        {
-                                            Swal.fire({
-                                                title: 'Error!',
-                                                text: 'Error Occurred Please Try Again',
-                                                icon: 'error',
-                                            });
-                                        }
-                                    },
-                                    error: function(xhr, status, error) {
-                                        var errorMessage =
-                                            'An error occurred. Please try again later.';
-                                        if (xhr.responseJSON && xhr.responseJSON
-                                            .error) {
-                                            errorMessage = xhr.responseJSON.error;
-                                        }
-                                        Swal.fire({
-                                            title: 'Error!',
-                                            text: errorMessage,
-                                            icon: 'error',
-                                        });
-                                    }
-                                })
-                            }
-                        })
-                    } else {
+                    const newRowTemplate = `
+                        <div class="row atm-details mb-3 mt-2">
+                            <label class="fw-bold h6 text-center mb-3 text-primary">Add ATM / Passbook / Simcard No.</label>
+                            <hr>
+                            <div class="col-md-6">
+                                <div class="form-group mb-2 row align-items-center">
+                                    <label class="col-form-label col-sm-4 fw-bold">Type</label>
+                                    <div class="col-5">
+                                        <select name="atm_type[]" class="form-select" required>
+                                            <option value="" selected disabled>Type</option>
+                                            <option value="ATM">ATM</option>
+                                            <option value="Passbook">Passbook</option>
+                                            <option value="Sim Card">Sim Card</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <select name="atm_status[]" class="form-select" required>
+                                            <option value="">ATM Status</option>
+                                            <option value="New" selected>New</option>
+                                            <option value="Old">Old</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-2 row align-items-center">
+                                    <label class="col-form-label col-sm-4 fw-bold">ATM / Passbook / Sim No.</label>
+                                    <div class="col-8">
+                                        <input type="text" name="atm_number[]" class="atm_card_input_mask form-control" placeholder="ATM / Passbook / Sim No." required>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3 row align-items-center">
+                                    <label class="col-form-label col-4 fw-bold">Balance</label>
+                                    <div class="col-8">
+                                        <input type="text" name="atm_balance[]" class="balance_input_mask form-control" placeholder="Balance" required>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-2 row align-items-center">
+                                    <label class="font-size col-form-label col-4 fw-bold">Banks</label>
+                                    <div class="col-8">
+                                        <select name="bank_id[]" class="form-select select2">
+                                            <option value="" selected disabled>Banks</option>
+                                            @foreach ($DataBankLists as $bank)
+                                                <option value="{{ $bank->bank_name }}">{{ $bank->bank_name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3 row align-items-center">
+                                    <label class="col-form-label col-4 fw-bold">Pin Code</label>
+                                    <div class="col-8">
+                                        <input type="number" name="pin_code[]" class="form-control" placeholder="PIN Code">
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3 row align-items-center">
+                                    <label class="col-form-label col-4 fw-bold">Expiration Date</label>
+                                    <div class="col-8">
+                                        <input type="month" name="expiration_date[]" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3 row align-items-center">
+                                    <label class="col-form-label col-4 fw-bold">Remarks</label>
+                                    <div class="col-8">
+                                        <input type="text" name="remarks[]" class="form-control" placeholder="Remarks" minlength="0" maxlength="100">
+                                    </div>
+                                </div>
+                                <div class="form-group mb-2 row align-items-center">
+                                    <label class="col-form-label col-4 fw-bold">Remove</label>
+                                    <div class="col-8">
+                                        <a href="#" class="btn btn-danger remove-atm-row"><i class="fas fa-trash"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="mt-3">
+                        </div>`;
 
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Empty Record!',
-                            text: 'Table is empty, add row to proceed!',
-                        });
+                    function applyMasks() {
+                        applyInputMaskCurrency();
+                        applyCardNumberInputMask();
                     }
-                }
-            });
+
+                    $('#addMoreAtmBtn').on('click', function(e) {
+                        e.preventDefault();
+                        const rowCount = $('.atm-details').length; // Get updated row count
+                        if (rowCount < maxRows) {
+                            $('#AddMoreAtmContainer').append(newRowTemplate);
+                            applyMasks();
+                        } else {
+                            Swal.fire({ icon: "error", title: "Oops...", text: "Limit of 5 ATM Rows Only!" });
+                        }
+                    });
+
+                    $('#AddMoreAtmContainer').on('click', '.remove-atm-row', function(e) {
+                        e.preventDefault();
+                        const rowCount = $('.atm-details').length; // Get updated row count
+                        if (rowCount > 1) { // Ensure at least one row remains
+                            $(this).closest('.atm-details').remove();
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: "At least one row must remain!"
+                            });
+                        }
+                    });
+
+                    applyMasks();
+                });
+
+
+
+                $('#FetchingDatatable').on('click', '.returnClientTransaction', function(e) {
+                    e.preventDefault();
+                    var new_atm_id = $(this).data('id');
+
+                    $.ajax({
+                        url: "/AtmClientFetch",
+                        type: "GET",
+                        data: { new_atm_id : new_atm_id },
+                        success: function(data) {
+                            let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+
+                            $('#return_fullname').text(data.client_information.last_name +', '
+                                                        + data.client_information.first_name +' '
+                                                        +(data.client_information.middle_name ?? '') +' '
+                                                        + (data.client_information.suffix ?? ''));
+
+                            $('#return_branch_id').val(data.branch_id ?? '').trigger('change');
+
+                            $('#return_pension_number_display').text(data.client_information.pension_number ?? '');
+                            $('#return_pension_number_display').inputmask("99-9999999-99");
+
+                            $('#return_pension_number').val(data.client_information.pension_number);
+                            $('#return_pension_account_type').text(data.client_information.pension_account_type);
+                            $('#return_pension_type').val(data.client_information.pension_type);
+                            $('#return_birth_date').val(formattedBirthDate);
+                            $('#return_branch_location').val(data.branch.branch_location);
+
+                            $('#return_atm_id').val(data.id);
+                            $('#return_bank_account_no').val(data.bank_account_no ?? '');
+                            $('#return_collection_date').val(data.collection_date ?? '').trigger('change');
+                            $('#return_atm_type').val(data.atm_type ?? '');
+                            $('#return_bank_name').val(data.bank_name ?? '');
+                            $('#return_transaction_number').val(data.transaction_number ?? '');
+
+                            let expirationDate = '';
+                            if (data.expiration_date && data.expiration_date !== '0000-00-00') {
+                                expirationDate = new Date(data.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                            }
+                            $('#return_expiration_date').val((expirationDate || ''));
+
+                            $('#returnClientTransactionModal').modal('show');
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("An error occurred: " + error);
+                        }
+                    });
+                });
+
+                $('#TransactionReturnClientValidateForm').validate({
+                    rules: {
+                        remarks: { required: true }
+                    },
+                    errorElement: 'span',
+                    errorPlacement: function(error, element) {
+                        error.addClass('invalid-feedback');
+                        element.closest('.form-group').append(error);
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element, errorClass, validClass) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    submitHandler: function(form) {
+                        var hasRows = FetchingDatatableBody.children('tr').length > 0;
+                        if (hasRows) {
+                            Swal.fire({
+                                title: 'Confirmation',
+                                text: 'Are you sure you want to save this?',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonColor: "#007BFF",
+                                cancelButtonColor: "#6C757D",
+                                confirmButtonText: "Yes, Save it!"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    const currentPage = dataTable.table.page();
+                                    $.ajax({
+                                        url: form.action,
+                                        type: form.method,
+                                        data: $(form).serialize(),
+                                        success: function(response) {
+
+                                            if (typeof response === 'string') {
+                                                var res = JSON.parse(response);
+                                            } else {
+                                                var res = response; // If it's already an object
+                                            }
+
+                                            if (res.status === 'success')
+                                            {
+                                                closeTransactionModal();
+                                                Swal.fire({
+                                                    title: 'Successfully Created!',
+                                                    text: 'Transaction is successfully Created!',
+                                                    icon: 'success',
+                                                    showCancelButton: false,
+                                                    showConfirmButton: true,
+                                                    confirmButtonText: 'OK',
+                                                    preConfirm: () => {
+                                                        return new Promise(( resolve
+                                                        ) => {
+                                                            Swal.fire({
+                                                                title: 'Please Wait...',
+                                                                allowOutsideClick: false,
+                                                                allowEscapeKey: false,
+                                                                showConfirmButton: false,
+                                                                showCancelButton: false,
+                                                                didOpen: () => {
+                                                                    Swal.showLoading();
+                                                                    // here the reload of datatable
+                                                                    dataTable.table.ajax.reload( () =>
+                                                                    {
+                                                                        Swal.close();
+                                                                        $(form)[0].reset();
+                                                                        dataTable.table.page(currentPage).draw( false );
+                                                                    },
+                                                                    false );
+                                                                }
+                                                            })
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                            else if (res.status === 'error')
+                                            {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: res.message,
+                                                    icon: 'error',
+                                                });
+                                            }
+                                            else
+                                            {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: 'Error Occurred Please Try Again',
+                                                    icon: 'error',
+                                                });
+                                            }
+                                        },
+                                        error: function(xhr, status, error) {
+                                            var errorMessage =
+                                                'An error occurred. Please try again later.';
+                                            if (xhr.responseJSON && xhr.responseJSON
+                                                .error) {
+                                                errorMessage = xhr.responseJSON.error;
+                                            }
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: errorMessage,
+                                                icon: 'error',
+                                            });
+                                        }
+                                    })
+                                }
+                            })
+                        } else {
+
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Empty Record!',
+                                text: 'Table is empty, add row to proceed!',
+                            });
+                        }
+                    }
+                });
+             // Returning Client Transaction
         });
 
         $(document).on('click', '.view_pin_code', function(e) {
