@@ -19,11 +19,37 @@
                                 A Centralized Record of all ATMs managed by the head office
                             </p>
                         </div>
-                        {{-- <div class="col-md-4 text-end">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAreaModal"><i
-                                class="fas fa-plus-circle me-1"></i> Create Area</button>
-                        </div> --}}
+                        <div class="col-md-4 text-end" id="passbookForCollection" style="display: none;">
+                            <a href="#" class="btn btn-primary" id="ForCollectionButton">Passbook For Collection</a>
+                        </div>
+
                     </div>
+                    <hr>
+                    @if(in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin','Branch Head']))
+                        <form id="filterForm">
+                            @csrf
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group mb-3">
+                                        <label class="fw-bold h6">Branch</label>
+                                        <select name="branch_id" id="branch_id_select" class="form-select select2" required>
+                                            <option value="">Select Branches</option>
+                                            @foreach($Branches as $branch)
+                                                <option value="{{ $branch->id }}" {{ $branch->id == $branch_id ? 'selected' : '' }}>
+                                                    {{ $branch->branch_location }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2" style="margin-top: 25px;">
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-primary">Filter</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    @endif
                     <hr>
 
 
@@ -70,8 +96,8 @@
             }];
             const columns = [
                 {
-                    data: 'id',
-                    name: 'id',
+                    data: 'action',
+                    name: 'action',
                     render: function(data, type, row, meta) {
                         return '<span class="fw-bold h6 text-primary">' + data + '</span>';
                     },
@@ -80,8 +106,8 @@
                 },
                 // Transaction Type and Pending By
                 {
-                    data: 'id',
-                    name: 'id',
+                    data: 'pending_to',
+                    name: 'pending_to',
                     render: function(data, type, row, meta) {
                         return '<span class="fw-bold h6 text-primary">' + data + '</span>';
                     },
@@ -224,10 +250,86 @@
                     orderable: true,
                     searchable: true,
                 }
-
-
             ];
             dataTable.initialize(url, columns);
+            // Filtering of Transaction
+                var branchId = @json($branch_id);
+                var userHasBranchId = {!! Auth::user()->branch_id ? 'true' : 'false' !!};
+
+                if (userHasBranchId) {
+                    $('#branch_id_select').val(branchId).prop('disabled', true);
+                }
+
+                $('#filterForm').submit(function(e) {
+                    e.preventDefault();
+                    var selectedBranch = $('#branch_id_select').val();
+
+                    // Get the base URL for filtering
+                    var targetUrl = '{!! route('PassbookCollectionData') !!}';
+
+                    // Add branch_id as a query parameter if user doesn't have a fixed branch and has selected a branch
+                    if (!userHasBranchId && selectedBranch) {
+                        targetUrl += '?branch_id=' + selectedBranch;
+                    }
+
+                    // Update the DataTable with the filtered data
+                    dataTable.table.ajax.url(targetUrl).load();
+                });
+            // End Filtering of Transaction
+
+            $(document).on('change', '.check-item', function() {
+                if ($('.check-item:checked').length > 0) {
+                    $('#passbookForCollection').show();
+                } else {
+                    $('#passbookForCollection').hide();
+                }
+            });
+
+            // Handle button click to collect checked item IDs and show confirmation
+            $('#ForCollectionButton').on('click', function(e) {
+                e.preventDefault(); // Prevent default link behavior
+
+                // Collect all checked item IDs
+                var checkedItemsData = [];
+                $('.check-item:checked').each(function() {
+                    var itemId = $(this).data('id');
+                    checkedItemsData.push(itemId);
+
+                    console.log(checkedItemsData);
+                });
+
+                // Confirm the action with SweetAlert
+                Swal.fire({
+                    title: 'Passbook For Collection',
+                    text: 'Are you sure you want to proceed with these to For Passbook for Collection?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, proceed!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                        console.log('Proceed to Collection');
+
+                        // $.ajax({
+                        //     url: '/your-action-url', // Replace with your URL
+                        //     method: 'POST',
+                        //     data: {
+                        //         item_ids: checkedItemsData
+                        //     },
+                        //     success: function(response) {
+                        //         // Handle success, like reloading the table or showing a success message
+                        //         Swal.fire('Success!', 'The items have been processed.', 'success');
+                        //     },
+                        //     error: function() {
+                        //         // Handle error
+                        //         Swal.fire('Error!', 'There was a problem processing the items.', 'error');
+                        //     }
+                        // });
+                    }
+                });
+            });
         });
     </script>
 

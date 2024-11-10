@@ -114,6 +114,30 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="fw-bold">
+                                Transaction Number : <span class="text-primary" id="view_transaction_number"></span>
+                            </div>
+                            <div class="fw-bold">
+                                Transaction : <span class="text-primary" id="view_transaction_action"></span>
+                            </div>
+                            <div class="fw-bold">
+                                Date Requested : <span class="text-primary" id="view_created_date"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="fw-bold">
+                                Name : <span class="text-primary" id="view_fullname"></span>
+                            </div>
+                            <div class="fw-bold">
+                                Pension Number : <span class="text-primary" id="view_pension_number_display"></span> /
+                                <span id="view_pension_account_type_display" class="fw-bold h6"></span> /
+                                <span id="view_pension_type_display" class="fw-bold h6"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
 
                     <div class="table-responsive mt-3">
                         <table class="table table-design">
@@ -398,108 +422,111 @@
 
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="fw-bold">
-                                Transaction Number : <span class="text-primary" id="update_transaction_number"></span>
+                <form action="#" method="POST" id="updateTransactionValidateForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="fw-bold">
+                                    Transaction Number : <span class="text-primary" id="update_transaction_number"></span>
+                                </div>
+                                <div class="fw-bold">
+                                    Transaction : <span class="text-primary" id="update_transaction_action"></span>
+                                </div>
+                                <div class="fw-bold">
+                                    Date Requested : <span class="text-primary" id="update_created_date"></span>
+                                </div>
                             </div>
-                            <div class="fw-bold">
-                                Transaction : <span class="text-primary" id="update_transaction_action"></span>
+                            <div class="col-md-6">
+                                <div class="fw-bold">
+                                    Name : <span class="text-primary" id="update_fullname"></span>
+                                </div>
+                                <div class="fw-bold">
+                                    Pension Number : <span class="text-primary" id="update_pension_number_display"></span> /
+                                    <span id="update_pension_account_type_display" class="fw-bold h6"></span> /
+                                    <span id="update_pension_type_display" class="fw-bold h6"></span>
+                                </div>
                             </div>
-                            <div class="fw-bold">
-                                Date Requested : <span class="text-primary" id="update_created_date"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="fw-bold">
-                                Name : <span class="text-primary" id="update_fullname"></span>
-                            </div>
-                            <div class="fw-bold">
-                                Pension Number : <span class="text-primary" id="update_pension_number_display"></span> /
-                                <span id="update_pension_account_type_display" class="fw-bold h6"></span> /
-                                <span id="update_pension_type_display" class="fw-bold h6"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="form-group col-3 mb-3">
-                          <label class="fw-bold h6">Location</label>
-                          <select name="location" id="update_location" class="form-select">
-                                <option value="Head Office">Head Office</option>
-                                <option value="Branch">Branch</option>
-                                <option value="Released">Released</option>
-                                <option value="Safekeep">Safekeep</option>
-                              <!-- <option value="6">Safekeep</option> -->
-                          </select>
-                        </div>
-                        <div class="form-group col-3 mb-3">
-                          <label class="fw-bold h6">ATM / Passbook Status</label>
-                          <select name="bank_status" id="update_bank_status" class="form-select">
-                                <option value="1">Active ATM</option>
-                                <option value="0">Release to Client</option>
-                                <option value="3">Release to Client - Become Return Client</option>
-                                <option value="5">Return Client / Balik Loob</option>
-                                <option value="6">Safekeep</option>
-                                <option value="27">Old ATM Did Not Return By Bank</option>
-                          </select>
-                        </div>
-                        <div class="form-group col-3 mb-3">
-                          <label class="fw-bold h6">Bank Account No</label>
-                          <input type="text" name="update_atm_bank_no" id="update_atm_bank_account_no" class="atm_card_input_mask form-control" required>
-                        </div>
-
-                        <hr>
-                        <div class="form-group col-3 mb-3">
-                          <label class="fw-bold h6">Transaction Bank Account No</label>
-                          <input type="text" name="update_transaction_bank_no" id="update_transaction_bank_account_no" class="atm_card_input_mask form-control" required>
-                        </div>
-
-                        <div class="form-group col-2 mb-3">
-                          <label class="fw-bold h6">Transaction Status</label>
-                          <select name="transaction_status" id="update_transaction_status" class="form-select">
-                              <option value="ON GOING">ON GOING</option>
-                              <option value="COMPLETED">COMPLETED</option>
-                              <option value="CANCELLED">CANCELLED</option>
-                          </select>
-                        </div>
-
-                        <div class="form-group col-3 mb-3">
-                          <label class="fw-bold h6">Reason</label>
-                          <input type="text" name="reason" id="update_reason" class="form-control">
-                        </div>
-
-                        <div class="form-group col-3 mb-3">
-                          <label class="fw-bold h6">Reason Remarks</label>
-                          <input type="text" name="reason_remarks" id="update_reason_remarks" class="form-control">
                         </div>
                         <hr>
-                    {{-- update_transaction_number --}}
+                        <div class="row">
+                            <div class="form-group col-3 mb-3">
+                            <label class="fw-bold h6">Location</label>
+                            <select name="location" id="update_location" class="form-select">
+                                    <option value="Head Office">Head Office</option>
+                                    <option value="Branch">Branch</option>
+                                    <option value="Released">Released</option>
+                                    <option value="Safekeep">Safekeep</option>
+                                <!-- <option value="6">Safekeep</option> -->
+                            </select>
+                            </div>
+                            <div class="form-group col-3 mb-3">
+                            <label class="fw-bold h6">ATM / Passbook Status</label>
+                            <select name="bank_status" id="update_bank_status" class="form-select">
+                                    <option value="1">Active ATM</option>
+                                    <option value="0">Release to Client</option>
+                                    <option value="3">Release to Client - Become Return Client</option>
+                                    <option value="5">Return Client / Balik Loob</option>
+                                    <option value="6">Safekeep</option>
+                                    <option value="27">Old ATM Did Not Return By Bank</option>
+                            </select>
+                            </div>
+                            <div class="form-group col-3 mb-3">
+                            <label class="fw-bold h6">Bank Account No</label>
+                            <input type="text" name="update_atm_bank_no" id="update_atm_bank_account_no" class="atm_card_input_mask form-control" required>
+                            </div>
 
-                    <div class="table-responsive mt-3">
-                        <table class="table table-design">
-                            <thead>
-                                <th style="width: 5%;">ID</th>
-                                <th style="width: 18%;">Employee ID</th>
-                                <th style="width: 18%;">Position</th>
-                                <th style="width: 5%;">Sequence</th>
-                                <th style="width: 10%;">Balance</th>
-                                <th style="width: 15%;">Remarks</th>
-                                <th style="width: 13%;">Status</th>
-                                <th style="width: 11%;">Date Received</th>
-                                <th style="width: 5%;">Image</th>
-                            </thead>
-                            <tbody id="UpdateTransactionApprovalBody">
+                            <hr>
+                            <div class="form-group col-3 mb-3">
+                            <label class="fw-bold h6">Transaction Bank Account No</label>
+                            <input type="text" name="update_transaction_bank_no" id="update_transaction_bank_account_no" class="atm_card_input_mask form-control" required>
+                            </div>
 
-                            </tbody>
-                        </table>
+                            <div class="form-group col-2 mb-3">
+                            <label class="fw-bold h6">Transaction Status</label>
+                            <select name="transaction_status" id="update_transaction_status" class="form-select">
+                                <option value="ON GOING">ON GOING</option>
+                                <option value="COMPLETED">COMPLETED</option>
+                                <option value="CANCELLED">CANCELLED</option>
+                            </select>
+                            </div>
+
+                            <div class="form-group col-3 mb-3">
+                            <label class="fw-bold h6">Reason</label>
+                            <input type="text" name="reason" id="update_reason" class="form-control">
+                            </div>
+
+                            <div class="form-group col-3 mb-3">
+                            <label class="fw-bold h6">Reason Remarks</label>
+                            <input type="text" name="reason_remarks" id="update_reason_remarks" class="form-control">
+                            </div>
+                            <hr>
+                        {{-- update_transaction_number --}}
+
+                        <div class="table-responsive mt-3">
+                            <table class="table table-design">
+                                <thead>
+                                    <th style="width: 5%;">ID</th>
+                                    <th style="width: 18%;">Employee ID</th>
+                                    <th style="width: 18%;">Position</th>
+                                    <th style="width: 5%;">Sequence</th>
+                                    <th style="width: 10%;">Balance</th>
+                                    <th style="width: 15%;">Remarks</th>
+                                    <th style="width: 13%;">Status</th>
+                                    <th style="width: 11%;">Date Received</th>
+                                    <th style="width: 5%;">Image</th>
+                                </thead>
+                                <tbody id="UpdateTransactionApprovalBody">
+
+                                </tbody>
+                            </table>
+                        </div>
+
                     </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                        <button type="submit" class="btn btn-success">Update</button>
+                    </div>
+                </form>
 
             </div>
         </div>
@@ -794,6 +821,22 @@
                     type: "GET",
                     data: { transaction_id : transaction_id },
                     success: function(data) {
+                        $('#view_fullname').text(data.atm_client_banks.client_information.last_name +', '
+                                                    + data.atm_client_banks.client_information.first_name +' '
+                                                    +(data.atm_client_banks.client_information.middle_name ?? '') +' '
+                                                    + (data.atm_client_banks.client_information.suffix ?? ''));
+
+                        $('#view_pension_number_display').text(data.atm_client_banks.client_information.pension_number ?? '');
+                        $('#view_pension_number_display').inputmask("99-9999999-99");
+                        $('#view_pension_type_display').text(data.atm_client_banks.client_information.pension_type);
+                        $('#view_pension_account_type_display').text(data.atm_client_banks.client_information.pension_account_type);
+
+                        let formattedCreatedDate = data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+
+                        $('#view_transaction_number').text(data.transaction_number);
+                        $('#view_created_date').text(formattedCreatedDate);
+                        $('#view_transaction_action').text(data.atm_transaction_action.name);
+
 
                         $('#TransactionApprovalBody').empty();
 
@@ -1180,6 +1223,8 @@
                         }
                     });
                 });
+
+                // updateTransactionValidateForm
             // Edit Transaction
 
 

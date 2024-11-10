@@ -26,29 +26,29 @@
                     </div>
                     <hr>
                         @if(in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin','Branch Head']))
-                        <form id="filterForm">
-                            @csrf
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group mb-3">
-                                        <label class="fw-bold h6">Branch</label>
-                                        <select name="branch_id" id="branch_id_select" class="form-select select2" required>
-                                            <option value="">Select Branches</option>
-                                            @foreach($Branches as $branch)
-                                                <option value="{{ $branch->id }}" {{ $branch->id == $branch_id ? 'selected' : '' }}>
-                                                    {{ $branch->branch_location }}
-                                                </option>
-                                            @endforeach
-                                        </select>
+                            <form id="filterForm">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group mb-3">
+                                            <label class="fw-bold h6">Branch</label>
+                                            <select name="branch_id" id="branch_id_select" class="form-select select2" required>
+                                                <option value="">Select Branches</option>
+                                                @foreach($Branches as $branch)
+                                                    <option value="{{ $branch->id }}" {{ $branch->id == $branch_id ? 'selected' : '' }}>
+                                                        {{ $branch->branch_location }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2" style="margin-top: 25px;">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-primary">Filter</button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-2" style="margin-top: 25px;">
-                                    <div class="form-group">
-                                        <button type="submit" class="btn btn-primary">Filter</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
                         @endif
                     <hr>
 
@@ -883,28 +883,28 @@
             dataTable.initialize(url, columns);
 
             // Filtering of Transaction
-            var branchId = @json($branch_id);
-            var userHasBranchId = {!! Auth::user()->branch_id ? 'true' : 'false' !!};
+                var branchId = @json($branch_id);
+                var userHasBranchId = {!! Auth::user()->branch_id ? 'true' : 'false' !!};
 
-            if (userHasBranchId) {
-                $('#branch_id_select').val(branchId).prop('disabled', true);
-            }
-
-            $('#filterForm').submit(function(e) {
-                e.preventDefault();
-                var selectedBranch = $('#branch_id_select').val();
-
-                // Get the base URL for filtering
-                var targetUrl = '{!! route('HeadOfficeData') !!}';
-
-                // Add branch_id as a query parameter if user doesn't have a fixed branch and has selected a branch
-                if (!userHasBranchId && selectedBranch) {
-                    targetUrl += '?branch_id=' + selectedBranch;
+                if (userHasBranchId) {
+                    $('#branch_id_select').val(branchId).prop('disabled', true);
                 }
 
-                // Update the DataTable with the filtered data
-                dataTable.table.ajax.url(targetUrl).load();
-            });
+                $('#filterForm').submit(function(e) {
+                    e.preventDefault();
+                    var selectedBranch = $('#branch_id_select').val();
+
+                    // Get the base URL for filtering
+                    var targetUrl = '{!! route('HeadOfficeData') !!}';
+
+                    // Add branch_id as a query parameter if user doesn't have a fixed branch and has selected a branch
+                    if (!userHasBranchId && selectedBranch) {
+                        targetUrl += '?branch_id=' + selectedBranch;
+                    }
+
+                    // Update the DataTable with the filtered data
+                    dataTable.table.ajax.url(targetUrl).load();
+                });
             // End Filtering of Transaction
 
 

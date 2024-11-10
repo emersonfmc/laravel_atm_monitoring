@@ -34,6 +34,7 @@ return new class extends Migration
             $table->foreign('request_by_employee_id', 'request_by_employee_id')->references('employee_id')->on('users')->onDelete('set null')->onUpdate('cascade');
 
             $table->foreign('scan_by_employee_id')->references('employee_id')->on('users')->onDelete('set null')->onUpdate('cascade');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
