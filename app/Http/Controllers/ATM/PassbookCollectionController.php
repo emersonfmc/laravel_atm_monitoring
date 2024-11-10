@@ -115,4 +115,22 @@ class PassbookCollectionController extends Controller
             ->make(true);
     }
 
+    public function PassbookForCollectionCreate(Request $request)
+    {
+       $item_id = $request->items;
+
+       if (is_array($item_id) && count($item_id) > 0) {
+            foreach ($item_id as $atm_ids) {
+
+                $SelectedAtmClientBanks = AtmClientBanks::findOrFail($atm_ids);
+                $selectBranchID = $SelectedAtmClientBanks->branch_id;
+
+                $BranchGet = Branch::where('id', $selectBranchID)->first();
+                $branch_abbreviation = $BranchGet->branch_abbreviation;
+
+                dd($branch_abbreviation);
+            }
+        }
+    }
+
 }

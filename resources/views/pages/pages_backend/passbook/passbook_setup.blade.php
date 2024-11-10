@@ -20,7 +20,9 @@
                             </p>
                         </div>
                         <div class="col-md-4 text-end" id="passbookForCollection" style="display: none;">
-                            <a href="#" class="btn btn-primary" id="ForCollectionButton">Passbook For Collection</a>
+                            <a href="#" class="btn btn-primary" id="ForCollectionButton"><i class="fas fa-plus-circle me-1"></i>
+                                Passbook For Collection
+                            </a>
                         </div>
 
                     </div>
@@ -294,14 +296,14 @@
                 $('.check-item:checked').each(function() {
                     var itemId = $(this).data('id');
                     checkedItemsData.push(itemId);
-
-                    console.log(checkedItemsData);
                 });
+
+                const csrfToken = $('meta[name="csrf-token"]').attr('content'); // Get CSRF token
 
                 // Confirm the action with SweetAlert
                 Swal.fire({
-                    title: 'Passbook For Collection',
-                    text: 'Are you sure you want to proceed with these to For Passbook for Collection?',
+                    title: 'Passbook For Collection Approval',
+                    text: 'Are you sure you want to proceed with these to Passbook for Collection?',
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: "#3085d6",
@@ -309,24 +311,59 @@
                     confirmButtonText: "Yes, proceed!"
                 }).then((result) => {
                     if (result.isConfirmed) {
-
-                        console.log('Proceed to Collection');
-
-                        // $.ajax({
-                        //     url: '/your-action-url', // Replace with your URL
-                        //     method: 'POST',
-                        //     data: {
-                        //         item_ids: checkedItemsData
-                        //     },
-                        //     success: function(response) {
-                        //         // Handle success, like reloading the table or showing a success message
-                        //         Swal.fire('Success!', 'The items have been processed.', 'success');
-                        //     },
-                        //     error: function() {
-                        //         // Handle error
-                        //         Swal.fire('Error!', 'There was a problem processing the items.', 'error');
-                        //     }
-                        // });
+                        const currentPage = dataTable.table.page();
+                        $.ajax({
+                            url: '{!! route('PassbookForCollectionCreate') !!}',
+                            type: 'POST',
+                            data: {
+                                items: checkedItemsData,
+                                _token: csrfToken // Include CSRF token in the request
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    title: 'Successfully Create!',
+                                    text: 'Passbook For Collection is successfully Created!',
+                                    icon: 'success',
+                                    showCancelButton: false,
+                                    showConfirmButton: true,
+                                    confirmButtonText: 'OK',
+                                    preConfirm: () => {
+                                        return new Promise((
+                                            resolve
+                                        ) => {
+                                            Swal.fire({
+                                                title: 'Please Wait...',
+                                                allowOutsideClick: false,
+                                                allowEscapeKey: false,
+                                                showConfirmButton: false,
+                                                showCancelButton: false,
+                                                didOpen: () => {
+                                                    Swal.showLoading();
+                                                    // here the reload of datatable
+                                                    dataTable.table.ajax.reload(() => {
+                                                        Swal.close();
+                                                        dataTable.table.page(currentPage).draw(false);
+                                                    }, false );
+                                                }
+                                            })
+                                        });
+                                    }
+                                });
+                            },
+                            error: function(xhr, status, error) {
+                                var errorMessage =
+                                    'An error occurred. Please try again later.';
+                                if (xhr.responseJSON && xhr.responseJSON
+                                    .error) {
+                                    errorMessage = xhr.responseJSON.error;
+                                }
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: errorMessage,
+                                    icon: 'error',
+                                });
+                            }
+                        })
                     }
                 });
             });

@@ -168,6 +168,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(PassbookCollectionController::class)->group(function () {
         Route::get('/PassbookCollectionSetUpPage', 'PassbookCollectionSetUpPage')->name('PassbookCollectionSetUpPage');
         Route::get('/PassbookCollectionData', 'PassbookCollectionData')->name('PassbookCollectionData');
+
+        Route::post('/PassbookForCollectionCreate', 'PassbookForCollectionCreate')->name('PassbookForCollectionCreate');
     });
 });
 

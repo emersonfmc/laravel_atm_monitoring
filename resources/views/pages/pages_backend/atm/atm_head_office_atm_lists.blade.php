@@ -20,8 +20,8 @@
                             </p>
                         </div>
                         <div class="col-md-4 text-end">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddOldNewClientModal"><i
-                                class="fas fa-plus-circle me-1"></i> Add Old / New Client</button>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddOldNewClientModal">
+                                <i class="fas fa-plus-circle me-1"></i> Add Old / New Client</button>
                         </div>
                     </div>
                     <hr>
