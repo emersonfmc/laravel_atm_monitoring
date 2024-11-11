@@ -29,7 +29,7 @@ return new class extends Migration
             $table->foreign('employee_id','employee_id')->references('employee_id')->on('users')->onDelete('set null')->onUpdate('cascade');
             $table->foreign('passbook_transactions_id','passbook_transactions_id')->references('id')->on('passbook_for_collection_transactions')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('user_groups_id','user_groups_id')->references('id')->on('data_user_groups')->onDelete('set null')->onUpdate('cascade');
-            $table->foreign('transaction_actions_id','transaction_actions_id')->references('id')->on('atm_transaction_actions')->onDelete('set null')->onUpdate('cascade');
+            $table->foreign('transaction_actions_id','transaction_actions_id')->references('id')->on('data_transaction_actions')->onDelete('set null')->onUpdate('cascade');
 
             $table->timestamps();
         });

@@ -2,12 +2,11 @@
 
 namespace App\Models;
 
-use App\Models\DataUserGroup;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class AtmTransactionSequence extends Model
+class DataTransactionSequence extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -17,5 +16,5 @@ class AtmTransactionSequence extends Model
     {
         return $this->belongsTo(DataUserGroup::class, 'user_group_id', 'id');
     }
-
 }
+
