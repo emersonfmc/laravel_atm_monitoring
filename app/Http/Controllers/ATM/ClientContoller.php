@@ -21,6 +21,7 @@ use App\Models\AtmBanksTransactionApproval;
 use App\Models\DataBankLists;
 use App\Models\AtmClientBanks;
 use App\Models\Branch;
+use App\Models\DataTransactionSequence;
 
 class ClientContoller extends Controller
 {
@@ -175,7 +176,7 @@ class ClientContoller extends Controller
                             'transaction_number' => $TransactionNumber,
                             'branch_id' => $branch_id ?? NULL,
                             'atm_type' => $value,
-                            'atm_status' => 'new',
+                            'atm_status' => $request->atm_status[$key] ?? NULL,
                             'location' => 'Branch',
                             'bank_account_no' => $BankAccountNo ?? NULL,
                             'bank_name' => $request->bank_id[$key] ?? NULL,
@@ -199,20 +200,19 @@ class ClientContoller extends Controller
                             'reason' => 'New Client',
                             'reason_remarks' => NULL,
                             'yellow_copy' => NULL,
-                            'released_client_images_id' => NULL,
                             'created_at' => Carbon::now(),
                         ]);
 
-                        $AtmTransactionSequences = AtmTransactionSequence::where('atm_transaction_actions_id', 5)
+                        $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', 5)
                             ->orderBy('sequence_no')
                             ->get();
 
-                        foreach ($AtmTransactionSequences as $transactionSequence)
+                        foreach ($DataTransactionSequence as $transactionSequence)
                         {
                             // Set the status based on the sequence number
                             $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
-                            $AtmBanksTransactionApproval = AtmBanksTransactionApproval::create([
+                            AtmBanksTransactionApproval::create([
                                 'banks_transactions_id' => $AtmBanksTransaction->id,
                                 'transaction_actions_id' => 5,
                                 'employee_id' => NULL,

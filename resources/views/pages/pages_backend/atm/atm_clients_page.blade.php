@@ -388,7 +388,7 @@
                         return `
                             <a href="#" class="text-info viewBtn me-1" data-id="${row.id}"
                                 data-bs-toggle="tooltip" data-bs-placement="top" title="View ">
-                                <i class="fas fa-eye me-2"></i>
+                                <i class="fas fa-eye me-2 fs-5"></i>
                             </a>`;
                     },
                     orderable: false,
@@ -845,6 +845,7 @@
             $('#createClientModal').on('shown.bs.modal', function () {
                 $('#branch_id').select2({ dropdownParent: $('#createClientModal'), });
                 $('#pension_account_type').select2({  dropdownParent: $('#createClientModal') });
+                $('#bank_id').select2({  dropdownParent: $('#createClientModal') });
             });
 
             function closeCreateClientModal() {
@@ -877,12 +878,19 @@
                             <div class="col-md-6">
                                 <div class="form-group mb-2 row align-items-center">
                                     <label class="col-form-label col-sm-4 fw-bold">Type</label>
-                                    <div class="col-8">
+                                    <div class="col-5">
                                         <select name="atm_type[]" class="form-select" required>
                                         <option value="" selected disabled>Type</option>
                                         <option value="ATM">ATM</option>
                                         <option value="Passbook">Passbook</option>
                                         <option value="Sim Card">Sim Card</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-3">
+                                        <select name="atm_status[]" id="atm_status" class="form-select" required>
+                                            <option value="">ATM Status</option>
+                                            <option value="New" selected>New</option>
+                                            <option value="Old">Old</option>
                                         </select>
                                     </div>
                                 </div>

@@ -49,7 +49,7 @@
                                     <label class="fw-bold h6">Transaction</label>
                                     <select name="transaction_id" id="transaction_id_select" class="form-select select2">
                                         <option value="">Select Transaction</option>
-                                        @foreach ($AtmTransactionAction as $transaction)
+                                        @foreach ($DataTransactionAction as $transaction)
                                             <option value="{{ $transaction->id }}">{{ $transaction->name }}</option>
                                         @endforeach
                                     </select>
@@ -835,7 +835,7 @@
 
                         $('#view_transaction_number').text(data.transaction_number);
                         $('#view_created_date').text(formattedCreatedDate);
-                        $('#view_transaction_action').text(data.atm_transaction_action.name);
+                        $('#view_transaction_action').text(data.data_transaction_action.name);
 
 
                         $('#TransactionApprovalBody').empty();
@@ -1104,7 +1104,7 @@
 
                             $('#update_transaction_number').text(data.transaction_number);
                             $('#update_created_date').text(formattedCreatedDate);
-                            $('#update_transaction_action').text(data.atm_transaction_action.name);
+                            $('#update_transaction_action').text(data.data_transaction_action.name);
 
                             $('#update_transaction_status').val(data.status).trigger('change');
                             $('#update_transaction_bank_account_no').val(data.bank_account_no);

@@ -22,9 +22,9 @@ class AtmBanksTransaction extends Model
         return $this->belongsTo(Branch::class, 'branch_id','id');
     }
 
-    public function AtmTransactionAction()
+    public function DataTransactionAction()
     {
-        return $this->belongsTo(AtmTransactionAction::class, 'transaction_actions_id','id');
+        return $this->belongsTo(DataTransactionAction::class, 'transaction_actions_id','id');
     }
 
     public function AtmBanksTransactionApproval()

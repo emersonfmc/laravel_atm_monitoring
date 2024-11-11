@@ -16,6 +16,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AtmTransactionAction;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DataPensionTypesLists;
+use App\Models\DataTransactionAction;
 use Yajra\DataTables\Facades\DataTables;
 
 class AtmHeadOfficeController extends Controller
@@ -25,15 +26,16 @@ class AtmHeadOfficeController extends Controller
         $userGroup = Auth::user()->UserGroup->group_name;
         $branch_id = Auth::user()->branch_id;
 
+        $Branches = Branch::where('status','Active')->get();
+
         $DataBankLists = DataBankLists::where('status','Active')->get();
         $DataCollectionDate = DataCollectionDate::where('status','Active')->get();
-        $Branches = Branch::where('status','Active')->get();
-        $AtmTransactionAction = AtmTransactionAction::where('transaction','1')->where('status','Active')->get();
+        $DataTransactionAction = DataTransactionAction::where('transaction','1')->where('status','Active')->get();
         $DataReleaseOption = DataReleaseOption::where('status','Active')->get();
         $DataPensionTypesLists = DataPensionTypesLists::where('status','Active')->get();
 
         return view('pages.pages_backend.atm.atm_head_office_atm_lists',
-                    compact('AtmTransactionAction',
+                    compact('DataTransactionAction',
                             'DataReleaseOption',
                             'DataBankLists',
                             'DataCollectionDate',
@@ -230,7 +232,7 @@ class AtmHeadOfficeController extends Controller
 
                         // Get the ATM transaction action name if it exists
                         if (isset($firstOngoingTransaction->transaction_actions_id)) {
-                            $atmTransactionAction = AtmTransactionAction::find($firstOngoingTransaction->transaction_actions_id);
+                            $atmTransactionAction = DataTransactionAction::find($firstOngoingTransaction->transaction_actions_id);
                             if ($atmTransactionAction) {
                                 $atmTransactionActionName = htmlspecialchars($atmTransactionAction->name);
                             }
@@ -373,7 +375,7 @@ class AtmHeadOfficeController extends Controller
 
                         // Get the ATM transaction action name if it exists
                         if (isset($firstOngoingTransaction->transaction_actions_id)) {
-                            $atmTransactionAction = AtmTransactionAction::find($firstOngoingTransaction->transaction_actions_id);
+                            $atmTransactionAction = DataTransactionAction::find($firstOngoingTransaction->transaction_actions_id);
                             if ($atmTransactionAction) {
                                 $atmTransactionActionName = htmlspecialchars($atmTransactionAction->name);
                             }
@@ -482,7 +484,7 @@ class AtmHeadOfficeController extends Controller
 
                         // Get the ATM transaction action name if it exists
                         if (isset($firstOngoingTransaction->transaction_actions_id)) {
-                            $atmTransactionAction = AtmTransactionAction::find($firstOngoingTransaction->transaction_actions_id);
+                            $atmTransactionAction = DataTransactionAction::find($firstOngoingTransaction->transaction_actions_id);
                             if ($atmTransactionAction) {
                                 $atmTransactionActionName = htmlspecialchars($atmTransactionAction->name);
                             }

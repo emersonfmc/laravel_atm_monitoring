@@ -18,7 +18,9 @@ use App\Http\Controllers\Controller;
 use App\Models\AtmTransactionAction;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DataPensionTypesLists;
+use App\Models\DataTransactionAction;
 use App\Models\AtmTransactionSequence;
+use App\Models\DataTransactionSequence;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\AtmTransactionBalanceLogs;
 use App\Models\AtmBanksTransactionApproval;
@@ -30,7 +32,7 @@ class AtmTransactionController extends Controller
         $branch_id = Auth::user()->branch_id;
 
         $Branches = Branch::where('status', 'Active')->get();
-        $AtmTransactionAction = AtmTransactionAction::where('status', 'Active')->get();
+        $DataTransactionAction = DataTransactionAction::where('status', 'Active')->get();
 
         $DataBankLists = DataBankLists::where('status','Active')->get();
         $DataReleaseOption = DataReleaseOption::where('status','Active')->get();
@@ -38,7 +40,7 @@ class AtmTransactionController extends Controller
         $DataCollectionDate = DataCollectionDate::where('status','Active')->get();
 
         return view('pages.pages_backend.atm.atm_transactions',
-                    compact('Branches','AtmTransactionAction','branch_id',
+                    compact('Branches','DataTransactionAction','branch_id',
                             'DataBankLists','DataPensionTypesLists','DataCollectionDate'));
     }
 
@@ -51,7 +53,7 @@ class AtmTransactionController extends Controller
         $query = AtmBanksTransaction::with([
             'AtmClientBanks',
             'AtmClientBanks.ClientInformation',
-            'AtmTransactionAction',
+            'DataTransactionAction',
             'AtmBanksTransactionApproval.DataUserGroup',
             'Branch'
         ])->latest('updated_at');
@@ -137,7 +139,7 @@ class AtmTransactionController extends Controller
                 }
 
                 // Get the ATM transaction action name directly
-                $atmTransactionActionName = optional($row->AtmTransactionAction)->name;
+                $atmTransactionActionName = optional($row->DataTransactionAction)->name;
 
                 // Return the ATM transaction action name and group name
                 return $atmTransactionActionName . ' <div class="text-dark"> ' . $groupName . '</div>';
@@ -153,7 +155,7 @@ class AtmTransactionController extends Controller
         $AtmBanksTransaction = AtmBanksTransaction::with([
                 'AtmClientBanks',
                 'AtmClientBanks.ClientInformation',
-                'AtmTransactionAction',
+                'DataTransactionAction',
                 'AtmBanksTransactionApproval.DataUserGroup', // Include DataUserGroup for efficient loading
                 'AtmBanksTransactionApproval.Employee',
                 'AtmBanksTransactionApproval.AtmTransactionApprovalsBalanceLogs',
@@ -244,7 +246,7 @@ class AtmTransactionController extends Controller
                         ]);
 
                         // Retrieve transaction sequences for approvals
-                        $AtmTransactionSequences = AtmTransactionSequence::where('atm_transaction_actions_id', $reason_for_pull_out)
+                        $AtmTransactionSequences = DataTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
                             ->orderBy('sequence_no')
                             ->get();
 
@@ -255,7 +257,7 @@ class AtmTransactionController extends Controller
                             // Create approval entries for the transaction
                             AtmBanksTransactionApproval::create([
                                 'banks_transactions_id' => $AtmBanksTransaction->id,
-                                'transaction_actions_id' => 5,
+                                'transaction_actions_id' => $reason_for_pull_out,
                                 'employee_id' => NULL,
                                 'date_approved' => NULL,
                                 'user_groups_id' => $transactionSequence->user_group_id,
@@ -326,18 +328,18 @@ class AtmTransactionController extends Controller
                     'updated_at' => Carbon::now(),
                 ]);
 
-                $AtmTransactionSequences = AtmTransactionSequence::where('atm_transaction_actions_id', $reason_for_pull_out)
+                $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
                     ->orderBy('sequence_no')
                     ->get();
 
-                foreach ($AtmTransactionSequences as $transactionSequence)
+                foreach ($DataTransactionSequence as $transactionSequence)
                 {
                     // Set the status based on the sequence number
                     $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                     AtmBanksTransactionApproval::create([
                         'banks_transactions_id' => $AtmBanksTransaction->id,
-                        'transaction_actions_id' => 5,
+                        'transaction_actions_id' => $reason_for_pull_out,
                         'employee_id' => NULL,
                         'date_approved' => NULL,
                         'user_groups_id' => $transactionSequence->user_group_id,

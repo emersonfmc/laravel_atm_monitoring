@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('atm_transaction_actions', function (Blueprint $table) {
+        Schema::create('data_transaction_actions', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->enum('type',['Going to Head Office','Going to Branch Office'])->nullable();
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('atm_transaction_actions');
+        Schema::dropIfExists('data_transaction_actions');
     }
 };
