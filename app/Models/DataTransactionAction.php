@@ -12,8 +12,8 @@ class DataTransactionAction extends Model
 
     protected $guarded = [];
 
-    public function AtmTransactionSequence()
+    public function DataTransactionSequence()
     {
-        return $this->hasMany(DataTransactionSequence::class, 'atm_transaction_actions_id', 'id');
+        return $this->hasMany(DataTransactionSequence::class, 'transaction_actions_id', 'id');
     }
 }

@@ -21,6 +21,7 @@ use App\Models\AtmBanksTransactionApproval;
 use App\Models\DataBankLists;
 use App\Models\AtmClientBanks;
 use App\Models\Branch;
+use App\Models\DataTransactionSequence;
 
 class ClientContoller extends Controller
 {
@@ -202,16 +203,16 @@ class ClientContoller extends Controller
                             'created_at' => Carbon::now(),
                         ]);
 
-                        $AtmTransactionSequences = AtmTransactionSequence::where('atm_transaction_actions_id', 5)
+                        $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', 5)
                             ->orderBy('sequence_no')
                             ->get();
 
-                        foreach ($AtmTransactionSequences as $transactionSequence)
+                        foreach ($DataTransactionSequence as $transactionSequence)
                         {
                             // Set the status based on the sequence number
                             $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
-                            $AtmBanksTransactionApproval = AtmBanksTransactionApproval::create([
+                            AtmBanksTransactionApproval::create([
                                 'banks_transactions_id' => $AtmBanksTransaction->id,
                                 'transaction_actions_id' => 5,
                                 'employee_id' => NULL,

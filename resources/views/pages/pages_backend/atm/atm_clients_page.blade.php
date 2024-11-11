@@ -388,7 +388,7 @@
                         return `
                             <a href="#" class="text-info viewBtn me-1" data-id="${row.id}"
                                 data-bs-toggle="tooltip" data-bs-placement="top" title="View ">
-                                <i class="fas fa-eye me-2"></i>
+                                <i class="fas fa-eye me-2 fs-5"></i>
                             </a>`;
                     },
                     orderable: false,

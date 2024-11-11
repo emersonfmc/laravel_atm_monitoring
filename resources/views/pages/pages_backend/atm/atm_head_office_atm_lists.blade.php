@@ -151,7 +151,7 @@
                                     <label class="fw-bold h6">Select Reason For Pullout</label>
                                     <select name="reason_for_pull_out" id="reason_for_pull_out" class="form-select" required>
                                         <option value="" selected disabled>Reason for Pullout</option>
-                                        @foreach ($AtmTransactionAction as $item)
+                                        @foreach ($DataTransactionAction as $item)
                                         <option value="{{ $item->id }}">{{ $item->name }}</option>
                                         @endforeach
                                     </select>

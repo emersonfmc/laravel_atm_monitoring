@@ -42,7 +42,7 @@ class AtmTransactionActionSeeder extends Seeder
         ];
 
         foreach ($datas as $data) {
-            DB::table('atm_transaction_actions')->insert([
+            DB::table('data_transaction_actions')->insert([
                 'id' => $data[0],
                 'name' => $data[1],
                 'transaction' => $data[2],
