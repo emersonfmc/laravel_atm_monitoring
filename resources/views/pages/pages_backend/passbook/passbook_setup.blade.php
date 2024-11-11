@@ -4,7 +4,7 @@
 
     @component('components.breadcrumb')
         @slot('li_1') Passbook Transaction @endslot
-        @slot('title') Passbook Setup @endslot
+        @slot('title') Passbook For Collection Setup @endslot
     @endcomponent
 
     <div class="row">
@@ -14,9 +14,9 @@
 
                     <div class="row">
                         <div class="col-md-8 text-start">
-                            <h4 class="card-title">Passbook Setup</h4>
+                            <h4 class="card-title">Passbook For Collection Setup</h4>
                             <p class="card-title-desc">
-                                A Centralized Record of all ATMs managed by the head office
+                                Where branches select Passbook for scheduled to collections.
                             </p>
                         </div>
                         <div class="col-md-4 text-end" id="passbookForCollection" style="display: none;">

@@ -175,7 +175,7 @@ class ClientContoller extends Controller
                             'transaction_number' => $TransactionNumber,
                             'branch_id' => $branch_id ?? NULL,
                             'atm_type' => $value,
-                            'atm_status' => 'new',
+                            'atm_status' => $request->atm_status[$key] ?? NULL,
                             'location' => 'Branch',
                             'bank_account_no' => $BankAccountNo ?? NULL,
                             'bank_name' => $request->bank_id[$key] ?? NULL,
@@ -199,7 +199,6 @@ class ClientContoller extends Controller
                             'reason' => 'New Client',
                             'reason_remarks' => NULL,
                             'yellow_copy' => NULL,
-                            'released_client_images_id' => NULL,
                             'created_at' => Carbon::now(),
                         ]);
 
