@@ -21,7 +21,9 @@ use App\Models\AtmTransactionAction;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\DataPensionTypesLists;
+use App\Models\DataTransactionAction;
 use App\Models\AtmTransactionSequence;
+use App\Models\DataTransactionSequence;
 use Yajra\DataTables\Facades\DataTables;
 
 class SettingsController extends Controller
@@ -581,23 +583,23 @@ class SettingsController extends Controller
 
     public function transaction_action_data()
     {
-       $AtmTransactionAction = AtmTransactionAction::with('AtmTransactionSequence','AtmTransactionSequence.DataUserGroup')->latest('updated_at')
+       $DataTransactionAction = DataTransactionAction::with('DataTransactionSequence','DataTransactionSequence.DataUserGroup')->latest('updated_at')
             ->get();
 
-        return DataTables::of($AtmTransactionAction)
+        return DataTables::of($DataTransactionAction)
             ->setRowId('id')
             ->make(true);
     }
 
     public function transaction_typesGet($id)
     {
-        $AtmTransactionAction = AtmTransactionAction::with('AtmTransactionSequence','AtmTransactionSequence.DataUserGroup')->findOrFail($id);
-        return response()->json($AtmTransactionAction);
+        $DataTransactionAction = DataTransactionAction::with('DataTransactionSequence','DataTransactionSequence.DataUserGroup')->findOrFail($id);
+        return response()->json($DataTransactionAction);
     }
 
     public function transaction_typesCreate(Request $request)
     {
-        $AtmTransactionAction = AtmTransactionAction::create([
+        $DataTransactionAction = DataTransactionAction::create([
             'name' => $request->name,
             'status' => 'Active',
             'created_at' => Carbon::now(),
@@ -605,8 +607,8 @@ class SettingsController extends Controller
         ]);
 
         foreach ($request->user_group_id as $key => $value) {
-            AtmTransactionSequence::create([
-                'atm_transaction_actions_id' =>$AtmTransactionAction->id,
+            DataTransactionSequence::create([
+                'atm_transaction_actions_id' =>$DataTransactionAction->id,
                 'user_group_id' => $value,
                 'sequence_no' => $request->sequence_no[$key],
                 'type' => $request->type[$key],
@@ -635,10 +637,10 @@ class SettingsController extends Controller
     public function transaction_typesUpdate(Request $request)
     {
         // Find the user group by ID
-        $AtmTransactionAction = AtmTransactionAction::findOrFail($request->item_id);
+        $DataTransactionAction = DataTransactionAction::findOrFail($request->item_id);
 
         // Proceed with update if validation passes
-        $AtmTransactionAction->update([  // Update the instance instead of using the class method
+        $DataTransactionAction->update([  // Update the instance instead of using the class method
             'name' => $request->name,
             'status' => $request->status,
             'updated_at' => Carbon::now(),
@@ -649,7 +651,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Update',
             'title' => 'Update Transaction Action',
-            'description' => 'Updating of Transaction Action' .  $AtmTransactionAction->name,
+            'description' => 'Updating of Transaction Action' .  $DataTransactionAction->name,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),

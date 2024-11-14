@@ -5,6 +5,7 @@ namespace App\Http\Controllers\ATM;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\AtmClientBanks;
+use App\Models\ClientInformation;
 use App\Http\Controllers\Controller;
 use App\Models\DataPensionTypesLists;
 
@@ -25,6 +26,22 @@ class DefaultController extends Controller
         $new_atm_id = $request->new_atm_id;
         $AtmClientBanks = AtmClientBanks::with('ClientInformation','ClientInformation.AtmClientBanks','Branch')->findOrFail($new_atm_id);
         return response()->json($AtmClientBanks);
+    }
+
+    public function AtmClientBanksFetch(Request $request)
+    {
+        $client_id = $request->client_id;
+
+        // Fetch the ClientInformation along with its AtmClientBanks that have no ongoing transactions
+        $ClientInfo = ClientInformation::with(['AtmClientBanks' => function ($query) {
+                $query->whereDoesntHave('AtmBanksTransaction', function ($query) {
+                    $query->where('status', 'ON GOING');
+                });
+            }, 'Branch'])
+            ->where('id', $client_id)
+            ->firstOrFail();
+
+        return response()->json($ClientInfo);
     }
 
     public function UserSelect()

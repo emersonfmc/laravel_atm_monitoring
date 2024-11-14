@@ -907,7 +907,6 @@
                 });
             // End Filtering of Transaction
 
-
             $('#FetchingDatatable').on('click', '.createTransaction', function(e) {
                 e.preventDefault();
                 var new_atm_id = $(this).data('id');
@@ -954,50 +953,55 @@
                         // Start Used Only for Releasing and Releasing with Balance Transaction
                             $('#displayClientBanksInformation').empty();
 
-                            // Check if the client information and ATM bank data exist
-                            if (data.client_information && data.client_information.atm_client_banks) {
-                                $.each(data.client_information.atm_client_banks, function(index, atms) {
-                                    // Only proceed if the status is equal to 1
-                                    if (atms.status == 1) {
-                                        let AtmsExpirationDate = '';
-                                        if (atms.expiration_date && atms.expiration_date !== '0000-00-00') {
-                                            AtmsExpirationDate = new Date(atms.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                                        }
+                            $.ajax({
+                                url: "/AtmClientBanksFetch",
+                                type: "GET",
+                                data: { client_id : data.client_information.id },
+                                success: function(response) {
+                                    if (response.atm_client_banks && response.atm_client_banks) {
+                                        $.each(response.atm_client_banks, function(index, atms) {
+                                            // Only proceed if the status is equal to 1
+                                            if (atms.status == 1) {
+                                                let AtmsExpirationDate = '';
+                                                if (atms.expiration_date && atms.expiration_date !== '0000-00-00') {
+                                                    AtmsExpirationDate = new Date(atms.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                                                }
 
-                                        let atmTypeClass = '';
-                                        if (atms.atm_type === 'ATM') {
-                                            atmTypeClass = 'text-primary';
-                                        } else if (atms.atm_type === 'Passbook') {
-                                            atmTypeClass = 'text-danger';
-                                        } else if (atms.atm_type === 'Sim Card') {
-                                            atmTypeClass = 'text-info';
-                                        }
+                                                let atmTypeClass = '';
+                                                if (atms.atm_type === 'ATM') {
+                                                    atmTypeClass = 'text-primary';
+                                                } else if (atms.atm_type === 'Passbook') {
+                                                    atmTypeClass = 'text-danger';
+                                                } else if (atms.atm_type === 'Sim Card') {
+                                                    atmTypeClass = 'text-info';
+                                                }
 
-                                        const row = `
-                                            <tr>
-                                                <td>
-                                                    <div class="form-group">
-                                                        <input type="checkbox" name="atm_checkboxes[]" id="atm_checkbox" value="${atms.id}">
-                                                    </div>
-                                                </td>
-                                                <td>${atms.transaction_number}</td>
-                                                <td>
-                                                    <span class="fw-bold h6 text-success">${atms.bank_account_no}</span><br>
-                                                    ${atms.bank_name}
-                                                </td>
-                                                <td class="${atmTypeClass}">${atms.atm_type}</td>
-                                                <td>${atms.atm_status}</td>
-                                                <td>${atms.collection_date}</td>
-                                                <td>${AtmsExpirationDate}</td>
-                                            </tr>
-                                        `;
+                                                const row = `
+                                                    <tr>
+                                                        <td>
+                                                            <div class="form-group">
+                                                                <input type="checkbox" name="atm_checkboxes[]" id="atm_checkbox" value="${atms.id}">
+                                                            </div>
+                                                        </td>
+                                                        <td>${atms.transaction_number}</td>
+                                                        <td>
+                                                            <span class="fw-bold h6 text-success">${atms.bank_account_no}</span><br>
+                                                            ${atms.bank_name}
+                                                        </td>
+                                                        <td class="${atmTypeClass}">${atms.atm_type}</td>
+                                                        <td>${atms.atm_status}</td>
+                                                        <td>${atms.collection_date}</td>
+                                                        <td>${AtmsExpirationDate}</td>
+                                                    </tr>
+                                                `;
 
-                                        // Append the row to the display element
-                                        $('#displayClientBanksInformation').append(row);
+                                                // Append the row to the display element
+                                                $('#displayClientBanksInformation').append(row);
+                                            }
+                                        });
                                     }
-                                });
-                            }
-                        // End Used Only for Releasing and Releasing with Balance Transaction
+                                }
+                            });
 
                         $('#createTransactionModal').modal('show');
                     },

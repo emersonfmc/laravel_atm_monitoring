@@ -767,8 +767,6 @@
                     var selectedTransaction = $('#transaction_id_select').val();
                     var selectedStatus = $('#status_select').val();
 
-                    console.log(selectedBranch);
-
                     // Construct the URL with required query parameters
                     var targetUrl = '{!! route('TransactionData') !!}';
                     targetUrl += '?transaction_actions_id=' + selectedTransaction + '&status=' + selectedStatus;

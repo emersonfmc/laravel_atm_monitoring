@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\ATM;
 
 use Illuminate\Http\Request;
+use App\Models\DataBankLists;
 use App\Models\AtmClientBanks;
 use App\Models\DataCollectionDate;
 use App\Http\Controllers\Controller;
 use App\Models\AtmTransactionAction;
-use App\Models\DataBankLists;
 use Illuminate\Support\Facades\Auth;
+use App\Models\DataTransactionAction;
 use Yajra\DataTables\Facades\DataTables;
 
 class AtmBranchOfficeController extends Controller
@@ -161,7 +162,7 @@ class AtmBranchOfficeController extends Controller
 
                         // Get the ATM transaction action name if it exists
                         if (isset($firstOngoingTransaction->transaction_actions_id)) {
-                            $atmTransactionAction = AtmTransactionAction::find($firstOngoingTransaction->transaction_actions_id);
+                            $atmTransactionAction = DataTransactionAction::find($firstOngoingTransaction->transaction_actions_id);
                             if ($atmTransactionAction) {
                                 $atmTransactionActionName = htmlspecialchars($atmTransactionAction->name);
                             }
