@@ -88,7 +88,7 @@ class AtmHeadOfficeController extends Controller
                 if (in_array($userGroup, ['Developer', 'Admin', 'Branch Head', 'Everfirst Admin'])) {
                     if ($hasOngoingTransaction) {
                         // Show spinning gear icon if there are ongoing transactions
-                        return '<i class="fas fa-spinner fa-spin fs-3 text-success"></i>';
+                        return '<i class="fas fa-spinner fa-spin fs-3 text-success me-2"></i>';
                     } else {
                         // Add buttons for creating a transaction and adding ATM transaction
                         $action .= '<a href="#" class="btn btn-primary createTransaction me-2 mb-2"
