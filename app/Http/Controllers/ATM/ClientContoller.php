@@ -127,8 +127,8 @@ class ClientContoller extends Controller
 
                 // Fetch the last transaction number based on the branch_id and branch_code
                 $lastTransaction = AtmClientBanks::where('branch_id', $branch_id)
-                ->orderBy('transaction_number', 'desc') // Order by transaction_number in descending order
-                ->first();
+                    ->orderBy('transaction_number', 'desc') // Order by transaction_number in descending order
+                    ->first();
 
                 if ($lastTransaction) {
                     $lastPart = substr($lastTransaction->transaction_number, strrpos($lastTransaction->transaction_number, '-') + 1);

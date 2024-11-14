@@ -68,7 +68,7 @@
                 </div>
 
                 <div class="modal-body">
-                    <form action="#" method="POST" id="releasingValidateForm">
+                    <form action="{{ route('TransactionCreate') }}" method="POST" id="releasingValidateForm">
                         @csrf
                         <div class="row">
                             <input type="hidden" name="atm_id" id="release_atm_id">
@@ -280,10 +280,11 @@
                 </div>
 
                 <div class="modal-body">
-                    <form action="#" method="POST" id="borrowValidateForm">
+                    <form action="{{ route('TransactionCreate') }}" method="POST" id="borrowValidateForm">
                         @csrf
                         <div class="row">
                             <input type="hidden" name="atm_id" id="borrow_atm_id">
+                            <input type="hidden" name="reason_for_pull_out" value="4">
                             <div class="col-6">
                                 <div class="form-group">
                                     <div id="borrow_fullname" class="fw-bold h4"></div>
@@ -362,7 +363,7 @@
                                     <div class="row">
                                         <div class="form-group mb-3">
                                             <label class="fw-bold h6">Reason For Replacement</label>
-                                            <select name="reason_for_pull_out" id="borrow_replacement_reason_for_pull_out" class="form-select" required>
+                                            <select name="replacement_type_action" id="borrow_replacement_reason_for_pull_out" class="form-select" required>
                                                 <option value="" selected disabled>Select Reason For Replacement</option>
                                                 <option value="4">Old Did not Return by Bank w/ Replacement</option>
                                                 <option value="12">Old Has Returned w/ Replacement</option>
@@ -415,9 +416,17 @@
                                             </select>
                                         </div>
 
-                                        <div class="form-group mb-3">
+                                        <div class="col-6 form-group mb-3">
                                             <label class="fw-bold h6">PIN Code</label>
                                             <input type="text" name="new_pin_code" class="form-control" placeholder="PIN Code">
+                                        </div>
+
+                                        <div class="col-6 form-group mb-3">
+                                            <label class="fw-bold h6">Status</label>
+                                            <select name="new_atm_status" id="new_atm_status" class="form-select" required>
+                                                <option value="new" selected>New</option>
+                                                <option value="old">Old</option>
+                                            </select>
                                         </div>
 
                                         <div class="form-group mb-3">
@@ -1367,6 +1376,10 @@
             // Releasing w/ Balance Transaction
 
             // Borrow Transaction
+                $('#BorrowTransactionModal').on('shown.bs.modal', function () {
+                    $('#borrow_bank_name_fetch').select2({ dropdownParent: $('#BorrowTransactionModal'), });
+                });
+
                 $('#FetchingDatatable').on('click', '.borrow_transaction', function(e) {
                     e.preventDefault();
                     var new_atm_id = $(this).data('id');

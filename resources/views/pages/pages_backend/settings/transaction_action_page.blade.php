@@ -228,12 +228,12 @@
                 {
                     data: null, // No direct data for ATM sequences; will be created from response
                     render: function(data, type, row) {
-                        // Check if atm_transaction_sequence exists and is an array
-                        if (data.atm_transaction_sequence && Array.isArray(data.atm_transaction_sequence)) {
+                        // Check if data_transaction_sequence exists and is an array
+                        if (data.data_transaction_sequence && Array.isArray(data.data_transaction_sequence)) {
                             // Initialize an empty string for group names
                             let groups = '';
                             // Use each to loop through the sequences
-                            $.each(data.atm_transaction_sequence, function(index, sequence) {
+                            $.each(data.data_transaction_sequence, function(index, sequence) {
                                 // Check if data_user_group exists before accessing group_name
                                 if (sequence.data_user_group) {
                                     // Set text class based on sequence type
@@ -405,7 +405,7 @@
                     $('#update_status').val(data.status);
 
                     $('#sequenceTableUpdateBody').empty();
-                        data.atm_transaction_sequence.forEach(function(rows) {
+                        data.data_transaction_sequence.forEach(function(rows) {
                             var newRow = '<tr>' +
                                             '<td>' +
                                                 '<input type="text" value="' + rows.sequence_no + '" class="sequence_no_update form-control" name="sequence_no[]" readonly>' +

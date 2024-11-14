@@ -19,11 +19,12 @@
                                 Where branches select Passbook for scheduled to collections.
                             </p>
                         </div>
-                        <div class="col-md-4 text-end" id="passbookForCollection" style="display: none;">
+                        <div class="col-md-4"></div>
+                        {{-- <div class="col-md-4 text-end" id="passbookForCollection" style="display: none;">
                             <a href="#" class="btn btn-primary" id="ForCollectionButton"><i class="fas fa-plus-circle me-1"></i>
                                 Passbook For Collection
                             </a>
-                        </div>
+                        </div> --}}
 
                     </div>
                     <hr>
@@ -44,12 +45,17 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2" style="margin-top: 25px;">
-                                    <div class="form-group">
-                                        <button type="submit" class="btn btn-primary">Filter</button>
-                                    </div>
+
+                                <div class="col-md-3 align-items-end" style="margin-top:25px;">
+                                    <button type="submit" class="btn btn-primary me-2">Filter</button>
+                                    <span id="passbookForCollection" style="display: none;">
+                                        <a href="#" class="btn btn-primary" id="ForCollectionButton">
+                                            <i class="fas fa-plus-circle me-1"></i> Passbook For Collection
+                                        </a>
+                                    </span>
                                 </div>
                             </div>
+
                         </form>
                     @endif
                     <hr>

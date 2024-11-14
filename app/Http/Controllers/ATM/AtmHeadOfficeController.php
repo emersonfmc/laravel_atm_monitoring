@@ -88,7 +88,7 @@ class AtmHeadOfficeController extends Controller
                 if (in_array($userGroup, ['Developer', 'Admin', 'Branch Head', 'Everfirst Admin'])) {
                     if ($hasOngoingTransaction) {
                         // Show spinning gear icon if there are ongoing transactions
-                        return '<i class="fas fa-spinner fa-spin fs-3 text-success"></i>';
+                        return '<i class="fas fa-spinner fa-spin fs-3 text-success me-2"></i>';
                     } else {
                         // Add buttons for creating a transaction and adding ATM transaction
                         $action .= '<a href="#" class="btn btn-primary createTransaction me-2 mb-2"
@@ -194,7 +194,7 @@ class AtmHeadOfficeController extends Controller
                 if (in_array($userGroup, ['Collection Staff', 'Developer', 'Admin', 'Everfirst Admin','Branch Head'])) {
                     if($row->atm_type === 'Passbook' && $row->passbook_for_collection === 'no')
                     {
-                        $passbook_for_collection .= '<a href="#" class="btn btn-info passbookForCollection ms-3 me-2 mb-2"
+                        $passbook_for_collection .= '<a href="#" class="btn btn-info passbookForCollection me-2 mb-2"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top"
                                     title="Passbook For Collection"
