@@ -1475,7 +1475,7 @@
 
             function closeTransactionModal() {
                 $('#createTransactionModal').modal('hide');
-                // $('#FetchingDatatable tbody').empty();
+                $('#FetchingDatatable tbody').empty();
             }
         });
 
