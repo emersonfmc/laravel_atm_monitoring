@@ -402,11 +402,9 @@ class AtmHeadOfficeController extends Controller
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
 
-
-        // Start the query with the necessary relationships
         $query = AtmClientBanks::with('ClientInformation', 'Branch', 'AtmBanksTransaction')
             ->where('location', 'Released')
-            ->where('status', ['0','2','3','4','5'])
+            ->whereIn('status', ['0', '2', '3', '4', '5']) // Use whereIn for multiple values
             ->latest('updated_at');
 
         // Check if the user has a valid branch_id
@@ -445,14 +443,18 @@ class AtmHeadOfficeController extends Controller
                         // Show spinning gear icon if there are ongoing transactions
                         return '<i class="fas fa-spinner fa-spin fs-3 text-success"></i>';
                     } else {
-                        // Add buttons for creating a transaction and adding ATM transaction
-                        $action .= '<a href="#" class="btn btn-success returnClientTransaction me-2 mb-2"
+                        if($row->location === 'Released' && $row->status == 0){
+                            $action .= '<a href="#" class="btn btn-success returnClientTransaction me-2 mb-2"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="top"
                                             title="Return Client / Balik Loob"
                                             data-id="' . $row->id . '">
-                                      <i class="fas fa-sign-in-alt fa-rotate-180"></i>
-                                     </a>';
+                                            <i class="fas fa-sign-in-alt fa-rotate-180"></i>
+                                        </a>';
+                        }
+                        if($row->location === 'Released' && $row->status == 5){
+                            $action .= '<span class="text-danger">Did Not Return By Bank</span>';
+                        }
                     }
                 }
                 return $action; // Return all the accumulated buttons

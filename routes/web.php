@@ -161,7 +161,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/TransactionData', 'TransactionData')->name('TransactionData');
         Route::get('/TransactionGet', 'TransactionGet')->name('TransactionGet');
         Route::post('/TransactionCreate', 'TransactionCreate')->name('TransactionCreate');
-        // Route::resource('products', ProductController::class);
+        Route::post('/TransactionReplacementCreate', 'TransactionReplacementCreate')->name('TransactionReplacementCreate');
     });
 });
 

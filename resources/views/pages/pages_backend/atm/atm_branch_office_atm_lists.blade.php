@@ -36,11 +36,11 @@
                                     <th>Reference No</th>
                                     <th>Client</th>
                                     <th>Branch</th>
-                                    <th>Pension No. / Type</th>
+                                    <th>Pension No</th>
                                     <th>Created Date</th>
                                     <th>Birthdate</th>
                                     <th>Box</th>
-                                    <th>ATM / Passbook / Simcard No & Bank</th>
+                                    <th>Card No. & Bank</th>
                                     <th>PIN Code</th>
                                     <th>Status</th>
                                     <th>QR</th>
@@ -272,7 +272,7 @@
 
     <div class="modal fade" id="BorrowTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="BorrowTransactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-uppercase">Returning of Borrow Transaction</h5>
@@ -285,7 +285,7 @@
                         <div class="row">
                             <input type="hidden" name="atm_id" id="borrow_atm_id">
                             <input type="hidden" name="reason_for_pull_out" value="4">
-                            <div class="col-6">
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <div id="borrow_fullname" class="fw-bold h4"></div>
                                     <span id="borrow_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="borrow_pension_account_type" class="fw-bold h5"></span>
@@ -332,7 +332,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-md-6">
                                 <div class="form-group row align-items-center mb-2">
                                     <div class="col-auto">
                                         <input type="checkbox" name="replacement_status" id="replacement_status_display" value="no" class="form-check-input ms-1 me-1">
@@ -429,7 +429,12 @@
                                             </select>
                                         </div>
 
-                                        <div class="form-group mb-3">
+                                        <div class="col-6 form-group mb-3">
+                                            <label class="fw-bold h6">Expiration Date</label>
+                                            <input type="month" name="new_expiration_date" class="form-control">
+                                        </div>
+
+                                        <div class="col-6 form-group mb-3">
                                             <label class="fw-bold h6">Balance</label>
                                             <input type="text" name="new_balance" class="balance_input_mask form-control" placeholder="Balance" required>
                                         </div>
@@ -454,7 +459,7 @@
 
     <div class="modal fade" id="ReplacementTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="ReplacementTransactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-xl"role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-uppercase">Replacement of ATM / Passbook / Simcard Transaction</h5>
@@ -462,7 +467,7 @@
                 </div>
 
                 <div class="modal-body">
-                    <form action="#" method="POST" id="replacementValidateForm">
+                    <form action="{{ route('TransactionReplacementCreate') }}" method="POST" id="replacementValidateForm">
                         @csrf
                         <div class="row">
                             <input type="hidden" name="atm_id" id="replacement_atm_id">
@@ -573,12 +578,25 @@
                                             </select>
                                         </div>
 
-                                        <div class="form-group mb-3">
+                                        <div class="col-6 form-group mb-3">
                                             <label class="fw-bold h6">PIN Code</label>
                                             <input type="text" name="new_pin_code" class="form-control" placeholder="PIN Code">
                                         </div>
 
-                                        <div class="form-group mb-3">
+                                        <div class="col-6 form-group mb-3">
+                                            <label class="fw-bold h6">Status</label>
+                                            <select name="new_atm_status" id="new_atm_status" class="form-select" required>
+                                                <option value="new" selected>New</option>
+                                                <option value="old">Old</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-6 form-group mb-3">
+                                            <label class="fw-bold h6">Expiration Date</label>
+                                            <input type="month" name="new_expiration_date" class="form-control">
+                                        </div>
+
+                                        <div class="col-6 form-group mb-3">
                                             <label class="fw-bold h6">Balance</label>
                                             <input type="text" name="new_balance" class="balance_input_mask form-control" placeholder="Balance" required>
                                         </div>
@@ -1480,7 +1498,17 @@
 
                     $('#borrowValidateForm').validate({
                         rules: {
-                            remarks: { required: true }
+                            remarks: { required: true },
+                            new_pin_code: { // Initial validation for PIN Code
+                                required: function() {
+                                    return $('#borrow_atm_type_fetch').val() === 'ATM'; // Make required only if ATM is selected
+                                }
+                            }
+                        },
+                        messages: {
+                            new_pin_code: {
+                                required: "PIN Code is required for ATM type."
+                            }
                         },
                         errorElement: 'span',
                         errorPlacement: function(error, element) {
@@ -1653,7 +1681,7 @@
                 });
 
                 function closeReplacementTransactionModal() {
-                    $('#CancelledLoanTransactionModal').modal('hide');
+                    $('#ReplacementTransactionModal').modal('hide');
                     $('#FetchingDatatable tbody').empty();
                 }
 

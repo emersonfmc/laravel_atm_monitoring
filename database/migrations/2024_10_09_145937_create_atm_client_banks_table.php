@@ -17,10 +17,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('client_information_id')->nullable();
             $table->unsignedBigInteger('branch_id')->nullable();
-            $table->string('transaction_number')->unique()->nullable();
+            $table->string('transaction_number')->nullable();
 
             $table->enum('atm_type',['ATM','Passbook','Sim Card'])->nullable();
-            $table->string('bank_account_no')->unique()->nullable();
+            $table->string('bank_account_no')->nullable();
             $table->string('bank_name')->nullable();
             $table->integer('pin_no')->nullable();
             $table->enum('atm_status',['old','new'])->nullable();

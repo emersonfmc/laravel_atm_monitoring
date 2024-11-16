@@ -66,7 +66,7 @@
                                     <th>Created Date</th>
                                     <th>Birthdate</th>
                                     <th>Box</th>
-                                    <th>Bank Account No</th>
+                                    <th>Card No. & Bank</th>
                                     {{-- <th>ATM / Passbook / Simcard No & Bank</th> --}}
                                     <th>PIN Code</th>
                                     <th>Status</th>
@@ -165,7 +165,7 @@
                                             <option value="For SSS/GSIS Report">For SSS/GSIS Report</option>
                                             <option value="For Emegency Loan">For Emegency Loan</option>
                                             <option value="For Bank Report">For Bank Report</option>
-                                            <option value="For Requiremtns">For Requiremtns</option>
+                                            <option value="For Requirements">For Requirements</option>
                                         </select>
                                     </div>
                                 </span>
