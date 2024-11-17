@@ -16,9 +16,12 @@ return new class extends Migration
         Schema::create('atm_released_client_images', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('banks_transactions_id')->nullable();
+            $table->string('update_by_employee_id')->nullable();
             $table->string('filename')->nullable();
             $table->string('image_name')->nullable();
+            $table->string('type')->nullable();
             $table->foreign('banks_transactions_id')->references('id')->on('atm_banks_transactions')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('update_by_employee_id')->references('employee_id')->on('users')->onDelete('set null')->onUpdate('cascade');
             $table->timestamps();
         });
     }

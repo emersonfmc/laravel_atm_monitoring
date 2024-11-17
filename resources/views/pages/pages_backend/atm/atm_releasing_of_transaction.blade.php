@@ -4,8 +4,9 @@
 
     @component('components.breadcrumb')
         @slot('li_1') ATM / Passbook / Simcard @endslot
-        @slot('title') Receiving of Transaction @endslot
+        @slot('title') Releasing of Transaction @endslot
     @endcomponent
+
 
     <div class="row">
         <div class="col-12">
@@ -47,7 +48,7 @@
             var FetchingDatatableBody = $('#FetchingDatatable tbody');
 
             const dataTable = new ServerSideDataTable('#FetchingDatatable');
-            var url = '{!! route('TransactionReceivingData') !!}';
+            var url = '{!! route('TransactionReleasingData') !!}';
             const buttons = [{
                 text: 'Delete',
                 action: function(e, dt, node, config) {
@@ -178,6 +179,7 @@
             ];
             dataTable.initialize(url, columns);
         });
-        </script>
+    </script>
 
 @endsection
+

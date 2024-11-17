@@ -12,6 +12,11 @@ class AtmBanksTransactionApproval extends Model
 
     protected $guarded = [];
 
+    public function AtmBanksTransaction()
+    {
+        return $this->belongsTo(AtmBanksTransaction::class, 'banks_transactions_id', 'id');
+    }
+
     public function DataUserGroup()
     {
         return $this->belongsTo(DataUserGroup::class, 'user_groups_id','id');

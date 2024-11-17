@@ -86,11 +86,11 @@
                                     <th>Transaction Number</th>
                                     <th>Client</th>
                                     <th>Pension No. / Type</th>
-                                    <th>Status</th>
-                                    <th>ATM / Passbook / Simcard No & Bank</th>
+                                    <th>Card No & Bank</th>
                                     <th>Type</th>
                                     <th>PIN Code</th>
                                     <th>Collection Date</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -622,39 +622,6 @@
                     searchable: true,
                 },
                 {
-                    data: 'status',
-                    name: 'status',
-                    render: function(data, type, row, meta) {
-                        let badgeClass = '';
-                        let statusClass = '';
-
-                        // Determine the badge class and status label based on status value
-                        switch (row.status) {
-                            case 'ON GOING':
-                                badgeClass = 'pt-1 pb-1 ps-2 ps-2 pe-2 badge bg-warning fw-bold h6';
-                                statusClass = 'On Going';
-                                break;
-                            case 'CANCELLED':
-                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-danger fw-bold h6';
-                                statusClass = 'Cancelled';
-                                break;
-                            case 'COMPLETED':
-                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-success fw-bold h6';
-                                statusClass = 'Completed';
-                                break;
-                            default:
-                                badgeClass = 'badge bg-secondary fw-bold h6'; // Default badge class
-                                statusClass = 'Unknown Status';
-                        }
-
-                        // Return the status wrapped in a span with the appropriate badge and status class
-                        return `<span class="${badgeClass} fw-bold h6">${statusClass}</span>`;
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-
-                {
                     data: 'bank_account_no',
                     name: 'bank_account_no',
                     render: function(data, type, row, meta) {
@@ -743,6 +710,39 @@
                         }
 
                         return `<span>${CollectionDate}</span>`;
+                    },
+                    orderable: true,
+                    searchable: true,
+                },
+
+                {
+                    data: 'status',
+                    name: 'status',
+                    render: function(data, type, row, meta) {
+                        let badgeClass = '';
+                        let statusClass = '';
+
+                        // Determine the badge class and status label based on status value
+                        switch (row.status) {
+                            case 'ON GOING':
+                                badgeClass = 'pt-1 pb-1 ps-2 ps-2 pe-2 badge bg-warning fw-bold h6';
+                                statusClass = 'On Going';
+                                break;
+                            case 'CANCELLED':
+                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-danger fw-bold h6';
+                                statusClass = 'Cancelled';
+                                break;
+                            case 'COMPLETED':
+                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-success fw-bold h6';
+                                statusClass = 'Completed';
+                                break;
+                            default:
+                                badgeClass = 'badge bg-secondary fw-bold h6'; // Default badge class
+                                statusClass = 'Unknown Status';
+                        }
+
+                        // Return the status wrapped in a span with the appropriate badge and status class
+                        return `<span class="${badgeClass} fw-bold h6">${statusClass}</span>`;
                     },
                     orderable: true,
                     searchable: true,

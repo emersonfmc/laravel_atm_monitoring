@@ -45,6 +45,7 @@
                                     <div class="col-md-2" style="margin-top: 25px;">
                                         <div class="form-group">
                                             <button type="submit" class="btn btn-primary">Filter</button>
+                                            <button type="button" class="btn btn-success">Generate Reports</button>
                                         </div>
                                     </div>
                                 </div>
@@ -66,7 +67,7 @@
                                     <th>Created Date</th>
                                     <th>Birthdate</th>
                                     <th>Box</th>
-                                    <th>Bank Account No</th>
+                                    <th>Card No. & Bank</th>
                                     {{-- <th>ATM / Passbook / Simcard No & Bank</th> --}}
                                     <th>PIN Code</th>
                                     <th>Status</th>
@@ -165,7 +166,7 @@
                                             <option value="For SSS/GSIS Report">For SSS/GSIS Report</option>
                                             <option value="For Emegency Loan">For Emegency Loan</option>
                                             <option value="For Bank Report">For Bank Report</option>
-                                            <option value="For Requiremtns">For Requiremtns</option>
+                                            <option value="For Requirements">For Requirements</option>
                                         </select>
                                     </div>
                                 </span>
@@ -1475,7 +1476,7 @@
 
             function closeTransactionModal() {
                 $('#createTransactionModal').modal('hide');
-                // $('#FetchingDatatable tbody').empty();
+                $('#FetchingDatatable tbody').empty();
             }
         });
 

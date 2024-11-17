@@ -23,6 +23,7 @@ class ClientInformationFactory extends Factory
             'last_name' => $this->faker->lastName, // Generate a random last name
             'suffix' => $this->faker->optional()->randomElement(['Jr.', 'Sr.', 'Ma.', 'I', 'II', 'III', 'IV']), // Random suffix or null
             'birth_date' => $this->faker->dateTimeBetween('1950-01-01', '1960-12-31')->format('Y-m-d'), // Random birth date
+            'passbook_for_collection' => 'no',
         ];
     }
 

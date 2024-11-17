@@ -229,7 +229,7 @@ class ClientContoller extends Controller
 
                         AtmTransactionBalanceLogs::create([
                             'banks_transactions_id' => $AtmBanksTransaction->id,
-                            'check_by_user_id' => Auth::user()->id,
+                            'check_by_employee_id' => Auth::user()->employee_id,
                             'balance' => $balance,
                             'remarks' => $request->remarks[$key] ?? NULL,
                             'created_at' => Carbon::now(),
