@@ -31,6 +31,7 @@ return new class extends Migration
             $table->foreign('user_groups_id','user_groups_id')->references('id')->on('data_user_groups')->onDelete('set null')->onUpdate('cascade');
             $table->foreign('transaction_actions_id','transaction_actions_id')->references('id')->on('data_transaction_actions')->onDelete('set null')->onUpdate('cascade');
 
+            $table->softDeletes();
             $table->timestamps();
         });
     }

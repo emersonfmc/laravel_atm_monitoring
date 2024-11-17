@@ -43,8 +43,6 @@ return new class extends Migration
                                6 = Safekeep
                                7 = Cancelled Loan');
 
-            $table->enum('passbook_for_collection',['yes','no'])->nullable();
-
             $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('client_information_id')->references('id')->on('client_information')->onDelete('set null')->onUpdate('cascade');
 

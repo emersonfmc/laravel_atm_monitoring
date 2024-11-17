@@ -335,6 +335,7 @@
 
                                 if (res.status === 'success')
                                 {
+                                    createDatatable();
                                     Swal.fire({
                                         title: 'Successfully Create!',
                                         text: 'Passbook For Collection is successfully Created!',
@@ -357,7 +358,7 @@
                                                         dataTable.table.ajax.reload( () =>
                                                         {
                                                             Swal.close();
-                                                            $(form)[0].reset();
+                                                            $('#passbookForCollection').hide();
                                                             dataTable.table.page(currentPage).draw( false );
                                                         },
                                                         false );
@@ -401,6 +402,10 @@
                     }
                 });
             });
+
+            function createDatatable() {
+                $('#FetchingDatatable tbody').empty();
+            }
         });
     </script>
 

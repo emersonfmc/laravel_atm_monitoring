@@ -164,6 +164,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/TransactionCreate', 'TransactionCreate')->name('TransactionCreate');
         Route::post('/TransactionReplacementCreate', 'TransactionReplacementCreate')->name('TransactionReplacementCreate');
         Route::post('/TransactionReleaseCreate', 'TransactionReleaseCreate')->name('TransactionReleaseCreate');
+
+        Route::get('/TransactionReceivingPage', 'TransactionReceivingPage')->name('TransactionReceivingPage');
+        Route::get('/TransactionReceivingData', 'TransactionReceivingData')->name('TransactionReceivingData');
+        Route::get('/TransactionReleasingPage', 'TransactionReleasingPage')->name('TransactionReleasingPage');
+        Route::get('/TransactionReleasingData', 'TransactionReleasingData')->name('TransactionReleasingData');
     });
 });
 

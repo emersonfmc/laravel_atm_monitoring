@@ -123,13 +123,13 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" key="atm_receiving_transaction">
+                            <a href="{{ route('TransactionReceivingPage') }}" key="atm_receiving_transaction">
                                 <span class="badge rounded-pill bg-info float-start me-2" id="PendingReceivingTransactionCount"></span>
                                 Receiving of Transaction
                             </a>
                         </li>
                         <li>
-                            <a href="#" key="atm_releasing_transaction">
+                            <a href="{{ route('TransactionReleasingPage') }}" key="atm_releasing_transaction">
                                 <span class="badge rounded-pill bg-danger float-start me-2" id="PendingReleasingTransactionCount"></span>
                                 Releasing of Transaction
                             </a>

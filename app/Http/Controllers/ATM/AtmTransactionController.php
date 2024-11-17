@@ -2,28 +2,25 @@
 
 namespace App\Http\Controllers\ATM;
 
-use App\Models\Branch;
-use App\Models\DataArea;
-use App\Models\SystemLogs;
 use Illuminate\Http\Request;
-
-use App\Models\DataBankLists;
-
-use App\Models\AtmClientBanks;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+
+use Yajra\DataTables\Facades\DataTables;
+use App\Http\Controllers\Controller;
+
+use App\Models\Branch;
+use App\Models\SystemLogs;
+use App\Models\DataBankLists;
+use App\Models\AtmClientBanks;
 use App\Models\DataReleaseOption;
 use App\Models\DataCollectionDate;
 use App\Models\AtmBanksTransaction;
-use App\Http\Controllers\Controller;
-use App\Models\AtmTransactionAction;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
 use App\Models\DataPensionTypesLists;
 use App\Models\DataTransactionAction;
 use App\Models\AtmReleasedClientImage;
-use App\Models\AtmTransactionSequence;
 use App\Models\DataTransactionSequence;
-use Yajra\DataTables\Facades\DataTables;
 use App\Models\AtmTransactionBalanceLogs;
 use App\Models\AtmBanksTransactionApproval;
 
@@ -1368,4 +1365,79 @@ class AtmTransactionController extends Controller
             'message' => 'Transaction Created successfully!'  // Changed message to reflect update action
         ]);
     }
+
+    public function TransactionReceivingPage()
+    {
+        return view('pages.pages_backend.atm.atm_receiving_of_transaction');
+    }
+
+    public function TransactionReleasingPage()
+    {
+        return view('pages.pages_backend.atm.atm_releasing_of_transaction');
+    }
+
+    public function TransactionReceivingData(Request $request)
+    {
+        $userBranchId = Auth::user()->branch_id;
+        $userGroup = Auth::user()->UserGroup->group_name;
+
+        $query = AtmBanksTransactionApproval::with('AtmBanksTransaction')
+            ->where('status', 'Pending')
+            ->where('type', 'Received')
+            ->where('user_groups_id', Auth::user()->user_group_id)
+            // ->where(function ($query) use ($userGroup) {
+            //     if (in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin'])) {
+            //         $query->whereIn('user_groups_id', [1, 2, 56]);
+            //     } else {
+            //         $query->where('user_groups_id', Auth::user()->user_group_id);
+            //     }
+            // })
+            ->whereHas('AtmBanksTransaction', function ($query) use ($userBranchId, $request) {
+                // Apply branch filter based on user branch_id or request input
+                if ($userBranchId) {
+                    $query->where('branch_id', $userBranchId);
+                } elseif ($request->filled('branch_id')) {
+                    $query->where('branch_id', $request->branch_id);
+                }
+            });
+
+            $pendingReceivingTransaction = $query->get();
+
+            return DataTables::of($pendingReceivingTransaction)
+                ->setRowId('id')
+                ->make(true);
+    }
+
+    public function TransactionReleasingData(Request $request)
+    {
+        $userBranchId = Auth::user()->branch_id;
+        $userGroup = Auth::user()->UserGroup->group_name;
+
+        $query = AtmBanksTransactionApproval::with('AtmBanksTransaction')
+            ->where('status', 'Pending')
+            ->where('type', 'Released')
+            ->where('user_groups_id', Auth::user()->user_group_id)
+            // ->where(function ($query) use ($userGroup) {
+            //     if (in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin'])) {
+            //         $query->whereIn('user_groups_id', [1, 2, 56]);
+            //     } else {
+            //         $query->where('user_groups_id', Auth::user()->user_group_id);
+            //     }
+            // })
+            ->whereHas('AtmBanksTransaction', function ($query) use ($userBranchId, $request) {
+                // Apply branch filter based on user branch_id or request input
+                if ($userBranchId) {
+                    $query->where('branch_id', $userBranchId);
+                } elseif ($request->filled('branch_id')) {
+                    $query->where('branch_id', $request->branch_id);
+                }
+            });
+
+            $pendingReleasingTransaction = $query->get();
+
+            return DataTables::of($pendingReleasingTransaction)
+                ->setRowId('id')
+                ->make(true);
+    }
+
 }

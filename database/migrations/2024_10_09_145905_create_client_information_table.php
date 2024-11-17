@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('last_name')->nullable();
             $table->enum('suffix', ['Jr.','Sr.','Ma.','I','II','III','IV'])->nullable();
             $table->date('birth_date')->nullable();
+            $table->enum('passbook_for_collection',['yes','no'])->nullable();
             $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade')->onUpdate('cascade');
 
             $table->softDeletes();

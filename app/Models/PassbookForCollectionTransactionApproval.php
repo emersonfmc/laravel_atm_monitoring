@@ -17,6 +17,11 @@ class PassbookForCollectionTransactionApproval extends Model
         return $this->belongsTo(DataUserGroup::class, 'user_groups_id','id');
     }
 
+    public function DataTransactionAction()
+    {
+        return $this->belongsTo(DataTransactionAction::class, 'transaction_actions_id','id');
+    }
+
     public function Employee()
     {
         return $this->belongsTo(User::class, 'employee_id','employee_id');
