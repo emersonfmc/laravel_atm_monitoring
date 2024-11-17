@@ -30,7 +30,7 @@ class AtmTransactionActionSeeder extends Seeder
             [12, 'Returning of Old ATM',             2, 'Going to Head Office','Active'],
             [13, 'Cancelled Loan',                   1, 'Going to Branch Office','Active'],
             [14, 'Cancelled Request Released',       NULL ,NUll, 'Active'],
-            [15, 'Returning of Cancelled Form',      NULL ,NULL,'Active'],
+            [15, 'Returning of Cancelled Form',      3, 'Going to Head Office','Active'],
             [16, 'Release With Balance',             1, 'Going to Branch Office','Active'],
             [17, 'New ATM (Replacement)',            2, 'Going to Head Office','Active'],
             [18, 'New ATM (Add ATM)',                2, 'Going to Head Office','Active'],

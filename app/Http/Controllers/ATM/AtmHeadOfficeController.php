@@ -192,7 +192,7 @@ class AtmHeadOfficeController extends Controller
 
                 // Add buttons for users in Collection Staff and others
                 if (in_array($userGroup, ['Collection Staff', 'Developer', 'Admin', 'Everfirst Admin','Branch Head'])) {
-                    if($row->atm_type === 'Passbook' && $row->passbook_for_collection === 'no')
+                    if($row->atm_type === 'Passbook' && $row->ClientInformation->passbook_for_collection === 'no')
                     {
                         $passbook_for_collection .= '<a href="#" class="btn btn-info passbookForCollection me-2 mb-2"
                                     data-bs-toggle="tooltip"
@@ -249,11 +249,16 @@ class AtmHeadOfficeController extends Controller
 
     public function PassbookForCollectionSetup(Request $request)
     {
-        try {
             $atm_id = $request->atm_id;
 
             $AtmClientBanks = AtmClientBanks::with('ClientInformation', 'Branch')->findOrFail($atm_id);
             $AtmClientBanks->update([
+                'updated_at' => Carbon::now(),
+            ]);
+            $ClientInformationId = $AtmClientBanks->client_information_id;
+
+            $ClientInformation = ClientInformation::findOrFail($ClientInformationId);
+            $ClientInformation->update([
                 'passbook_for_collection' => 'yes',
                 'updated_at' => Carbon::now(),
             ]);
@@ -263,7 +268,11 @@ class AtmHeadOfficeController extends Controller
                 'system' => 'ATM Monitoring',
                 'action' => 'Create',
                 'title' => 'Passbook For Collection',
-                'description' => 'Add to Setup for Passbook For Collection' .  $AtmClientBanks->transaction_number,
+                'description' => 'Add to Setup for Passbook For Collection' .
+                        $ClientInformation->last_name ?? ''.
+                        $ClientInformation->first_name ?? ''. ', ' .
+                        $ClientInformation->middle_name ?? ''.
+                        $ClientInformation->suffix ?? NULL,
                 'employee_id' => Auth::user()->employee_id,
                 'ip_address' => $request->ip(),
                 'created_at' => Carbon::now(),
@@ -276,12 +285,7 @@ class AtmHeadOfficeController extends Controller
                 'message' => 'Already Setup for Passbook for Collection'
             ]);
 
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred while setting up the Passbook for Collection.',
-            ]);
-        }
+
     }
 
     public function SafekeepPage()
@@ -402,11 +406,9 @@ class AtmHeadOfficeController extends Controller
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
 
-
-        // Start the query with the necessary relationships
         $query = AtmClientBanks::with('ClientInformation', 'Branch', 'AtmBanksTransaction')
             ->where('location', 'Released')
-            ->where('status', ['0','2','3','4','5'])
+            ->whereIn('status', ['0', '2', '3', '4', '5','7']) // Use whereIn for multiple values
             ->latest('updated_at');
 
         // Check if the user has a valid branch_id
@@ -445,14 +447,21 @@ class AtmHeadOfficeController extends Controller
                         // Show spinning gear icon if there are ongoing transactions
                         return '<i class="fas fa-spinner fa-spin fs-3 text-success"></i>';
                     } else {
-                        // Add buttons for creating a transaction and adding ATM transaction
-                        $action .= '<a href="#" class="btn btn-success returnClientTransaction me-2 mb-2"
+                        if($row->location === 'Released' && $row->status == 0){
+                            $action .= '<a href="#" class="btn btn-success returnClientTransaction me-2 mb-2"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="top"
                                             title="Return Client / Balik Loob"
                                             data-id="' . $row->id . '">
-                                      <i class="fas fa-sign-in-alt fa-rotate-180"></i>
-                                     </a>';
+                                            <i class="fas fa-sign-in-alt fa-rotate-180"></i>
+                                        </a>';
+                        }
+                        if($row->location === 'Released' && $row->status == 5){
+                            $action .= '<span class="text-danger">Did Not Return By Bank</span>';
+                        }
+                        if($row->location === 'Released' && $row->status == 7){
+                            $action .= '<span class="text-danger">Cancelled Loan</span>';
+                        }
                     }
                 }
                 return $action; // Return all the accumulated buttons

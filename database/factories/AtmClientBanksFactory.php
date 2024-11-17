@@ -27,7 +27,6 @@ class AtmClientBanksFactory extends Factory
             'location' => 'Head Office',
             'branch_id' => null, // This will be set to the client's branch_id in ClientInformationFactory
             'status' => '1',
-            'passbook_for_collection' => $atmType === 'Passbook' ? 'no' : null,
         ];
     }
 }

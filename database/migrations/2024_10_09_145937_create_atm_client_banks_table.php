@@ -17,10 +17,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('client_information_id')->nullable();
             $table->unsignedBigInteger('branch_id')->nullable();
-            $table->string('transaction_number')->unique()->nullable();
+            $table->string('transaction_number')->nullable();
 
             $table->enum('atm_type',['ATM','Passbook','Sim Card'])->nullable();
-            $table->string('bank_account_no')->unique()->nullable();
+            $table->string('bank_account_no')->nullable();
             $table->string('bank_name')->nullable();
             $table->integer('pin_no')->nullable();
             $table->enum('atm_status',['old','new'])->nullable();
@@ -40,9 +40,8 @@ return new class extends Migration
                                3 = Released ATM to client and Become Return Client but in Another ATM
                                4 = Return Client Same ATM
                                5 = Old ATM Did Not Return by Bank
-                               6 = Safekeep');
-
-            $table->enum('passbook_for_collection',['yes','no'])->nullable();
+                               6 = Safekeep
+                               7 = Cancelled Loan');
 
             $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('client_information_id')->references('id')->on('client_information')->onDelete('set null')->onUpdate('cascade');

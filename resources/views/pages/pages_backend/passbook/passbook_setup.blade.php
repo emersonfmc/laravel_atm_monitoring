@@ -325,36 +325,65 @@
                                 items: checkedItemsData,
                                 _token: csrfToken // Include CSRF token in the request
                             },
+
                             success: function(response) {
-                                Swal.fire({
-                                    title: 'Successfully Create!',
-                                    text: 'Passbook For Collection is successfully Created!',
-                                    icon: 'success',
-                                    showCancelButton: false,
-                                    showConfirmButton: true,
-                                    confirmButtonText: 'OK',
-                                    preConfirm: () => {
-                                        return new Promise((
-                                            resolve
-                                        ) => {
-                                            Swal.fire({
-                                                title: 'Please Wait...',
-                                                allowOutsideClick: false,
-                                                allowEscapeKey: false,
-                                                showConfirmButton: false,
-                                                showCancelButton: false,
-                                                didOpen: () => {
-                                                    Swal.showLoading();
-                                                    // here the reload of datatable
-                                                    dataTable.table.ajax.reload(() => {
-                                                        Swal.close();
-                                                        dataTable.table.page(currentPage).draw(false);
-                                                    }, false );
-                                                }
-                                            })
-                                        });
-                                    }
-                                });
+                                if (typeof response === 'string') {
+                                    var res = JSON.parse(response);
+                                } else {
+                                    var res = response; // If it's already an object
+                                }
+
+                                if (res.status === 'success')
+                                {
+                                    createDatatable();
+                                    Swal.fire({
+                                        title: 'Successfully Create!',
+                                        text: 'Passbook For Collection is successfully Created!',
+                                        icon: 'success',
+                                        showCancelButton: false,
+                                        showConfirmButton: true,
+                                        confirmButtonText: 'OK',
+                                        preConfirm: () => {
+                                            return new Promise(( resolve
+                                            ) => {
+                                                Swal.fire({
+                                                    title: 'Please Wait...',
+                                                    allowOutsideClick: false,
+                                                    allowEscapeKey: false,
+                                                    showConfirmButton: false,
+                                                    showCancelButton: false,
+                                                    didOpen: () => {
+                                                        Swal.showLoading();
+                                                        // here the reload of datatable
+                                                        dataTable.table.ajax.reload( () =>
+                                                        {
+                                                            Swal.close();
+                                                            $('#passbookForCollection').hide();
+                                                            dataTable.table.page(currentPage).draw( false );
+                                                        },
+                                                        false );
+                                                    }
+                                                })
+                                            });
+                                        }
+                                    });
+                                }
+                                else if (res.status === 'error')
+                                {
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: res.message,
+                                        icon: 'error',
+                                    });
+                                }
+                                else
+                                {
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: 'Error Occurred Please Try Again',
+                                        icon: 'error',
+                                    });
+                                }
                             },
                             error: function(xhr, status, error) {
                                 var errorMessage =
@@ -373,6 +402,10 @@
                     }
                 });
             });
+
+            function createDatatable() {
+                $('#FetchingDatatable tbody').empty();
+            }
         });
     </script>
 

@@ -31,4 +31,14 @@ class AtmBanksTransaction extends Model
     {
         return $this->hasMany(AtmBanksTransactionApproval::class, 'banks_transactions_id','id');
     }
+
+    public function AtmReleasedClientImage()
+    {
+        return $this->hasOne(AtmReleasedClientImage::class, 'banks_transactions_id','id');
+    }
+
+    public function AtmReleasedRiderImage()
+    {
+        return $this->hasOne(AtmReleasedRiderImage::class, 'banks_transactions_id','id');
+    }
 }

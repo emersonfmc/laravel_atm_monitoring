@@ -151,6 +151,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(DashboardController::class)->group(function () {
         Route::get('/index', 'dashboard')->name('dashboard');
+        Route::get('/SidebarCount', 'SidebarCount')->name('SidebarCount');
         // Route::resource('products', ProductController::class);
     });
 });
@@ -161,7 +162,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/TransactionData', 'TransactionData')->name('TransactionData');
         Route::get('/TransactionGet', 'TransactionGet')->name('TransactionGet');
         Route::post('/TransactionCreate', 'TransactionCreate')->name('TransactionCreate');
-        // Route::resource('products', ProductController::class);
+        Route::post('/TransactionReplacementCreate', 'TransactionReplacementCreate')->name('TransactionReplacementCreate');
+        Route::post('/TransactionReleaseCreate', 'TransactionReleaseCreate')->name('TransactionReleaseCreate');
+
+        Route::get('/TransactionReceivingPage', 'TransactionReceivingPage')->name('TransactionReceivingPage');
+        Route::get('/TransactionReceivingData', 'TransactionReceivingData')->name('TransactionReceivingData');
+        Route::get('/TransactionReleasingPage', 'TransactionReleasingPage')->name('TransactionReleasingPage');
+        Route::get('/TransactionReleasingData', 'TransactionReleasingData')->name('TransactionReleasingData');
     });
 });
 

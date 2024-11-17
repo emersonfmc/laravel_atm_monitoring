@@ -17,10 +17,12 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('banks_transactions_id')->nullable();
             $table->unsignedBigInteger('check_by_user_id')->nullable();
+            $table->string('check_by_employee_id')->nullable();
+
             $table->integer('balance')->default(0);
             $table->string('remarks')->nullable();
             $table->foreign('banks_transactions_id')->references('id')->on('atm_banks_transactions')->onDelete('set null')->onUpdate('cascade');
-            $table->foreign('check_by_user_id')->references('id')->on('users')->onDelete('set null')->onUpdate('cascade');
+            $table->foreign('check_by_employee_id')->references('employee_id')->on('users')->onDelete('set null')->onUpdate('cascade');
             $table->softDeletes();
             $table->timestamps();
         });
