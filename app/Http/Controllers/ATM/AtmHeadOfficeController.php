@@ -404,7 +404,7 @@ class AtmHeadOfficeController extends Controller
 
         $query = AtmClientBanks::with('ClientInformation', 'Branch', 'AtmBanksTransaction')
             ->where('location', 'Released')
-            ->whereIn('status', ['0', '2', '3', '4', '5']) // Use whereIn for multiple values
+            ->whereIn('status', ['0', '2', '3', '4', '5','7']) // Use whereIn for multiple values
             ->latest('updated_at');
 
         // Check if the user has a valid branch_id
@@ -454,6 +454,9 @@ class AtmHeadOfficeController extends Controller
                         }
                         if($row->location === 'Released' && $row->status == 5){
                             $action .= '<span class="text-danger">Did Not Return By Bank</span>';
+                        }
+                        if($row->location === 'Released' && $row->status == 7){
+                            $action .= '<span class="text-danger">Cancelled Loan</span>';
                         }
                     }
                 }

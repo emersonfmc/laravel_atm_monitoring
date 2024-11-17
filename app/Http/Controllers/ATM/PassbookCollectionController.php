@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AtmTransactionAction;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
+use App\Models\PassbookForCollectionTransaction;
 
 class PassbookCollectionController extends Controller
 {
@@ -117,20 +118,61 @@ class PassbookCollectionController extends Controller
 
     public function PassbookForCollectionCreate(Request $request)
     {
-       $item_id = $request->items;
+        $item_ids = $request->items;
 
-       if (is_array($item_id) && count($item_id) > 0) {
-            foreach ($item_id as $atm_ids) {
+        if (is_array($item_ids) && count($item_ids) > 0) {
+            // Retrieve all selected ATM client banks based on the provided IDs
+            $selectedAtmClientBanks = AtmClientBanks::whereIn('id', $item_ids)->get();
 
-                $SelectedAtmClientBanks = AtmClientBanks::findOrFail($atm_ids);
-                $selectBranchID = $SelectedAtmClientBanks->branch_id;
+            $branchIds = $selectedAtmClientBanks->pluck('branch_id')->unique();
 
-                $BranchGet = Branch::where('id', $selectBranchID)->first();
-                $branch_abbreviation = $BranchGet->branch_abbreviation;
-
-                dd($branch_abbreviation);
+            if ($branchIds->count() > 1) {
+                // If there are multiple branch IDs, return an error response
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'All selected items must belong to the same branch.',
+                ]);
             }
+
+            // Get the branch abbreviation for the single branch_id
+            $branchId = $branchIds->first();
+            $branch = Branch::where('id', $branchId)->first();
+            $branchAbbreviation = $branch->branch_abbreviation;
+
+
+            // Generate Request Number
+                $request_number_initial = $branchAbbreviation . '-PB' . date('mdy');
+
+                // Fetch the last `request_number` with the matching prefix
+                $fetch_validate = PassbookForCollectionTransaction::select('request_number')
+                    ->where('request_number', 'like', $request_number_initial . '%')
+                    ->orderByDesc('id') // Ensure we get the latest one
+                    ->first();
+
+                if ($fetch_validate) {
+                    // Extract the number part from the existing `request_number`
+                    $last_number = substr($fetch_validate->request_number, -6); // Get the last 6 digits
+                    $new_number = (int)$last_number + 1; // Increment the number
+                } else {
+                    // If no existing request number, start with 1
+                    $new_number = 1;
+                }
+
+                $formatted_number = str_pad($new_number, 6, '0', STR_PAD_LEFT);
+                $RequestNumber = $request_number_initial . '-' . $formatted_number;
+            // Generate Request Number
+
+            dd($RequestNumber);
+
+            // Output the result
+
+            // Handle case where the branch is not found
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Branch not found for the selected items.',
+            ]);
         }
+
     }
 
 }

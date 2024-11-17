@@ -68,10 +68,12 @@
                 </div>
 
                 <div class="modal-body">
-                    <form action="{{ route('TransactionCreate') }}" method="POST" id="releasingValidateForm">
+                    <form action="{{ route('TransactionReleaseCreate') }}" method="POST" id="releasingValidateForm" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <input type="hidden" name="atm_id" id="release_atm_id">
+                            <input type="hidden" name="action_name" value="Released">
+                            <input type="hidden" name="transaction_action_id" value="3">
                             <div class="col-6">
                                 <div class="form-group">
                                     <div id="release_fullname" class="fw-bold h4"></div>
@@ -122,7 +124,7 @@
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label class="fw-bold h6">Select Reason For Pull Out</label>
-                                    <select name="reason_for_pullout" id="releasing_reason_select" class="form-select" required>
+                                    <select name="reason_for_pull_out" id="releasing_reason_select" class="form-select" required>
                                         <option value="" selected disabled>Select Reason</option>
                                         <option value="6">For Safekeeping</option>
                                         <option value="8">Send Copy of Yellow Paper </option>
@@ -154,7 +156,7 @@
                                 <span id="ReleasingImage" style="display: none;">
                                     <div class="form-group mb-3">
                                         <label class="fw-bold h6">Yellow Copy and Client Image</label> <span class="text-danger">( Proof of Release to Client )</span>
-                                        <input type="file" name="image_upload" id="imageReleaseUpload" class="form-control" accept=".jpg, .jpeg, .png" required>
+                                        <input type="file" name="upload_file" id="imageReleaseUpload" class="form-control" accept=".jpg, .jpeg, .png" required>
                                     </div>
                                 </span>
                             </div>
@@ -179,10 +181,13 @@
                 </div>
 
                 <div class="modal-body">
-                    <form action="#" method="POST" id="releasingBalanceValidateForm">
+                    <form action="{{ route('TransactionReleaseCreate') }}" method="POST" id="releasingBalanceValidateForm" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <input type="hidden" name="atm_id" id="release_balance_atm_id">
+                            <input type="hidden" name="reason_for_pull_out" value="8">
+                            <input type="hidden" name="action_name" value="Released With Balance">
+                            <input type="hidden" name="transaction_action_id" value="3">
                             <div class="col-6">
                                 <div class="form-group">
                                     <div id="release_balance_fullname" class="fw-bold h4"></div>
@@ -232,7 +237,6 @@
                             </div>
                             <div class="col-6">
                                 <div class="form-group mb-3 text-center">
-                                    <input type="hidden" name="reason_for_pull_out" class="form-control" placeholder="Remarks">
                                     <span class="fw-bold h6 text-primary">Release to Client ( Sending of Yellow Copy )</span>
                                 </div>
                                 <hr>
@@ -256,7 +260,7 @@
 
                                 <div class="form-group mb-3">
                                     <label class="fw-bold h6">Yellow Copy and Client Image</label> <span class="text-danger">( Proof of Release to Client )</span>
-                                    <input type="file" name="image_upload" id="imageReleaseBalanceUpload" class="form-control" accept=".jpg, .jpeg, .png" required>
+                                    <input type="file" name="upload_file" id="imageReleaseBalanceUpload" class="form-control" accept=".jpg, .jpeg, .png" required>
                                 </div>
                             </div>
                         </div>
@@ -636,7 +640,7 @@
 
     <div class="modal fade" id="CancelledLoanTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="CancelledLoanTransactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 35%;" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-uppercase">Cancelled Loan Transaction</h5>
@@ -644,71 +648,90 @@
                 </div>
 
                 <div class="modal-body">
-                    <form action="#" method="POST" id="cancelledLoanValidateForm">
+                    <form action="{{ route('TransactionReleaseCreate') }}" method="POST" id="cancelledLoanValidateForm" enctype="multipart/form-data">
                         @csrf
-                            <input type="hidden" name="atm_id" id="cancelled_loan_atm_id">
-                            <div class="form-group">
-                                <div id="cancelled_loan_fullname" class="fw-bold h4"></div>
-                                <span id="cancelled_loan_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="cancelled_loan_pension_account_type" class="fw-bold h5"></span>
-                            </div>
-                            <hr>
-                            <div class="row mb-3">
-                                <div class="form-group col-6">
-                                    <label class="fw-bold h6">Transaction Number</label>
-                                    <input type="text" class="form-control" id="cancelled_loan_transaction_number" readonly>
+                        <div class="row">
+                            <input type="hidden" name="reason_for_pull_out" value="15">
+                            <input type="hidden" name="action_name" value="Cancelled Loan">
+                            <input type="hidden" name="transaction_action_id" value="13">
+
+                            <div class="col-md-6">
+                                <input type="hidden" name="atm_id" id="cancelled_loan_atm_id">
+                                <div class="form-group">
+                                    <div id="cancelled_loan_fullname" class="fw-bold h4"></div>
+                                    <span id="cancelled_loan_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="cancelled_loan_pension_account_type" class="fw-bold h5"></span>
+                                </div>
+                                <hr>
+                                <div class="row mb-3">
+                                    <div class="form-group col-6">
+                                        <label class="fw-bold h6">Transaction Number</label>
+                                        <input type="text" class="form-control" id="cancelled_loan_transaction_number" readonly>
+                                    </div>
+
+                                    <div class="form-group col-6">
+                                        <label class="fw-bold h6">Birthdate</label>
+                                        <input type="text" class="form-control" id="cancelled_loan_birth_date" readonly>
+                                    </div>
                                 </div>
 
-                                <div class="form-group col-6">
-                                    <label class="fw-bold h6">Birthdate</label>
-                                    <input type="text" class="form-control" id="cancelled_loan_birth_date" readonly>
+                                <div class="row mb-3">
+                                    <div class="form-group col-6">
+                                        <label class="fw-bold h6">Bank Account Number</label>
+                                        <input type="text" class="form-control" id="cancelled_loan_bank_account_no" readonly>
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label class="fw-bold h6">Bank Name</label>
+                                        <input type="text" class="form-control" id="cancelled_loan_bank_name" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="form-group col-6">
+                                        <label class="fw-bold h6">Type</label>
+                                        <input type="text" class="form-control" id="cancelled_loan_atm_type" readonly>
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <label class="fw-bold h6">Expiration Date</label>
+                                        <input type="text" class="form-control" id="cancelled_loan_expiration_date" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="form-group col-6">
+                                        <label class="fw-bold h6">Collection Date</label>
+                                        <input type="text" class="form-control" id="cancelled_loan_collection_date" readonly>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div class="row mb-3">
-                                <div class="form-group col-6">
-                                    <label class="fw-bold h6">Bank Account Number</label>
-                                    <input type="text" class="form-control" id="cancelled_loan_bank_account_no" readonly>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3 text-center">
+                                    <span class="fw-bold h6 text-primary">Proof of Release to Client</span>
                                 </div>
-                                <div class="form-group col-6">
-                                    <label class="fw-bold h6">Bank Name</label>
-                                    <input type="text" class="form-control" id="cancelled_loan_bank_name" readonly>
+                                <hr>
+
+                                <div class="text-center">
+                                    <div class="fw-bold h6 text-primary text-uppercase">Image Preview</div>
+                                    <img id="image_release_cancelled_loan_preview" src="{{ asset('images/no_image.jpg') }}" class="img-fluid" style="height: 150px; width:150px;">
+                                </div>
+
+                                <hr>
+
+                                <div class="col-6 form-group mb-3">
+                                    <label class="fw-bold h6">Balance</label>
+                                    <input type="text" name="balance" class="balance_input_mask form-control" placeholder="Balance" required>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="fw-bold h6">Remarks</label>
+                                    <input type="text" name="remarks" class="form-control" placeholder="Remarks" minlength="0" maxlength="50">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="fw-bold h6">Upload Cancelled Form </label> <span class="text-danger">( Proof of Release to Client )</span>
+                                    <input type="file" name="upload_file" id="ProofReleaseCancelledLoan" class="form-control" required>
                                 </div>
                             </div>
-
-                            <div class="row mb-3">
-                                <div class="form-group col-6">
-                                    <label class="fw-bold h6">Type</label>
-                                    <input type="text" class="form-control" id="cancelled_loan_atm_type" readonly>
-                                </div>
-                                <div class="form-group col-6">
-                                    <label class="fw-bold h6">Expiration Date</label>
-                                    <input type="text" class="form-control" id="cancelled_loan_expiration_date" readonly>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="form-group col-6">
-                                    <label class="fw-bold h6">Collection Date</label>
-                                    <input type="text" class="form-control" id="cancelled_loan_collection_date" readonly>
-                                </div>
-                            </div>
-                            <hr>
-
-                            <div class="col-6 form-group mb-3">
-                                <label class="fw-bold h6">Balance</label>
-                                <input type="text" name="balance" class="balance_input_mask form-control" placeholder="Balance" required>
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label class="fw-bold h6">Remarks</label>
-                                <input type="text" name="remarks" class="form-control" placeholder="Remarks" minlength="0" maxlength="50">
-                            </div>
-
-                            <div class="form-group mb-3">
-                                <label class="fw-bold h6">Upload Client Image </label> <span class="text-danger">( Proof of Release to Client )</span>
-                                <input type="file" name="cancelled_loan" class="form-control">
-                            </div>
-
+                        </div>
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
@@ -1009,7 +1032,8 @@
 
                     });
 
-                    document.getElementById('imageReleaseUpload').addEventListener('change', function (event) {
+                    // Validate and Compress Image
+                    document.getElementById('imageReleaseUpload').addEventListener('change', async function (event) {
                         const file = event.target.files[0];
                         const preview = document.getElementById('image_release_preview');
 
@@ -1032,12 +1056,12 @@
                             return;
                         }
 
-                        // Validate file size (3 MB = 3 * 1024 * 1024 bytes)
-                        const maxSize = 3 * 1024 * 1024;
+                        // Validate file size (4 MB = 4 * 1024 * 1024 bytes)
+                        const maxSize = 4 * 1024 * 1024;
                         if (file.size > maxSize) {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'File size exceeds 3 MB',
+                                title: 'File size exceeds 4 MB',
                                 text: 'Please choose a smaller file.'
                             });
                             event.target.value = ''; // Clear the input
@@ -1045,12 +1069,52 @@
                             return;
                         }
 
+                        // Show loading indicator if compression is needed
+                        const maxAllowedSize = 2 * 1024 * 1024;
+                        let finalFile = file;
+
+                        if (file.size > maxAllowedSize) {
+                            // Show the SweetAlert loading indicator
+                            Swal.fire({
+                                title: 'Compressing image...',
+                                text: 'Please wait while the image is being compressed.',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+
+                            try {
+                                const options = {
+                                    maxSizeMB: 2, // Maximum size in MB
+                                    maxWidthOrHeight: 1920, // Maintain aspect ratio
+                                    useWebWorker: true
+                                };
+                                finalFile = await imageCompression(file, options);
+                                console.log('Compressed file size:', finalFile.size);
+
+                                // Close the loading indicator
+                                Swal.close();
+                            } catch (error) {
+                                console.error('Image compression failed:', error);
+
+                                // Close the loading indicator and show error
+                                Swal.close();
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Compression error',
+                                    text: 'An error occurred during image compression. Please try again.'
+                                });
+                                return;
+                            }
+                        }
+
                         // Display the preview of the uploaded image
                         const reader = new FileReader();
                         reader.onload = function (e) {
                             preview.src = e.target.result;
                         };
-                        reader.readAsDataURL(file);
+                        reader.readAsDataURL(finalFile);
                     });
 
                     $('#releasingValidateForm').validate({
@@ -1082,10 +1146,13 @@
                                 }).then((result) => {
                                     if (result.isConfirmed) {
                                         const currentPage = dataTable.table.page();
+                                        var formData = new FormData(form);
                                         $.ajax({
                                             url: form.action,
                                             type: form.method,
-                                            data: $(form).serialize(),
+                                            data: formData,
+                                            contentType: false,
+                                            processData: false,
                                             success: function(response) {
 
                                                 if (typeof response === 'string') {
@@ -1120,7 +1187,8 @@
                                                                         {
                                                                             Swal.close();
                                                                             $(form)[0].reset();
-                                                                            dataTable.table.page(currentPage).draw( false );
+                                                                            // dataTable.table.page(currentPage).draw( false );
+                                                                            window.location.href = '{{ route("ReleasedPage") }}';
                                                                         },
                                                                         false );
                                                                     }
@@ -1228,7 +1296,8 @@
                         $('#FetchingDatatable tbody').empty();
                     }
 
-                    document.getElementById('imageReleaseBalanceUpload').addEventListener('change', function (event) {
+                    // Validate and Compress Image
+                    document.getElementById('imageReleaseBalanceUpload').addEventListener('change', async function (event) {
                         const file = event.target.files[0];
                         const preview = document.getElementById('image_release_balance_preview');
 
@@ -1251,12 +1320,12 @@
                             return;
                         }
 
-                        // Validate file size (3 MB = 3 * 1024 * 1024 bytes)
-                        const maxSize = 3 * 1024 * 1024;
+                        // Validate file size (4 MB = 4 * 1024 * 1024 bytes)
+                        const maxSize = 4 * 1024 * 1024;
                         if (file.size > maxSize) {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'File size exceeds 3 MB',
+                                title: 'File size exceeds 4 MB',
                                 text: 'Please choose a smaller file.'
                             });
                             event.target.value = ''; // Clear the input
@@ -1264,12 +1333,52 @@
                             return;
                         }
 
+                        // Show loading indicator if compression is needed
+                        const maxAllowedSize = 2 * 1024 * 1024;
+                        let finalFile = file;
+
+                        if (file.size > maxAllowedSize) {
+                            // Show the SweetAlert loading indicator
+                            Swal.fire({
+                                title: 'Compressing image...',
+                                text: 'Please wait while the image is being compressed.',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+
+                            try {
+                                const options = {
+                                    maxSizeMB: 2, // Maximum size in MB
+                                    maxWidthOrHeight: 1920, // Maintain aspect ratio
+                                    useWebWorker: true
+                                };
+                                finalFile = await imageCompression(file, options);
+                                console.log('Compressed file size:', finalFile.size);
+
+                                // Close the loading indicator
+                                Swal.close();
+                            } catch (error) {
+                                console.error('Image compression failed:', error);
+
+                                // Close the loading indicator and show error
+                                Swal.close();
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Compression error',
+                                    text: 'An error occurred during image compression. Please try again.'
+                                });
+                                return;
+                            }
+                        }
+
                         // Display the preview of the uploaded image
                         const reader = new FileReader();
                         reader.onload = function (e) {
                             preview.src = e.target.result;
                         };
-                        reader.readAsDataURL(file);
+                        reader.readAsDataURL(finalFile);
                     });
 
                     $('#releasingBalanceValidateForm').validate({
@@ -1301,10 +1410,13 @@
                                 }).then((result) => {
                                     if (result.isConfirmed) {
                                         const currentPage = dataTable.table.page();
+                                        var formData = new FormData(form);
                                         $.ajax({
                                             url: form.action,
                                             type: form.method,
-                                            data: $(form).serialize(),
+                                            data: formData,
+                                            contentType: false,
+                                            processData: false,
                                             success: function(response) {
 
                                                 if (typeof response === 'string') {
@@ -1886,6 +1998,91 @@
                         $('#FetchingDatatable tbody').empty();
                     }
 
+                    // Validate and Compress Image
+                    document.getElementById('ProofReleaseCancelledLoan').addEventListener('change', async function (event) {
+                        const file = event.target.files[0];
+                        const preview = document.getElementById('image_release_cancelled_loan_preview');
+
+                        // Reset the preview image if no file is selected
+                        if (!file) {
+                            preview.src = "{{ asset('images/no_image.jpg') }}";
+                            return;
+                        }
+
+                        // Validate file type
+                        const validTypes = ['image/jpeg', 'image/png'];
+                        if (!validTypes.includes(file.type)) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Invalid file type',
+                                text: 'Only JPG, JPEG, and PNG files are allowed.'
+                            });
+                            event.target.value = ''; // Clear the input
+                            preview.src = "{{ asset('images/no_image.jpg') }}"; // Reset preview
+                            return;
+                        }
+
+                        // Validate file size (4 MB = 4 * 1024 * 1024 bytes)
+                        const maxSize = 4 * 1024 * 1024;
+                        if (file.size > maxSize) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'File size exceeds 4 MB',
+                                text: 'Please choose a smaller file.'
+                            });
+                            event.target.value = ''; // Clear the input
+                            preview.src = "{{ asset('images/no_image.jpg') }}"; // Reset preview
+                            return;
+                        }
+
+                        // Show loading indicator if compression is needed
+                        const maxAllowedSize = 2 * 1024 * 1024;
+                        let finalFile = file;
+
+                        if (file.size > maxAllowedSize) {
+                            // Show the SweetAlert loading indicator
+                            Swal.fire({
+                                title: 'Compressing image...',
+                                text: 'Please wait while the image is being compressed.',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+
+                            try {
+                                const options = {
+                                    maxSizeMB: 2, // Maximum size in MB
+                                    maxWidthOrHeight: 1920, // Maintain aspect ratio
+                                    useWebWorker: true
+                                };
+                                finalFile = await imageCompression(file, options);
+                                console.log('Compressed file size:', finalFile.size);
+
+                                // Close the loading indicator
+                                Swal.close();
+                            } catch (error) {
+                                console.error('Image compression failed:', error);
+
+                                // Close the loading indicator and show error
+                                Swal.close();
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Compression error',
+                                    text: 'An error occurred during image compression. Please try again.'
+                                });
+                                return;
+                            }
+                        }
+
+                        // Display the preview of the uploaded image
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            preview.src = e.target.result;
+                        };
+                        reader.readAsDataURL(finalFile);
+                    });
+
                     $('#cancelledLoanValidateForm').validate({
                         rules: {
                             remarks: { required: true }
@@ -1915,10 +2112,13 @@
                                 }).then((result) => {
                                     if (result.isConfirmed) {
                                         const currentPage = dataTable.table.page();
+                                        var formData = new FormData(form);
                                         $.ajax({
                                             url: form.action,
                                             type: form.method,
-                                            data: $(form).serialize(),
+                                            data: formData,
+                                            contentType: false,
+                                            processData: false,
                                             success: function(response) {
 
                                                 if (typeof response === 'string') {
@@ -1953,7 +2153,8 @@
                                                                         {
                                                                             Swal.close();
                                                                             $(form)[0].reset();
-                                                                            dataTable.table.page(currentPage).draw( false );
+                                                                            // dataTable.table.page(currentPage).draw( false );
+                                                                            window.location.href = '{{ route("ReleasedPage") }}';
                                                                         },
                                                                         false );
                                                                     }

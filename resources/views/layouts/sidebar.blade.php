@@ -105,49 +105,50 @@
                     <ul class="sub-menu" aria-expanded="true">
                         <li>
                             <a href="{{ route('clients.page') }}" key="atm_clients">
-                                <span class="badge rounded-pill bg-success float-start me-2 fw-bold text-dark">20</span>
+                                <span class="badge rounded-pill bg-success float-start me-2 fw-bold text-dark" id="ClientInformationCount"></span>
                                 Clients
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('HeadOfficePage') }}" key="atm_ho_lists">
-                                <span class="badge rounded-pill bg-success float-start me-2 fw-bold text-dark">20</span>
+                                <span class="badge rounded-pill bg-success float-start me-2 fw-bold text-dark" id="HeadOfficeCount"></span>
                                 H.O. ATM Lists
                             </a>
                         </li>
+
                         <li>
                             <a href="{{ route('BranchOfficePage') }}" key="atm_branch_lists">
-                                <span class="badge rounded-pill bg-primary float-start me-2">20</span>
+                                <span class="badge rounded-pill bg-primary float-start me-2" id="BranchOfficeCount"></span>
                                 Branch ATM Lists
                             </a>
                         </li>
                         <li>
                             <a href="#" key="atm_receiving_transaction">
-                                <span class="badge rounded-pill bg-info float-start me-2">20</span>
+                                <span class="badge rounded-pill bg-info float-start me-2" id="PendingReceivingTransactionCount"></span>
                                 Receiving of Transaction
                             </a>
                         </li>
                         <li>
                             <a href="#" key="atm_releasing_transaction">
-                                <span class="badge rounded-pill bg-danger float-start me-2">20</span>
+                                <span class="badge rounded-pill bg-danger float-start me-2" id="PendingReleasingTransactionCount"></span>
                                 Releasing of Transaction
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('TransactionPage') }}" key="atm_branch_transaction">
-                                <span class="badge rounded-pill float-start me-2 text-white" style="background: #000000;">20</span>
+                                <span class="badge rounded-pill float-start me-2 text-white"  style="background: #000000;" id="OnGoingTransactionCount"></span>
                                 Branch Transaction
                             </a>
                         </li>
                         <li>
                             <a href="{{  route('ReleasedPage') }}" key="atm_released_atm">
-                                <span class="badge rounded-pill float-start me-2 text-dark" style="background: #00CC99;">20</span>
+                                <span class="badge rounded-pill float-start me-2 text-dark" style="background: #00CC99;" id="ReleasedCount"></span>
                                 Released ATM
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('SafekeepPage') }}" key="atm_safekeep_atm">
-                                <span class="badge rounded-pill float-start me-2" style="background: #00008B;">20</span>
+                                <span class="badge rounded-pill float-start me-2" style="background: #00008B;" id="SafekeepCount"></span>
                                 Safekeep ATM
                             </a>
                         </li>
@@ -325,4 +326,31 @@
         <!-- Sidebar -->
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: "/SidebarCount",  // Your route to get the counts
+            type: "GET",
+            success: function(response) {
+                // Format the numbers with comma as thousand separator
+                const formatNumber = (number) => {
+                    return number.toLocaleString(); // Formats the number with commas (e.g., 1,000)
+                };
+                $('#ClientInformationCount').text(formatNumber(response.ClientInformationCount));
+                $('#HeadOfficeCount').text(formatNumber(response.HeadOfficeCounts));
+                $('#BranchOfficeCount').text(formatNumber(response.BranchOfficeCounts));
+                $('#ReleasedCount').text(formatNumber(response.ReleasedCounts));
+                $('#SafekeepCount').text(formatNumber(response.SafekeepCounts));
+                $('#OnGoingTransactionCount').text(formatNumber(response.OnGoingTransaction));
+                $('#PendingReceivingTransactionCount').text(formatNumber(response.PendingReceivingTransaction));
+                $('#PendingReleasingTransactionCount').text(formatNumber(response.PendingReleasingTransaction));
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching counts:", error);
+            }
+        });
+    });
+
+</script>
 <!-- Left Sidebar End -->

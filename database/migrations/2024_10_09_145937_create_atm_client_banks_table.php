@@ -40,7 +40,8 @@ return new class extends Migration
                                3 = Released ATM to client and Become Return Client but in Another ATM
                                4 = Return Client Same ATM
                                5 = Old ATM Did Not Return by Bank
-                               6 = Safekeep');
+                               6 = Safekeep
+                               7 = Cancelled Loan');
 
             $table->enum('passbook_for_collection',['yes','no'])->nullable();
 

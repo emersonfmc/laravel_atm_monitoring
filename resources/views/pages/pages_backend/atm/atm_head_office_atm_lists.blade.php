@@ -45,6 +45,7 @@
                                     <div class="col-md-2" style="margin-top: 25px;">
                                         <div class="form-group">
                                             <button type="submit" class="btn btn-primary">Filter</button>
+                                            <button type="button" class="btn btn-success">Generate Reports</button>
                                         </div>
                                     </div>
                                 </div>

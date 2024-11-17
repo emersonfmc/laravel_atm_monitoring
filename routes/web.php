@@ -151,6 +151,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(DashboardController::class)->group(function () {
         Route::get('/index', 'dashboard')->name('dashboard');
+        Route::get('/SidebarCount', 'SidebarCount')->name('SidebarCount');
         // Route::resource('products', ProductController::class);
     });
 });
@@ -162,6 +163,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/TransactionGet', 'TransactionGet')->name('TransactionGet');
         Route::post('/TransactionCreate', 'TransactionCreate')->name('TransactionCreate');
         Route::post('/TransactionReplacementCreate', 'TransactionReplacementCreate')->name('TransactionReplacementCreate');
+        Route::post('/TransactionReleaseCreate', 'TransactionReleaseCreate')->name('TransactionReleaseCreate');
     });
 });
 
