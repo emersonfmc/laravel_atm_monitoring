@@ -1381,8 +1381,12 @@ class AtmTransactionController extends Controller
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
 
-        $query = AtmBanksTransactionApproval::with('AtmBanksTransaction')
-            ->where('status', 'Pending')
+        $query = AtmBanksTransactionApproval::with('DataUserGroup','Employee','DataTransactionAction',
+                    'AtmBanksTransaction',
+                    'AtmBanksTransaction.Branch',
+                    'AtmBanksTransaction.AtmClientBanks',
+                    'AtmBanksTransaction.AtmClientBanks.ClientInformation')
+            ->whereIn('status', ['Pending', 'Completed']) // Use whereIn for multiple values
             ->where('type', 'Received')
             ->where('user_groups_id', Auth::user()->user_group_id)
             // ->where(function ($query) use ($userGroup) {
@@ -1413,8 +1417,12 @@ class AtmTransactionController extends Controller
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
 
-        $query = AtmBanksTransactionApproval::with('AtmBanksTransaction')
-            ->where('status', 'Pending')
+        $query = AtmBanksTransactionApproval::with('DataUserGroup','Employee','DataTransactionAction',
+                    'AtmBanksTransaction',
+                    'AtmBanksTransaction.Branch',
+                    'AtmBanksTransaction.AtmClientBanks',
+                    'AtmBanksTransaction.AtmClientBanks.ClientInformation')
+            ->whereIn('status', ['Pending', 'Completed']) // Use whereIn for multiple values
             ->where('type', 'Released')
             ->where('user_groups_id', Auth::user()->user_group_id)
             // ->where(function ($query) use ($userGroup) {
