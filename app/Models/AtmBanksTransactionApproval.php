@@ -17,6 +17,11 @@ class AtmBanksTransactionApproval extends Model
         return $this->belongsTo(AtmBanksTransaction::class, 'banks_transactions_id', 'id');
     }
 
+    public function DataTransactionAction()
+    {
+        return $this->belongsTo(DataTransactionAction::class, 'transaction_actions_id','id');
+    }
+
     public function DataUserGroup()
     {
         return $this->belongsTo(DataUserGroup::class, 'user_groups_id','id');
