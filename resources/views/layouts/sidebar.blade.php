@@ -147,6 +147,12 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{  route('CancelledLoanPage') }}" key="atm_released_atm">
+                                <span class="badge rounded-pill bg-danger float-start me-2">0</span>
+                                Cancelled Loan
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('SafekeepPage') }}" key="atm_safekeep_atm">
                                 <span class="badge rounded-pill float-start me-2" style="background: #00008B;" id="SafekeepCount"></span>
                                 Safekeep ATM

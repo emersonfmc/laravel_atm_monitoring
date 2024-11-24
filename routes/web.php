@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ATM\ClientContoller;
@@ -30,6 +31,8 @@ Route::controller(DefaultController::class)->group(function () {
     Route::get('/AtmClientFetch', 'AtmClientFetch')->name('AtmClientFetch');
     Route::get('/AtmClientBanksFetch', 'AtmClientBanksFetch')->name('AtmClientBanksFetch');
     Route::get('/UserSelect', 'UserSelect')->name('UserSelect');
+    Route::get('/GenerateQRCode/{transaction_number}', 'GenerateQRCode')->name('generate_qr_code');
+
 });
 
 
@@ -130,6 +133,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/ReleasedPage', 'ReleasedPage')->name('ReleasedPage');
         Route::get('/ReleasedData', 'ReleasedData')->name('ReleasedData');
 
+
         Route::post('/PassbookForCollectionSetup', 'PassbookForCollectionSetup')->name('PassbookForCollectionSetup');
     });
 });
@@ -138,13 +142,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(AtmBranchOfficeController::class)->group(function () {
         Route::get('/BranchOfficePage', 'BranchOfficePage')->name('BranchOfficePage');
         Route::get('/BranchOfficeData', 'BranchOfficeData')->name('BranchOfficeData');
-    });
-});
 
-Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::controller(AtmBranchOfficeController::class)->group(function () {
-        Route::get('/BranchOfficePage', 'BranchOfficePage')->name('BranchOfficePage');
-        Route::get('/BranchOfficeData', 'BranchOfficeData')->name('BranchOfficeData');
+        Route::get('/CancelledLoanPage', 'CancelledLoanPage')->name('CancelledLoanPage');
+        Route::get('/CancelledLoanData', 'CancelledLoanData')->name('CancelledLoanData');
     });
 });
 
@@ -162,8 +162,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/TransactionData', 'TransactionData')->name('TransactionData');
         Route::get('/TransactionGet', 'TransactionGet')->name('TransactionGet');
         Route::post('/TransactionCreate', 'TransactionCreate')->name('TransactionCreate');
+        Route::post('/TransactionAddAtm', 'TransactionAddAtm')->name('TransactionAddAtm');
+        Route::post('/TransactionTransferBranch', 'TransactionTransferBranch')->name('TransactionTransferBranch');
         Route::post('/TransactionReplacementCreate', 'TransactionReplacementCreate')->name('TransactionReplacementCreate');
         Route::post('/TransactionReleaseCreate', 'TransactionReleaseCreate')->name('TransactionReleaseCreate');
+        Route::post('/TransactionEditClient', 'TransactionEditClient')->name('TransactionEditClient');
+        Route::post('/TransactionUpdate', 'TransactionUpdate')->name('TransactionUpdate');
 
         Route::get('/TransactionReceivingPage', 'TransactionReceivingPage')->name('TransactionReceivingPage');
         Route::get('/TransactionReceivingData', 'TransactionReceivingData')->name('TransactionReceivingData');
@@ -180,6 +184,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/PassbookForCollectionCreate', 'PassbookForCollectionCreate')->name('PassbookForCollectionCreate');
     });
 });
+
 
 
 
