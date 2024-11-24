@@ -130,6 +130,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/ReleasedPage', 'ReleasedPage')->name('ReleasedPage');
         Route::get('/ReleasedData', 'ReleasedData')->name('ReleasedData');
 
+
         Route::post('/PassbookForCollectionSetup', 'PassbookForCollectionSetup')->name('PassbookForCollectionSetup');
     });
 });
@@ -138,13 +139,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(AtmBranchOfficeController::class)->group(function () {
         Route::get('/BranchOfficePage', 'BranchOfficePage')->name('BranchOfficePage');
         Route::get('/BranchOfficeData', 'BranchOfficeData')->name('BranchOfficeData');
-    });
-});
 
-Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::controller(AtmBranchOfficeController::class)->group(function () {
-        Route::get('/BranchOfficePage', 'BranchOfficePage')->name('BranchOfficePage');
-        Route::get('/BranchOfficeData', 'BranchOfficeData')->name('BranchOfficeData');
+        Route::get('/CancelledLoanPage', 'CancelledLoanPage')->name('CancelledLoanPage');
+        Route::get('/CancelledLoanData', 'CancelledLoanData')->name('CancelledLoanData');
     });
 });
 
@@ -162,8 +159,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/TransactionData', 'TransactionData')->name('TransactionData');
         Route::get('/TransactionGet', 'TransactionGet')->name('TransactionGet');
         Route::post('/TransactionCreate', 'TransactionCreate')->name('TransactionCreate');
+        Route::post('/TransactionAddAtm', 'TransactionAddAtm')->name('TransactionAddAtm');
+        Route::post('/TransactionTransferBranch', 'TransactionTransferBranch')->name('TransactionTransferBranch');
         Route::post('/TransactionReplacementCreate', 'TransactionReplacementCreate')->name('TransactionReplacementCreate');
         Route::post('/TransactionReleaseCreate', 'TransactionReleaseCreate')->name('TransactionReleaseCreate');
+        Route::post('/TransactionEditClient', 'TransactionEditClient')->name('TransactionEditClient');
 
         Route::get('/TransactionReceivingPage', 'TransactionReceivingPage')->name('TransactionReceivingPage');
         Route::get('/TransactionReceivingData', 'TransactionReceivingData')->name('TransactionReceivingData');
