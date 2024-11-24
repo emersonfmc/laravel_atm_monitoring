@@ -422,7 +422,11 @@
 
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="#" method="POST" id="updateTransactionValidateForm">
+                <form action="{{ route('TransactionUpdate') }}" method="POST" id="updateTransactionValidateForm">
+                    @csrf
+                    <input type="hidden" name="transanction_id" id="update_transaction_id">
+                    <input type="hidden" name="atm_id" id="update_atm_id">
+
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -450,54 +454,54 @@
                         <hr>
                         <div class="row">
                             <div class="form-group col-3 mb-3">
-                            <label class="fw-bold h6">Location</label>
-                            <select name="location" id="update_location" class="form-select">
-                                    <option value="Head Office">Head Office</option>
-                                    <option value="Branch">Branch</option>
-                                    <option value="Released">Released</option>
-                                    <option value="Safekeep">Safekeep</option>
-                                <!-- <option value="6">Safekeep</option> -->
-                            </select>
+                                <label class="fw-bold h6">Location</label>
+                                <select name="location" id="update_location" class="form-select">
+                                        <option value="Head Office">Head Office</option>
+                                        <option value="Branch">Branch</option>
+                                        <option value="Released">Released</option>
+                                        <option value="Safekeep">Safekeep</option>
+                                    <!-- <option value="6">Safekeep</option> -->
+                                </select>
                             </div>
                             <div class="form-group col-3 mb-3">
-                            <label class="fw-bold h6">ATM / Passbook Status</label>
-                            <select name="bank_status" id="update_bank_status" class="form-select">
-                                    <option value="1">Active ATM</option>
-                                    <option value="0">Release to Client</option>
-                                    <option value="3">Release to Client - Become Return Client</option>
-                                    <option value="5">Return Client / Balik Loob</option>
-                                    <option value="6">Safekeep</option>
-                                    <option value="27">Old ATM Did Not Return By Bank</option>
-                            </select>
+                                <label class="fw-bold h6">ATM / Passbook Status</label>
+                                <select name="bank_status" id="update_bank_status" class="form-select">
+                                        <option value="1">Active ATM</option>
+                                        <option value="0">Release to Client</option>
+                                        <option value="3">Release to Client - Become Return Client</option>
+                                        <option value="5">Return Client / Balik Loob</option>
+                                        <option value="6">Safekeep</option>
+                                        <option value="27">Old ATM Did Not Return By Bank</option>
+                                </select>
                             </div>
                             <div class="form-group col-3 mb-3">
-                            <label class="fw-bold h6">Bank Account No</label>
-                            <input type="text" name="update_atm_bank_no" id="update_atm_bank_account_no" class="atm_card_input_mask form-control" required>
+                                <label class="fw-bold h6">Bank Account No</label>
+                                <input type="text" name="update_atm_bank_no" id="update_atm_bank_account_no" class="atm_card_input_mask form-control" required>
                             </div>
 
                             <hr>
                             <div class="form-group col-3 mb-3">
-                            <label class="fw-bold h6">Transaction Bank Account No</label>
-                            <input type="text" name="update_transaction_bank_no" id="update_transaction_bank_account_no" class="atm_card_input_mask form-control" required>
+                                <label class="fw-bold h6">Transaction Bank Account No</label>
+                                <input type="text" name="update_transaction_bank_no" id="update_transaction_bank_account_no" class="atm_card_input_mask form-control" required>
                             </div>
 
                             <div class="form-group col-2 mb-3">
-                            <label class="fw-bold h6">Transaction Status</label>
-                            <select name="transaction_status" id="update_transaction_status" class="form-select">
-                                <option value="ON GOING">ON GOING</option>
-                                <option value="COMPLETED">COMPLETED</option>
-                                <option value="CANCELLED">CANCELLED</option>
-                            </select>
+                                <label class="fw-bold h6">Transaction Status</label>
+                                <select name="transaction_status" id="update_transaction_status" class="form-select">
+                                    <option value="ON GOING">ON GOING</option>
+                                    <option value="COMPLETED">COMPLETED</option>
+                                    <option value="CANCELLED">CANCELLED</option>
+                                </select>
                             </div>
 
                             <div class="form-group col-3 mb-3">
-                            <label class="fw-bold h6">Reason</label>
-                            <input type="text" name="reason" id="update_reason" class="form-control">
+                                <label class="fw-bold h6">Reason</label>
+                                <input type="text" name="reason" id="update_reason" class="form-control">
                             </div>
 
                             <div class="form-group col-3 mb-3">
-                            <label class="fw-bold h6">Reason Remarks</label>
-                            <input type="text" name="reason_remarks" id="update_reason_remarks" class="form-control">
+                                <label class="fw-bold h6">Reason Remarks</label>
+                                <input type="text" name="reason_remarks" id="update_reason_remarks" class="form-control">
                             </div>
                             <hr>
                         {{-- update_transaction_number --}}
@@ -625,14 +629,20 @@
                     data: 'bank_account_no',
                     name: 'bank_account_no',
                     render: function(data, type, row, meta) {
-                        let BankName = ''; // Define BankName outside the if block with a default value
-
+                        // Initialize the variable for replacement count
+                        let replacementCountDisplay = '';
                         if (row.atm_client_banks && row.atm_client_banks.bank_name) {
                             BankName = row.atm_client_banks.bank_name;
                         }
+                        // Check if replacement_count is greater than 0
+                        if (row.replacement_count > 0) {
+                        replacementCountDisplay = `<span class="text-danger fw-bold h6"> / ${row.replacement_count}</span>`;
+                        }
 
-                        return `<span class="fw-bold h6 text-success">${row.bank_account_no}</span><br>
-                                <span class="fw-bold h6">${BankName}</span>`;
+                        return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span>
+                                ${replacementCountDisplay}<br>
+                                <span>${BankName}</span>`;
+
                     },
                     orderable: true,
                     searchable: true,
@@ -981,7 +991,8 @@
                         type: "GET",
                         data: { transaction_id : transaction_id },
                         success: function(data) {
-                           $('#edit_fullname').text(data.atm_client_banks.client_information.last_name +', '
+                            $('#edit_transaction_id').val(data.id);
+                            $('#edit_fullname').text(data.atm_client_banks.client_information.last_name +', '
                                                         + data.atm_client_banks.client_information.first_name +' '
                                                         +(data.atm_client_banks.client_information.middle_name ?? '') +' '
                                                         + (data.atm_client_banks.client_information.suffix ?? ''));
@@ -1088,6 +1099,8 @@
                         type: "GET",
                         data: { transaction_id : transaction_id },
                         success: function(data) {
+                            $('#update_transaction_id').val(data.id);
+                            $('#update_atm_id').val(data.atm_client_banks.id);
                             $('#update_fullname').text(data.atm_client_banks.client_information.last_name +', '
                                                         + data.atm_client_banks.client_information.first_name +' '
                                                         +(data.atm_client_banks.client_information.middle_name ?? '') +' '
@@ -1222,7 +1235,135 @@
                     });
                 });
 
-                // updateTransactionValidateForm
+                function UpdateTransactionModal() {
+                    $('#updateTransactionModal').modal('hide');
+                    $('#FetchingDatatable tbody').empty();
+                }
+
+                $('#updateTransactionValidateForm').validate({
+                    rules: {
+                        remarks: {
+                            required: true
+                        }
+                    },
+                    errorElement: 'span',
+                    errorPlacement: function(error, element) {
+                        error.addClass('invalid-feedback');
+                        element.closest('.form-group').append(error);
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element, errorClass, validClass) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    submitHandler: function(form) {
+                        var hasRows = FetchingDatatableBody.children('tr').length > 0;
+                        if (hasRows) {
+                            Swal.fire({
+                                title: 'Confirmation',
+                                text: 'Are you sure you want to save this?',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonColor: "#007BFF",
+                                cancelButtonColor: "#6C757D",
+                                confirmButtonText: "Yes, Save it!"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    const currentPage = dataTable.table.page();
+                                    var formData = new FormData(form);
+                                    $.ajax({
+                                        url: form.action,
+                                        type: form.method,
+                                        data: formData,
+                                        contentType: false,
+                                        processData: false,
+                                        success: function(response) {
+
+                                            if (typeof response === 'string') {
+                                                var res = JSON.parse(response);
+                                            } else {
+                                                var res = response; // If it's already an object
+                                            }
+
+                                            if (res.status === 'success')
+                                            {
+                                                UpdateTransactionModal();
+                                                Swal.fire({
+                                                    title: 'Successfully Updated!',
+                                                    text: 'Transaction is successfully Update!',
+                                                    icon: 'success',
+                                                    showCancelButton: false,
+                                                    showConfirmButton: true,
+                                                    confirmButtonText: 'OK',
+                                                    preConfirm: () => {
+                                                        return new Promise(( resolve
+                                                        ) => {
+                                                            Swal.fire({
+                                                                title: 'Please Wait...',
+                                                                allowOutsideClick: false,
+                                                                allowEscapeKey: false,
+                                                                showConfirmButton: false,
+                                                                showCancelButton: false,
+                                                                didOpen: () => {
+                                                                    Swal.showLoading();
+                                                                    // here the reload of datatable
+                                                                    dataTable.table.ajax.reload( () =>
+                                                                    {
+                                                                        Swal.close();
+                                                                        $(form)[0].reset();
+                                                                        dataTable.table.page(currentPage).draw( false );
+                                                                    },
+                                                                    false );
+                                                                }
+                                                            })
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                            else if (res.status === 'error')
+                                            {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: res.message,
+                                                    icon: 'error',
+                                                });
+                                            }
+                                            else
+                                            {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: 'Error Occurred Please Try Again',
+                                                    icon: 'error',
+                                                });
+                                            }
+                                        },
+                                        error: function(xhr, status, error) {
+                                            var errorMessage =
+                                                'An error occurred. Please try again later.';
+                                            if (xhr.responseJSON && xhr.responseJSON
+                                                .error) {
+                                                errorMessage = xhr.responseJSON.error;
+                                            }
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: errorMessage,
+                                                icon: 'error',
+                                            });
+                                        }
+                                    })
+                                }
+                            })
+                        } else {
+
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Empty Record!',
+                                text: 'Table is empty, add row to proceed!',
+                            });
+                        }
+                    }
+                });
             // Edit Transaction
 
 

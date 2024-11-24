@@ -246,10 +246,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="#" method="POST" id="#">
+                    <form action="{{ route('TransactionAddAtm') }}" method="POST" id="TransactionAddAtmValidateForm">
                         @csrf
                         <div class="row">
                             <input type="hidden" name="atm_id" id="add_atm_atm_id">
+                            <input type="hidden" name="reason_for_pull_out" value="23">
                             <div class="col-12">
                                 <div class="form-group">
                                     <div id="add_atm_fullname" class="fw-bold h4"></div>
@@ -289,7 +290,7 @@
 
                                     <div class="form-group col-3">
                                         <label class="fw-bold h6">Collection Date</label>
-                                        <select name="collection_date" id="add_atm_collection_date" class="form-select">
+                                        <select name="collection_date" id="add_atm_collection_date" class="form-select select2">
                                             @foreach ($DataCollectionDate as $collection)
                                                 <option value="{{ $collection->collection_date }}">{{ $collection->collection_date }}</option>
                                             @endforeach
@@ -341,7 +342,7 @@
                                         <label class="font-size col-form-label col-4 fw-bold">Banks</label>
                                         <div class="col-8">
                                           <div class="form-group">
-                                              <select name="bank_name" id="bank_name" class="form-select" required>
+                                              <select name="bank_name" id="add_atm_bank_names" class="form-select select2" required>
                                                 @foreach ($DataBankLists as $bank)
                                                     <option value="{{ $bank->bank_name }}">{{ $bank->bank_name }}</option>
                                                 @endforeach
@@ -394,7 +395,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="#" method="POST" id="#">
+                    <form action="{{ route('TransactionTransferBranch') }}" method="POST" id="TransactionTransferBranchValidateForm">
                         @csrf
                         <div class="row">
                             <input type="hidden" name="atm_id" id="transfer_atm_id">
@@ -482,7 +483,8 @@
                     <h5 class="modal-title fw-bold text-uppercase">Edit Client / ATM Transaction</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="#">
+                <form action="{{ route('TransactionEditClient') }}" method="POST" id="TransactionEditClientValidateForm">
+                    @csrf
                     <div class="modal-body">
                         <input type="hidden" name="atm_id" id="edit_atm_id">
                         <div class="form-group">
@@ -580,6 +582,7 @@
                                                     Is this a Replacement ATM with the same Bank Number? Check if Yes Select Checkbox.
                                                 </label>
                                             </div>
+                                            <input type="hidden" name="replace_status" value="no" id="replaced_status">
                                         </div>
                                     <hr>
                                     <div class="col-md-6">
@@ -604,7 +607,7 @@
 
                                         {{-- <div class="row" id="replaceBankAccountNo" style="display:block;"> --}}
 
-                                        <div class="row mb-2 replaceBankAccountNo">
+                                        <div class="row mb-3 replaceBankAccountNo">
                                             <label class="col-4 fw-bold">ATM / Passbook / Sim No.</label>
                                             <div class="form-group col-8">
                                                 <input type="text" name="atm_number" class="atm_card_input_mask form-control" id="edit_bank_account_no" placeholder="ATM / Passbook / Sim No." required>
@@ -612,7 +615,7 @@
                                         </div>
                                         {{-- <div class="row mb-3" id="replaceBankName" style="display:block;"> --}}
 
-                                        <div class="row mb-2 replaceBankName">
+                                        <div class="row mb-3 replaceBankName">
                                             <label class="col-4 fw-bold">Banks</label>
                                             <div class="form-group col-8">
                                                 <select name="bank_name" id="edit_bank_name" class="form-select select2" required>
@@ -646,7 +649,7 @@
                                         </div>
                                       </div>
                                     </div>
-                                    <hr class="mt-2 mb-2">
+                                    <hr class="mt-2 mb-3">
                                   </div>
 
                             </div>
@@ -810,20 +813,26 @@
                     orderable: true,
                     searchable: true,
                 },
-
-
                 {
                     data: 'bank_account_no',
                     name: 'bank_account_no',
                     render: function(data, type, row, meta) {
-                            return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span><br>
-                                <span class="fw-bold">${row.bank_name}</span>`;
+                        // Initialize the variable for replacement count
+                        let replacementCountDisplay = '';
+
+                        // Check if replacement_count is greater than 0
+                        if (row.replacement_count > 0) {
+                        replacementCountDisplay = `<span class="text-danger fw-bold h6"> / ${row.replacement_count}</span>`;
+                        }
+
+                        return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span>
+                                ${replacementCountDisplay}<br>
+                                <span>${row.bank_name}</span>`;
 
                     },
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'pin_no',
                     name: 'pin_no',
@@ -870,10 +879,10 @@
                 },
 
                 {
-                    data: 'id',
-                    name: 'id',
+                    data: 'qr_code',
+                    name: 'qr_code',
                     render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6 text-primary">' + data + '</span>';
+                        return '<span>' + data + '</span>';
                     },
                     orderable: true,
                     searchable: true,
@@ -1013,6 +1022,11 @@
             });
 
             // Validation for Creation of Transaction
+                function closeTransactionModal() {
+                    $('#createTransactionModal').modal('hide');
+                    $('#FetchingDatatable tbody').empty();
+                }
+
                 $.validator.addMethod("checkAtLeastOne", function(value, element) {
                     return $('input[name="atm_checkboxes[]"]:checked').length > 0;
                 }, "Please select at least one ATM / Passbook / Simcard for this transaction.");
@@ -1155,104 +1169,379 @@
                 });
             // Validation for Creation of Transaction
 
-            $('#FetchingDatatable').on('click', '.addAtmTransaction', function(e) {
-                e.preventDefault();
-                var new_atm_id = $(this).data('id');
+            // Add ATM Transaction
+                $('#addAtmTransactionModal').on('shown.bs.modal', function () {
+                    $('#add_atm_bank_names').select2({ dropdownParent: $('#addAtmTransactionModal'), });
+                    $('#add_atm_collection_date').select2({ dropdownParent: $('#addAtmTransactionModal'), });
+                });
 
-                $.ajax({
-                    url: "/AtmClientFetch",
-                    type: "GET",
-                    data: { new_atm_id : new_atm_id },
-                    success: function(data) {
-                        let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+                $('#FetchingDatatable').on('click', '.addAtmTransaction', function(e) {
+                    e.preventDefault();
+                    var new_atm_id = $(this).data('id');
 
-                        $('#add_atm_fullname').text(data.client_information.last_name +', '
-                                                    + data.client_information.first_name +' '
-                                                    +(data.client_information.middle_name ?? '') +' '
-                                                    + (data.client_information.suffix ?? ''));
+                    $.ajax({
+                        url: "/AtmClientFetch",
+                        type: "GET",
+                        data: { new_atm_id : new_atm_id },
+                        success: function(data) {
+                            let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
 
-                        $('#add_atm_pension_number_display').text(data.client_information.pension_number ?? '');
-                        $('#add_atm_pension_number_display').inputmask("99-9999999-99");
+                            $('#add_atm_fullname').text(data.client_information.last_name +', '
+                                                        + data.client_information.first_name +' '
+                                                        +(data.client_information.middle_name ?? '') +' '
+                                                        + (data.client_information.suffix ?? ''));
 
-                        $('#add_atm_pension_number').val(data.client_information.pension_number);
-                        $('#add_atm_pension_account_type').text(data.client_information.pension_account_type);
-                        $('#add_atm_pension_type').val(data.client_information.pension_type);
-                        $('#add_atm_birth_date').val(formattedBirthDate);
-                        $('#add_atm_branch_location').val(data.branch.branch_location);
+                            $('#add_atm_pension_number_display').text(data.client_information.pension_number ?? '');
+                            $('#add_atm_pension_number_display').inputmask("99-9999999-99");
 
-                        $('#add_atm_atm_id').val(data.id);
-                        $('#add_atm_bank_account_no').val(data.bank_account_no ?? '');
-                        $('#add_atm_collection_date').val(data.collection_date ?? '').trigger('change');
-                        $('#add_atm_atm_type').val(data.atm_type ?? '');
-                        $('#add_atm_bank_name').val(data.bank_name ?? '');
-                        $('#add_atm_transaction_number').val(data.transaction_number ?? '');
+                            $('#add_atm_pension_number').val(data.client_information.pension_number);
+                            $('#add_atm_pension_account_type').text(data.client_information.pension_account_type);
+                            $('#add_atm_pension_type').val(data.client_information.pension_type);
+                            $('#add_atm_birth_date').val(formattedBirthDate);
+                            $('#add_atm_branch_location').val(data.branch.branch_location);
 
-                        let expirationDate = '';
-                        if (data.expiration_date && data.expiration_date !== '0000-00-00') {
-                            expirationDate = new Date(data.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                            $('#add_atm_atm_id').val(data.id);
+                            $('#add_atm_bank_account_no').val(data.bank_account_no ?? '');
+                            $('#add_atm_collection_date').val(data.collection_date ?? '').trigger('change');
+                            $('#add_atm_atm_type').val(data.atm_type ?? '');
+                            $('#add_atm_bank_name').val(data.bank_name ?? '');
+                            $('#add_atm_transaction_number').val(data.transaction_number ?? '');
+
+                            let expirationDate = '';
+                            if (data.expiration_date && data.expiration_date !== '0000-00-00') {
+                                expirationDate = new Date(data.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                            }
+                            $('#add_atm_expiration_date').val((expirationDate || ''));
+
+                            $('#addAtmTransactionModal').modal('show');
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("An error occurred: " + error);
                         }
-                        $('#add_atm_expiration_date').val((expirationDate || ''));
+                    });
+                });
 
-                        $('#addAtmTransactionModal').modal('show');
+                function AddAtmTransactionModal() {
+                    $('#addAtmTransactionModal').modal('hide');
+                    $('#FetchingDatatable tbody').empty();
+                }
+
+                $('#TransactionAddAtmValidateForm').validate({
+                    rules: {
+                        remarks: {
+                            required: true
+                        },
+                        pin_code: {
+                            required: function (element) {
+                                return $('#atm_type_add_atm').val() === 'ATM'; // Pin code required only if ATM type is 'ATM'
+                            }
+                        }
                     },
-                    error: function(xhr, status, error) {
-                        console.error("An error occurred: " + error);
+                    errorElement: 'span',
+                    errorPlacement: function(error, element) {
+                        error.addClass('invalid-feedback');
+                        element.closest('.form-group').append(error);
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element, errorClass, validClass) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    submitHandler: function(form) {
+                        var hasRows = FetchingDatatableBody.children('tr').length > 0;
+                        if (hasRows) {
+                            Swal.fire({
+                                title: 'Confirmation',
+                                text: 'Are you sure you want to save this?',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonColor: "#007BFF",
+                                cancelButtonColor: "#6C757D",
+                                confirmButtonText: "Yes, Save it!"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    const currentPage = dataTable.table.page();
+                                    var formData = new FormData(form);
+                                    $.ajax({
+                                        url: form.action,
+                                        type: form.method,
+                                        data: formData,
+                                        contentType: false,
+                                        processData: false,
+                                        success: function(response) {
+
+                                            if (typeof response === 'string') {
+                                                var res = JSON.parse(response);
+                                            } else {
+                                                var res = response; // If it's already an object
+                                            }
+
+                                            if (res.status === 'success')
+                                            {
+                                                AddAtmTransactionModal();
+                                                Swal.fire({
+                                                    title: 'Successfully Created!',
+                                                    text: 'Transaction is successfully Created!',
+                                                    icon: 'success',
+                                                    showCancelButton: false,
+                                                    showConfirmButton: true,
+                                                    confirmButtonText: 'OK',
+                                                    preConfirm: () => {
+                                                        return new Promise(( resolve
+                                                        ) => {
+                                                            Swal.fire({
+                                                                title: 'Please Wait...',
+                                                                allowOutsideClick: false,
+                                                                allowEscapeKey: false,
+                                                                showConfirmButton: false,
+                                                                showCancelButton: false,
+                                                                didOpen: () => {
+                                                                    Swal.showLoading();
+                                                                    // here the reload of datatable
+                                                                    window.location.href = '{{ route("BranchOfficePage") }}';
+                                                                    // dataTable.table.ajax.reload( () =>
+                                                                    // {
+                                                                    //     Swal.close();
+                                                                    //     $(form)[0].reset();
+                                                                    //     // dataTable.table.page(currentPage).draw( false );
+
+                                                                    //     window.location.href = '{{ route("BranchOfficePage") }}';
+                                                                    // },
+                                                                    // false );
+                                                                }
+                                                            })
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                            else if (res.status === 'error')
+                                            {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: res.message,
+                                                    icon: 'error',
+                                                });
+                                            }
+                                            else
+                                            {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: 'Error Occurred Please Try Again',
+                                                    icon: 'error',
+                                                });
+                                            }
+                                        },
+                                        error: function(xhr, status, error) {
+                                            var errorMessage =
+                                                'An error occurred. Please try again later.';
+                                            if (xhr.responseJSON && xhr.responseJSON
+                                                .error) {
+                                                errorMessage = xhr.responseJSON.error;
+                                            }
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: errorMessage,
+                                                icon: 'error',
+                                            });
+                                        }
+                                    })
+                                }
+                            })
+                        } else {
+
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Empty Record!',
+                                text: 'Table is empty, add row to proceed!',
+                            });
+                        }
                     }
                 });
-            });
+            // Add ATM Transaction
 
-            $('#transferBranchTransactionModal').on('shown.bs.modal', function () {
-                $('#transfer_branch_id').select2({ dropdownParent: $('#transferBranchTransactionModal'), });
-            });
+            // Transfer to Other Branch
+                $('#transferBranchTransactionModal').on('shown.bs.modal', function () {
+                    $('#transfer_branch_id').select2({ dropdownParent: $('#transferBranchTransactionModal'), });
+                });
 
-            $('#FetchingDatatable').on('click', '.transferBranchTransaction', function(e) {
-                e.preventDefault();
-                var new_atm_id = $(this).data('id');
+                $('#FetchingDatatable').on('click', '.transferBranchTransaction', function(e) {
+                    e.preventDefault();
+                    var new_atm_id = $(this).data('id');
 
-                $.ajax({
-                    url: "/AtmClientFetch",
-                    type: "GET",
-                    data: { new_atm_id : new_atm_id },
-                    success: function(data) {
-                        let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+                    $.ajax({
+                        url: "/AtmClientFetch",
+                        type: "GET",
+                        data: { new_atm_id : new_atm_id },
+                        success: function(data) {
+                            let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
 
-                        $('#transfer_fullname').text(data.client_information.last_name +', '
-                                                    + data.client_information.first_name +' '
-                                                    +(data.client_information.middle_name ?? '') +' '
-                                                    + (data.client_information.suffix ?? ''));
+                            $('#transfer_fullname').text(data.client_information.last_name +', '
+                                                        + data.client_information.first_name +' '
+                                                        +(data.client_information.middle_name ?? '') +' '
+                                                        + (data.client_information.suffix ?? ''));
 
-                        $('#transfer_branch_id').val(data.branch_id ?? '').trigger('change');
+                            $('#transfer_branch_id').val(data.branch_id ?? '').trigger('change');
 
-                        $('#transfer_pension_number_display').text(data.client_information.pension_number ?? '');
-                        $('#transfer_pension_number_display').inputmask("99-9999999-99");
+                            $('#transfer_pension_number_display').text(data.client_information.pension_number ?? '');
+                            $('#transfer_pension_number_display').inputmask("99-9999999-99");
 
-                        $('#transfer_pension_number').val(data.client_information.pension_number);
-                        $('#transfer_pension_account_type').text(data.client_information.pension_account_type);
-                        $('#transfer_pension_type').val(data.client_information.pension_type);
-                        $('#transfer_birth_date').val(formattedBirthDate);
-                        $('#transfer_branch_location').val(data.branch.branch_location);
+                            $('#transfer_pension_number').val(data.client_information.pension_number);
+                            $('#transfer_pension_account_type').text(data.client_information.pension_account_type);
+                            $('#transfer_pension_type').val(data.client_information.pension_type);
+                            $('#transfer_birth_date').val(formattedBirthDate);
+                            $('#transfer_branch_location').val(data.branch.branch_location);
 
-                        $('#transfer_atm_id').val(data.id);
-                        $('#transfer_bank_account_no').val(data.bank_account_no ?? '');
-                        $('#transfer_collection_date').val(data.collection_date ?? '').trigger('change');
-                        $('#transfer_atm_type').val(data.atm_type ?? '');
-                        $('#transfer_bank_name').val(data.bank_name ?? '');
-                        $('#transfer_transaction_number').val(data.transaction_number ?? '');
+                            $('#transfer_atm_id').val(data.id);
+                            $('#transfer_bank_account_no').val(data.bank_account_no ?? '');
+                            $('#transfer_collection_date').val(data.collection_date ?? '').trigger('change');
+                            $('#transfer_atm_type').val(data.atm_type ?? '');
+                            $('#transfer_bank_name').val(data.bank_name ?? '');
+                            $('#transfer_transaction_number').val(data.transaction_number ?? '');
 
-                        let expirationDate = '';
-                        if (data.expiration_date && data.expiration_date !== '0000-00-00') {
-                            expirationDate = new Date(data.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                            let expirationDate = '';
+                            if (data.expiration_date && data.expiration_date !== '0000-00-00') {
+                                expirationDate = new Date(data.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                            }
+                            $('#transfer_expiration_date').val((expirationDate || ''));
+
+                            $('#transferBranchTransactionModal').modal('show');
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("An error occurred: " + error);
                         }
-                        $('#transfer_expiration_date').val((expirationDate || ''));
+                    });
+                });
 
-                        $('#transferBranchTransactionModal').modal('show');
+                function TransferBranchTransactionModal() {
+                    $('#transferBranchTransactionModal').modal('hide');
+                    $('#FetchingDatatable tbody').empty();
+                }
+
+                $('#TransactionTransferBranchValidateForm').validate({
+                    rules: {
+                        remarks: {
+                            required: true
+                        }
                     },
-                    error: function(xhr, status, error) {
-                        console.error("An error occurred: " + error);
+                    errorElement: 'span',
+                    errorPlacement: function(error, element) {
+                        error.addClass('invalid-feedback');
+                        element.closest('.form-group').append(error);
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element, errorClass, validClass) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    submitHandler: function(form) {
+                        var hasRows = FetchingDatatableBody.children('tr').length > 0;
+                        if (hasRows) {
+                            Swal.fire({
+                                title: 'Confirmation',
+                                text: 'Are you sure you want to save this?',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonColor: "#007BFF",
+                                cancelButtonColor: "#6C757D",
+                                confirmButtonText: "Yes, Save it!"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    const currentPage = dataTable.table.page();
+                                    var formData = new FormData(form);
+                                    $.ajax({
+                                        url: form.action,
+                                        type: form.method,
+                                        data: formData,
+                                        contentType: false,
+                                        processData: false,
+                                        success: function(response) {
+
+                                            if (typeof response === 'string') {
+                                                var res = JSON.parse(response);
+                                            } else {
+                                                var res = response; // If it's already an object
+                                            }
+
+                                            if (res.status === 'success')
+                                            {
+                                                TransferBranchTransactionModal();
+                                                Swal.fire({
+                                                    title: 'Successfully Transfer!',
+                                                    text: 'Transaction is successfully Transfer!',
+                                                    icon: 'success',
+                                                    showCancelButton: false,
+                                                    showConfirmButton: true,
+                                                    confirmButtonText: 'OK',
+                                                    preConfirm: () => {
+                                                        return new Promise(( resolve
+                                                        ) => {
+                                                            Swal.fire({
+                                                                title: 'Please Wait...',
+                                                                allowOutsideClick: false,
+                                                                allowEscapeKey: false,
+                                                                showConfirmButton: false,
+                                                                showCancelButton: false,
+                                                                didOpen: () => {
+                                                                    Swal.showLoading();
+                                                                    dataTable.table.ajax.reload( () =>
+                                                                    {
+                                                                        Swal.close();
+                                                                        $(form)[0].reset();
+                                                                        dataTable.table.page(currentPage).draw( false );
+                                                                    },
+                                                                    false );
+                                                                }
+                                                            })
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                            else if (res.status === 'error')
+                                            {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: res.message,
+                                                    icon: 'error',
+                                                });
+                                            }
+                                            else
+                                            {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: 'Error Occurred Please Try Again',
+                                                    icon: 'error',
+                                                });
+                                            }
+                                        },
+                                        error: function(xhr, status, error) {
+                                            var errorMessage =
+                                                'An error occurred. Please try again later.';
+                                            if (xhr.responseJSON && xhr.responseJSON
+                                                .error) {
+                                                errorMessage = xhr.responseJSON.error;
+                                            }
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: errorMessage,
+                                                icon: 'error',
+                                            });
+                                        }
+                                    })
+                                }
+                            })
+                        } else {
+
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Empty Record!',
+                                text: 'Table is empty, add row to proceed!',
+                            });
+                        }
                     }
                 });
-            });
-
+            // Transfer to Other Branch
 
             // Edit Transaction
                 $('#EditInformationTransactionModal').on('shown.bs.modal', function () {
@@ -1302,9 +1591,11 @@
                     if ($(this).is(':checked')){
                         $(".replaceBankAccountNo").hide();
                         $(".replaceBankName").hide();
+                        $("#replaced_status").val('yes');
                     } else {
                         $(".replaceBankAccountNo").show();
                         $(".replaceBankName").show();
+                        $("#replaced_status").val('no');
                     }
                 });
 
@@ -1370,7 +1661,159 @@
                         }
                     });
                 });
+
+                function EditClientTransactionModal() {
+                    $('#EditInformationTransactionModal').modal('hide');
+                    $('#FetchingDatatable tbody').empty();
+                }
+
+                $('#TransactionEditClientValidateForm').validate({
+                    rules: {
+                        remarks: {
+                            required: true
+                        }
+                    },
+                    errorElement: 'span',
+                    errorPlacement: function(error, element) {
+                        error.addClass('invalid-feedback');
+                        element.closest('.form-group').append(error);
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element, errorClass, validClass) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    submitHandler: function(form) {
+                        var hasRows = FetchingDatatableBody.children('tr').length > 0;
+                        if (hasRows) {
+                            Swal.fire({
+                                title: 'Confirmation',
+                                text: 'Are you sure you want to save this?',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonColor: "#007BFF",
+                                cancelButtonColor: "#6C757D",
+                                confirmButtonText: "Yes, Save it!"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    const currentPage = dataTable.table.page();
+                                    var formData = new FormData(form);
+                                    $.ajax({
+                                        url: form.action,
+                                        type: form.method,
+                                        data: formData,
+                                        contentType: false,
+                                        processData: false,
+                                        success: function(response) {
+
+                                            if (typeof response === 'string') {
+                                                var res = JSON.parse(response);
+                                            } else {
+                                                var res = response; // If it's already an object
+                                            }
+
+                                            if (res.status === 'success')
+                                            {
+                                                EditClientTransactionModal();
+                                                Swal.fire({
+                                                    title: 'Successfully Edited!',
+                                                    text: 'Transaction is successfully Edited!',
+                                                    icon: 'success',
+                                                    showCancelButton: false,
+                                                    showConfirmButton: true,
+                                                    confirmButtonText: 'OK',
+                                                    preConfirm: () => {
+                                                        return new Promise(( resolve
+                                                        ) => {
+                                                            Swal.fire({
+                                                                title: 'Please Wait...',
+                                                                allowOutsideClick: false,
+                                                                allowEscapeKey: false,
+                                                                showConfirmButton: false,
+                                                                showCancelButton: false,
+                                                                didOpen: () => {
+                                                                    Swal.showLoading();
+                                                                    dataTable.table.ajax.reload( () =>
+                                                                    {
+                                                                        Swal.close();
+                                                                        $(form)[0].reset();
+                                                                        dataTable.table.page(currentPage).draw( false );
+                                                                    },
+                                                                    false );
+                                                                }
+                                                            })
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                            else if (res.status === 'error')
+                                            {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: res.message,
+                                                    icon: 'error',
+                                                });
+                                            }
+                                            else
+                                            {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: 'Error Occurred Please Try Again',
+                                                    icon: 'error',
+                                                });
+                                            }
+                                        },
+                                        error: function(xhr, status, error) {
+                                            var errorMessage =
+                                                'An error occurred. Please try again later.';
+                                            if (xhr.responseJSON && xhr.responseJSON
+                                                .error) {
+                                                errorMessage = xhr.responseJSON.error;
+                                            }
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: errorMessage,
+                                                icon: 'error',
+                                            });
+                                        }
+                                    })
+                                }
+                            })
+                        } else {
+
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Empty Record!',
+                                text: 'Table is empty, add row to proceed!',
+                            });
+                        }
+                    }
+                });
+
             // Edit Transaction
+
+            $(document).on('click', '.generate_qr_code', function (e) {
+                e.preventDefault();
+
+                const transaction_number = $(this).data('transaction_number');
+
+                // SweetAlert confirmation
+                Swal.fire({
+                    icon: "question",
+                    title: 'Do you want to Generate QR Code?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Open the QR code in a new tab
+                        window.open(`/GenerateQRCode/${transaction_number}`, '_blank');
+                    }
+                });
+            });
+
+
 
             $(document).on('click', '.passbookForCollection', function(e) {
                 e.preventDefault(); // Prevent the default anchor behavior
@@ -1474,10 +1917,6 @@
             });
 
 
-            function closeTransactionModal() {
-                $('#createTransactionModal').modal('hide');
-                $('#FetchingDatatable tbody').empty();
-            }
         });
 
         $(document).on('click', '.view_pin_code', function(e) {

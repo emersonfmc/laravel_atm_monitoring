@@ -8,6 +8,7 @@ use App\Models\AtmClientBanks;
 use App\Models\ClientInformation;
 use App\Http\Controllers\Controller;
 use App\Models\DataPensionTypesLists;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class DefaultController extends Controller
 {
@@ -49,4 +50,20 @@ class DefaultController extends Controller
         $User = User::get();
         return response()->json($User);
     }
+
+    public function GenerateQRCode($transaction_number)
+    {
+        // Generate QR code
+        $qrCode = QrCode::format('png') // Use PNG format
+            ->size(200)                // Set the size of the QR code
+            ->generate($transaction_number);
+
+        // Return the QR code as a response
+        return view('pages.pages_backend.atm.atm_generate_qr_code', [
+            'transactionNumber' => $transaction_number, // Ensure the variable name matches
+            'qrCode' => $qrCode,
+        ]);
+    }
+
+
 }

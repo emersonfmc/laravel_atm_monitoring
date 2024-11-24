@@ -406,8 +406,17 @@
                     data: 'bank_account_no',
                     name: 'bank_account_no',
                     render: function(data, type, row, meta) {
-                            return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span><br>
-                                <span class="fw-bold">${row.bank_name}</span>`;
+                        // Initialize the variable for replacement count
+                        let replacementCountDisplay = '';
+
+                        // Check if replacement_count is greater than 0
+                        if (row.replacement_count > 0) {
+                        replacementCountDisplay = `<span class="text-danger fw-bold h6"> / ${row.replacement_count}</span>`;
+                        }
+
+                        return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span>
+                                ${replacementCountDisplay}<br>
+                                <span>${row.bank_name}</span>`;
 
                     },
                     orderable: true,
