@@ -786,7 +786,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'client_information_id',
                     name: 'client_information.first_name',
@@ -803,7 +802,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'branch_id',
                     name: 'branch.branch_location',
@@ -813,8 +811,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
-
                 {
                     data: 'client_information_id',
                     name: 'client_information.pension_number',
@@ -833,7 +829,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'client_information_id',
                     name: 'client_information.created_at',
@@ -855,8 +850,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
-
                 {
                     data: 'client_information_id',
                     name: 'client_information.birth_date',
@@ -878,7 +871,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'cash_box_no',
                     name: 'cash_box_no',
@@ -888,22 +880,26 @@
                     orderable: true,
                     searchable: true,
                 },
-
-
                 {
                     data: 'bank_account_no',
                     name: 'bank_account_no',
                     render: function(data, type, row, meta) {
-                            return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span><br>
-                                <span class="fw-bold">${row.bank_name}</span>`;
+                        // Initialize the variable for replacement count
+                        let replacementCountDisplay = '';
+
+                        // Check if replacement_count is greater than 0
+                        if (row.replacement_count > 0) {
+                        replacementCountDisplay = `<span class="text-danger fw-bold h6"> / ${row.replacement_count}</span>`;
+                        }
+
+                        return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span>
+                                ${replacementCountDisplay}<br>
+                                <span>${row.bank_name}</span>`;
 
                     },
                     orderable: true,
                     searchable: true,
                 },
-
-
-
                 {
                     data: 'pin_no',
                     name: 'pin_no',
@@ -947,18 +943,15 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
-                    data: 'id',
-                    name: 'id',
+                    data: 'qr_code',
+                    name: 'qr_code',
                     render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6 text-primary">' + data + '</span>';
+                        return '<span>' + data + '</span>';
                     },
                     orderable: true,
                     searchable: true,
                 }
-
-
             ];
             dataTable.initialize(url, columns);
 

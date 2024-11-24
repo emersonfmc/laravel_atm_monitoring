@@ -1758,5 +1758,72 @@ class AtmTransactionController extends Controller
 
     }
 
+    public function TransactionUpdate(Request $request)
+    {
+        // Retrieve ATM ID and Transaction ID from the request, defaulting to NULL if not provided
+        $atm_id = $request->atm_id ?? NULL;
+        $transanction_id = $request->transanction_id ?? NULL;
+
+        // Clean up the bank account number by removing hyphens
+        $BankAccountNo = str_replace('-', '', $request->update_atm_bank_no);
+
+        // Update the AtmClientBanks model
+        $AtmClientBanks = AtmClientBanks::findOrFail($atm_id);
+        $AtmClientBanks->update([
+            'location' => $request->location,
+            'status' => $request->bank_status,
+            'bank_account_no' => $BankAccountNo,
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // Clean up the transaction bank account number
+        $TransactionBankAccountNo = str_replace('-', '', $request->update_transaction_bank_no);
+
+        // Update the AtmBanksTransaction model
+        $AtmBanksTransaction = AtmBanksTransaction::findOrFail($transanction_id);
+
+        $TransactionNumber = $AtmBanksTransaction->transaction_number;
+        $TransactionAction = $AtmBanksTransaction->transaction_actions_id;
+        $AtmBanksTransaction->update([
+            'status' => $request->transaction_status,
+            'reason' => $request->reason ?? NULL,
+            'reason_remarks' => $request->reason_remarks ?? NULL,
+            'bank_account_no' => $TransactionBankAccountNo,
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // Update approvals for each approval record
+        foreach ($request->approval_id as $key => $approval_id) {
+            $AtmBanksTransactionApproval = AtmBanksTransactionApproval::findOrFail($approval_id);
+            $AtmBanksTransactionApproval->update([
+                'employee_id' => $request->employee_id[$key],
+                'date_approved' => $request->date_approved[$key],
+                'status' => $request->status[$key],
+            ]);
+        }
+
+        // Retrieve the transaction action data for logging purposes
+        $DataTransactionAction = DataTransactionAction::findOrFail($TransactionAction);
+
+        // Log the transaction update in the system logs
+        SystemLogs::create([
+            'system' => 'ATM Monitoring',
+            'action' => 'Update',
+            'title' => 'Update Transaction',
+            'description' => $TransactionNumber . ' | ' . $DataTransactionAction->name,
+            'employee_id' => Auth::user()->employee_id,
+            'ip_address' => $request->ip(),
+            'created_at' => Carbon::now(),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        // Return a successful response
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Transaction updated successfully!'
+        ]);
+    }
+
+
 
 }

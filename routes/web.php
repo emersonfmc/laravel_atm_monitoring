@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ATM\ClientContoller;
@@ -30,6 +31,8 @@ Route::controller(DefaultController::class)->group(function () {
     Route::get('/AtmClientFetch', 'AtmClientFetch')->name('AtmClientFetch');
     Route::get('/AtmClientBanksFetch', 'AtmClientBanksFetch')->name('AtmClientBanksFetch');
     Route::get('/UserSelect', 'UserSelect')->name('UserSelect');
+    Route::get('/GenerateQRCode/{transaction_number}', 'GenerateQRCode')->name('generate_qr_code');
+
 });
 
 
@@ -164,6 +167,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/TransactionReplacementCreate', 'TransactionReplacementCreate')->name('TransactionReplacementCreate');
         Route::post('/TransactionReleaseCreate', 'TransactionReleaseCreate')->name('TransactionReleaseCreate');
         Route::post('/TransactionEditClient', 'TransactionEditClient')->name('TransactionEditClient');
+        Route::post('/TransactionUpdate', 'TransactionUpdate')->name('TransactionUpdate');
 
         Route::get('/TransactionReceivingPage', 'TransactionReceivingPage')->name('TransactionReceivingPage');
         Route::get('/TransactionReceivingData', 'TransactionReceivingData')->name('TransactionReceivingData');
@@ -180,6 +184,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/PassbookForCollectionCreate', 'PassbookForCollectionCreate')->name('PassbookForCollectionCreate');
     });
 });
+
 
 
 

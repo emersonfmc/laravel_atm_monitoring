@@ -70,7 +70,15 @@ class AtmBranchOfficeController extends Controller
                         $latestTransaction = $completedTransactions->first();
                         $latestTransactionId = $latestTransaction->id;
                     }
-                }
+                } else {
+                    $action = '<button type="button" class="btn btn-warning borrow_transaction"
+                                    data-id="'.$row->id.'"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="right"
+                                    title="Returning of Borrow Transaction">
+                                <i class="fas fa-undo"></i>
+                                </button>';
+                    }
 
                 // Only show the button for users in specific groups
                 if (in_array($userGroup, ['Developer', 'Admin', 'Branch Head', 'Everfirst Admin'])) {
@@ -128,8 +136,24 @@ class AtmBranchOfficeController extends Controller
                                         </button>';
                         }
                         else {
-                            $action = '';
+                            $action = '<button type="button" class="btn btn-warning borrow_transaction"
+                                            data-id="'.$row->id.'"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="right"
+                                            title="Returning of Borrow Transaction">
+                                           <i class="fas fa-undo"></i>
+                                        </button>';
                         }
+                    }
+                    else
+                    {
+                        $action = '<button type="button" class="btn btn-warning borrow_transaction"
+                                        data-id="'.$row->id.'"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="right"
+                                        title="Returning of Borrow Transaction">
+                                    <i class="fas fa-undo"></i>
+                                    </button>';
                     }
                 }
 
@@ -173,7 +197,19 @@ class AtmBranchOfficeController extends Controller
                 // Prepare the output
                 return $atmTransactionActionName . ' <div class="text-dark"> ' . $groupName .'</div>'; // Combine the group name and action name
             })
-            ->rawColumns(['action','pending_to']) // Render the HTML in the 'action' column
+            ->addColumn('qr_code', function($row) use ($userGroup) {
+                if (in_array($userGroup, ['Developer', 'Admin','Everfirst Admin'])) {
+                    $qr_code = '<button type="button" class="btn btn-primary generate_qr_code"
+                                    data-transaction_number="'.$row->transaction_number.'"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="right"
+                                    title="Generate QR Code">
+                                <i class="fas fa-qrcode fs-5"></i>
+                                </button>';
+                }
+                return $qr_code; // Return the action content
+            })
+            ->rawColumns(['action','pending_to','qr_code']) // Render the HTML in the 'action' column
             ->make(true);
     }
 

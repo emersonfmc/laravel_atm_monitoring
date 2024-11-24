@@ -813,8 +813,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
-
                 {
                     data: 'bank_account_no',
                     name: 'bank_account_no',
@@ -835,7 +833,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'pin_no',
                     name: 'pin_no',
@@ -882,10 +879,10 @@
                 },
 
                 {
-                    data: 'id',
-                    name: 'id',
+                    data: 'qr_code',
+                    name: 'qr_code',
                     render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6 text-primary">' + data + '</span>';
+                        return '<span>' + data + '</span>';
                     },
                     orderable: true,
                     searchable: true,
@@ -1546,7 +1543,6 @@
                 });
             // Transfer to Other Branch
 
-
             // Edit Transaction
                 $('#EditInformationTransactionModal').on('shown.bs.modal', function () {
                     $('#edit_branch_id').select2({ dropdownParent: $('#EditInformationTransactionModal'), });
@@ -1796,6 +1792,28 @@
                 });
 
             // Edit Transaction
+
+            $(document).on('click', '.generate_qr_code', function (e) {
+                e.preventDefault();
+
+                const transaction_number = $(this).data('transaction_number');
+
+                // SweetAlert confirmation
+                Swal.fire({
+                    icon: "question",
+                    title: 'Do you want to Generate QR Code?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Open the QR code in a new tab
+                        window.open(`/GenerateQRCode/${transaction_number}`, '_blank');
+                    }
+                });
+            });
+
+
 
             $(document).on('click', '.passbookForCollection', function(e) {
                 e.preventDefault(); // Prevent the default anchor behavior
