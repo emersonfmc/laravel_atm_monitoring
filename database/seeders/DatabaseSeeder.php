@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             DataCollectionDateSeeder::class,
             ClientsInformationSeeder::class,
             DataReleaseReasonSeeder::class,
+            AtmMaintenancePageSeeder::class,
         ]);
     }
 }

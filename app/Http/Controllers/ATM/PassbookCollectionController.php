@@ -220,4 +220,82 @@ class PassbookCollectionController extends Controller
 
     }
 
+    public function PassbookCollectionTransactionPage()
+    {
+        $userBranchId = Auth::user()->branch_id;
+        $userGroup = Auth::user()->UserGroup->group_name;
+
+
+        $Branches = Branch::where('status', 'Active')->get();
+
+        return view('pages.pages_backend.passbook.passbook_transactions',compact('userBranchId','userGroup','Branches'));
+    }
+
+    public function PassbookCollectionTransactionData(Request $request)
+    {
+        $userBranchId = Auth::user()->branch_id;
+        $userGroup = Auth::user()->UserGroup->group_name;
+
+        $branchId = $request->input('branch_id', $userBranchId);
+
+        $PassbookCollectionData = PassbookForCollectionTransaction::with('AtmClientBanks', 'AtmClientBanks.ClientInformation', 'Branch', 'DataTransactionAction', 'PassbookForCollectionTransactionApproval')
+            ->when($branchId, function ($query) use ($branchId) {
+                return $query->where('branch_id', $branchId); // Apply branch_id filter
+            })
+            ->latest('created_at')
+            ->get()
+            ->groupBy('request_number')
+            ->map(function ($group) {
+                // Get the latest record in the group based on updated_at
+                $latestRecord = $group->sortByDesc('updated_at')->first();
+                // Add count of transactions
+                $latestRecord->setAttribute('transaction_count', $group->count());
+                // Determine the overall status for the group
+                $statusCount = $group->groupBy('status')->map(function ($statusGroup) {
+                    return $statusGroup->count();
+                });
+
+                // Handle overall status logic
+                if ($statusCount->has('CANCELLED') && $statusCount->get('CANCELLED') == $group->count()) {
+                    $latestRecord->setAttribute('overall_status', 'CANCELLED');
+                } elseif ($statusCount->has('COMPLETED') && $statusCount->get('COMPLETED') == $group->count()) {
+                    $latestRecord->setAttribute('overall_status', 'COMPLETED');
+                } elseif ($statusCount->has('ON GOING') && $statusCount->get('ON GOING') == $group->count()) {
+                    $latestRecord->setAttribute('overall_status', 'ON GOING');
+                } elseif ($statusCount->has('ON GOING') && $statusCount->get('ON GOING') > 0 && $statusCount->has('CANCELLED') && $statusCount->get('CANCELLED') == 1) {
+                    $latestRecord->setAttribute('overall_status', 'ON GOING');
+                } elseif ($statusCount->has('COMPLETED') && $statusCount->get('COMPLETED') > 0 && $statusCount->has('CANCELLED') && $statusCount->get('CANCELLED') == 1) {
+                    $latestRecord->setAttribute('overall_status', 'COMPLETED');
+                } else {
+                    $latestRecord->setAttribute('overall_status', 'ON GOING');
+                }
+                return $latestRecord;
+            });
+
+
+        return DataTables::of($PassbookCollectionData->values()) // Reset the keys for DataTables compatibility
+            ->setRowId('id') // Use the unique `id` column as the row ID
+            ->addColumn('request_number', function ($row) {
+                return '<button class="btn btn-primary">' . htmlspecialchars($row->request_number) . '</button>';
+            })
+            ->addColumn('created_at', function ($row) {
+                return $row->created_at
+                    ? \Carbon\Carbon::parse($row->created_at)->format('F j, Y - h:i A')
+                    : 'N/A';
+            })
+            ->addColumn('transaction_count', function ($row) {
+                return $row->transaction_count;
+            })
+            ->addColumn('branch_location', function ($row) {
+                return $row->Branch->branch_location ?? 'N/A'; // Handle null branch gracefully
+            })
+            ->addColumn('overall_status', function ($row) {
+                return $row->overall_status;
+            })
+            ->rawColumns(['request_number']) // Allow rendering raw HTML for the request_number column
+            ->make(true);
+
+    }
+
+
 }

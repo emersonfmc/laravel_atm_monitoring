@@ -413,7 +413,7 @@
 
     <div class="modal fade" id="updateTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="updateTransactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 85%;" role="document">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 75%;" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <div class="modal-title">
