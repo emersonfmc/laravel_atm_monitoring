@@ -208,7 +208,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" key="pb_transaction">
+                                    <a href="{{ route('PassbookCollectionTransactionPage') }}" key="pb_transaction">
                                         <i class="fas fa-desktop fs-6 text-info"></i>
                                         PB Transaction
                                     </a>
