@@ -246,6 +246,7 @@ class AtmHeadOfficeController extends Controller
             ->addColumn('qr_code', function($row) use ($userGroup) {
                 if (in_array($userGroup, ['Developer', 'Admin','Everfirst Admin'])) {
                     $qr_code = '<button type="button" class="btn btn-primary generate_qr_code"
+                                    data-atm_id="'.$row->id.'"
                                     data-transaction_number="'.$row->transaction_number.'"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="right"
