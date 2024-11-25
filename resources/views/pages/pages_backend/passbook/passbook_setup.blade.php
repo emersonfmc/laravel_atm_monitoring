@@ -65,7 +65,9 @@
                         <table id="FetchingDatatable" class="table table-border dt-responsive wrap table-design" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Checkbox</th>
+                                    <th class="pe-4 ps-4">
+                                        <input type="checkbox" id="selectAll" title="Select All">
+                                    </th>
                                     <th>Pending By</th>
                                     <th>Reference No</th>
                                     <th>Client</th>
@@ -109,8 +111,8 @@
                     render: function(data, type, row, meta) {
                         return '<span class="fw-bold h6 text-primary">' + data + '</span>';
                     },
-                    orderable: true,
-                    searchable: true,
+                    orderable: false,
+                    searchable: false,
                 },
                 // Transaction Type and Pending By
                 {
@@ -285,8 +287,20 @@
                 });
             // End Filtering of Transaction
 
-            $(document).on('change', '.check-item', function() {
-                if ($('.check-item:checked').length > 0) {
+            $('#selectAll').on('change', function () {
+                const isChecked = $(this).is(':checked');
+                $('.check-item').prop('checked', isChecked);
+                $('.check-item').trigger('change');
+            });
+
+            // Individual checkbox logic
+            $(document).on('change', '.check-item', function () {
+                const totalCheckboxes = $('.check-item').length;
+                const checkedCheckboxes = $('.check-item:checked').length;
+
+                $('#selectAll').prop('checked', totalCheckboxes === checkedCheckboxes);
+
+                if (checkedCheckboxes > 0) {
                     $('#passbookForCollection').show();
                 } else {
                     $('#passbookForCollection').hide();

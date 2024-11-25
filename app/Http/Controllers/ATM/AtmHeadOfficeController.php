@@ -9,6 +9,7 @@ use App\Models\DataBankLists;
 
 use App\Models\AtmClientBanks;
 use Illuminate\Support\Carbon;
+use App\Models\MaintenancePage;
 use App\Models\ClientInformation;
 use App\Models\DataReleaseOption;
 use App\Models\DataCollectionDate;
@@ -24,24 +25,60 @@ class AtmHeadOfficeController extends Controller
     public function HeadOfficePage()
     {
         $userGroup = Auth::user()->UserGroup->group_name;
-        $branch_id = Auth::user()->branch_id;
 
-        $Branches = Branch::where('status','Active')->get();
+        // Allow "Developer" group to bypass maintenance mode
+        if (in_array($userGroup, ['Developer', 'Admin'])) {
+            $branch_id = Auth::user()->branch_id;
 
-        $DataBankLists = DataBankLists::where('status','Active')->get();
-        $DataCollectionDate = DataCollectionDate::where('status','Active')->get();
-        $DataTransactionAction = DataTransactionAction::where('transaction','1')->where('status','Active')->get();
-        $DataReleaseOption = DataReleaseOption::where('status','Active')->get();
-        $DataPensionTypesLists = DataPensionTypesLists::where('status','Active')->get();
+            $Branches = Branch::where('status', 'Active')->get();
+            $DataBankLists = DataBankLists::where('status', 'Active')->get();
+            $DataCollectionDate = DataCollectionDate::where('status', 'Active')->get();
+            $DataTransactionAction = DataTransactionAction::where('transaction', '1')
+                ->where('status', 'Active')
+                ->get();
+            $DataReleaseOption = DataReleaseOption::where('status', 'Active')->get();
+            $DataPensionTypesLists = DataPensionTypesLists::where('status', 'Active')->get();
 
-        return view('pages.pages_backend.atm.atm_head_office_atm_lists',
-                    compact('DataTransactionAction',
-                            'DataReleaseOption',
-                            'DataBankLists',
-                            'DataCollectionDate',
-                            'Branches',
-                            'DataPensionTypesLists','userGroup','branch_id'));
+            return view('pages.pages_backend.atm.atm_head_office_atm_lists', compact(
+                'DataTransactionAction',
+                'DataReleaseOption',
+                'DataBankLists',
+                'DataCollectionDate',
+                'Branches',
+                'DataPensionTypesLists',
+                'userGroup',
+                'branch_id'
+            ));
+        }
+
+        $MaintenancePage = MaintenancePage::where('pages_name', 'Head Office')->first();
+        if ($MaintenancePage->status == 'yes') {
+            return view('pages.pages_validate.pages-maintenance');
+        } else {
+            $branch_id = Auth::user()->branch_id;
+
+            $Branches = Branch::where('status', 'Active')->get();
+            $DataBankLists = DataBankLists::where('status', 'Active')->get();
+            $DataCollectionDate = DataCollectionDate::where('status', 'Active')->get();
+            $DataTransactionAction = DataTransactionAction::where('transaction', '1')
+                ->where('status', 'Active')
+                ->get();
+            $DataReleaseOption = DataReleaseOption::where('status', 'Active')->get();
+            $DataPensionTypesLists = DataPensionTypesLists::where('status', 'Active')->get();
+
+            return view('pages.pages_backend.atm.atm_head_office_atm_lists', compact(
+                'DataTransactionAction',
+                'DataReleaseOption',
+                'DataBankLists',
+                'DataCollectionDate',
+                'Branches',
+                'DataPensionTypesLists',
+                'userGroup',
+                'branch_id'
+            ));
+        }
     }
+
 
     public function HeadOfficeData(Request $request)
     {
@@ -246,6 +283,7 @@ class AtmHeadOfficeController extends Controller
             ->addColumn('qr_code', function($row) use ($userGroup) {
                 if (in_array($userGroup, ['Developer', 'Admin','Everfirst Admin'])) {
                     $qr_code = '<button type="button" class="btn btn-primary generate_qr_code"
+                                    data-atm_id="'.$row->id.'"
                                     data-transaction_number="'.$row->transaction_number.'"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="right"
