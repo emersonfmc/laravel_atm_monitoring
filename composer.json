@@ -12,9 +12,10 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.3",
-        "simplesoftwareio/simple-qrcode": "^4.2",
+        "mpdf/qrcode": "^1.2",
         "spatie/cpu-load-health-check": "^1.0",
         "spatie/laravel-health": "^1.7",
+        "spatie/laravel-permission": "^6.10",
         "yajra/laravel-datatables": "9.0"
     },
     "require-dev": {
