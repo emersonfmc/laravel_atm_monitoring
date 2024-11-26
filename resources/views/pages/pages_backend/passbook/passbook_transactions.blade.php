@@ -84,6 +84,48 @@
         </div> <!-- end col -->
     </div>
 
+    <div class="modal fade" id="viewPassbookTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="viewPassbookTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 85%;" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-uppercase">
+                        View Transaction :
+                        <span class="text-primary" id="view_request_number"></span>
+                     </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive mt-3">
+                        <table class="table table-design" id="datatableViewTransaction">
+                            <thead>
+                                <th>ID</th>
+                                <th style="width: 25%;">Pending By</th>
+                                <th>Pension</th>
+                                <th>Releasing Image</th>
+                                <th>Branch</th>
+                                <th>Client</th>
+                                <th>Passbook No & Bank</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                                <th>Transaction</th>
+                            </thead>
+                            <tbody id="TransactionApprovalBody">
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <script>
         $(document).ready(function () {
             var FetchingDatatableBody = $('#FetchingDatatable tbody');
@@ -191,6 +233,96 @@
                     dataTable.table.ajax.url(targetUrl).load(); // Reload the DataTable with the new URL
                 });
             // End Filtering of Transaction
+
+
+            // View Transaction
+                $('#FetchingDatatable').on('click', '.viewPassbookTransaction', function(e) {
+                    e.preventDefault();
+                    var request_number = $(this).data('request_number');
+
+                    $.ajax({
+                        url: "/PassbookCollectionTransactionGet",
+                        type: "GET",
+                        data: { request_number : request_number },
+                        success: function(data) {
+                            console.log(data);
+                            $('#view_request_number').text(data.request_number);
+
+                            $('#TransactionApprovalBody').empty();
+
+                            data.passbook_collection_data.forEach(function (rows) {
+                                var lastName = rows.atm_client_banks.client_information.last_name;
+                                var firstName = rows.atm_client_banks.client_information.first_name;
+                                var middleName = rows.atm_client_banks.client_information.middle_name;
+                                var suffix = rows.atm_client_banks.client_information.suffix;
+                                var fullName = lastName + ', ' + firstName + ' ' + (middleName || '') + ' ' + (suffix || '');
+
+                                var pensionNumber = rows.atm_client_banks.client_information.pension_number;
+                                var pensionAccountType = rows.atm_client_banks.client_information.pension_account_type;
+                                var pensionType = rows.atm_client_banks.client_information.pension_type;
+
+                                var newRow = '<tr>' +
+                                                '<td>' + rows.id + '</td>' +
+                                                '<td>'
+                                                    + '<span class="fw-bold text-primary">' + rows.transaction_action + '</span><br>'
+                                                    + '<span class="text-dark">' + rows.pending_to + '</span>' +
+                                                '</td>' +
+                                                '<td>'
+                                                    + '<span class="fw-bold text-primary">' + pensionNumber + '</span><br>'
+                                                    + '<span class="text-dark">' + pensionAccountType + '</span><br>'
+                                                    + '<span class="text-success">' + pensionType + '</span>' +
+                                                '</td>' +
+                                                '<td>' + rows.id + '</td>' +
+                                                '<td>' + rows.branch.branch_location + '</td>' +
+                                                '<td>' + fullName + '</td>' +
+                                                '<td>'
+                                                    + '<span class="fw-bold text-success">' + rows.atm_client_banks.bank_account_no + '</span><br>'
+                                                    + rows.atm_client_banks.bank_name +
+                                                '</td>' +
+                                                '<td>'
+                                                    + '<span class="text-danger">' + rows.atm_client_banks.atm_type + '</span><br>'
+                                                    + rows.atm_client_banks.atm_status +
+                                                '</td>' +
+                                                '<td>' + rows.id + '</td>' +
+                                                '<td>' + rows.id + '</td>' +
+                                                '<td>' + rows.id + '</td>' +
+                                             '</tr>';
+                                $('#TransactionApprovalBody').append(newRow);
+                            });
+
+
+                            $('#viewPassbookTransactionModal').modal('show');
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("An error occurred: " + error);
+                        }
+                    });
+                });
+                $('#datatableViewTransaction').DataTable({
+                    drawCallback: function () {
+                        $('[data-bs-toggle="tooltip"]').tooltip();
+                        $(".dataTables_paginate > .pagination").addClass("pagination-rounded");
+                    },
+                    language: {
+                        searchPlaceholder: "Enter to search ...",
+                        paginate: {
+                            previous: "<i class='fas fa-chevron-left text-dark'></i>",
+                            next: "<i class='fas fa-chevron-right text-dark'></i>",
+                        },
+                        processing: function () {
+                            Swal.fire({
+                                title: "Please Wait...",
+                                text: "Please wait for a moment",
+                                allowEscapeKey: false,
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                },
+                            });
+                            return "Please wait for a moment ....";
+                        },
+                    },
+                });
 
         });
     </script>

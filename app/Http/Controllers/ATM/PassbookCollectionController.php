@@ -276,7 +276,9 @@ class PassbookCollectionController extends Controller
         return DataTables::of($PassbookCollectionData->values()) // Reset the keys for DataTables compatibility
             ->setRowId('id') // Use the unique `id` column as the row ID
             ->addColumn('request_number', function ($row) {
-                return '<button class="btn btn-primary">' . htmlspecialchars($row->request_number) . '</button>';
+                return '<a href="#" class="btn btn-primary viewPassbookTransaction"
+                            data-request_number="' . htmlspecialchars($row->request_number) . '">' . htmlspecialchars($row->request_number) .
+                        '</a>';
             })
             ->addColumn('created_at', function ($row) {
                 return $row->created_at
@@ -296,6 +298,59 @@ class PassbookCollectionController extends Controller
             ->make(true);
 
     }
+
+    public function PassbookCollectionTransactionGet(Request $request)
+    {
+        $request_number = $request->request_number;
+
+        // Fetch the passbook collection data with the required relationships
+        $PassbookCollectionData = PassbookForCollectionTransaction::with([
+            'AtmClientBanks',
+            'AtmClientBanks.ClientInformation',
+            'Branch',
+            'DataTransactionAction',
+            'PassbookForCollectionTransactionApproval.DataUserGroup' // Include DataUserGroup relationship
+        ])
+            ->where('request_number', $request_number)
+            ->get()
+            ->map(function ($row) {
+                $groupName = null; // Initialize group name
+                $atmTransactionActionName = null; // Initialize ATM transaction action name
+
+                // Filter approvals with 'Pending' status
+                $pendingApprovals = $row->PassbookForCollectionTransactionApproval->filter(function ($approval) {
+                    return $approval->status === 'Pending';
+                });
+
+                // Get the last pending approval based on the highest ID
+                if ($pendingApprovals->isNotEmpty()) {
+                    $lastPendingApproval = $pendingApprovals->sortByDesc('id')->first();
+                    $groupName = optional($lastPendingApproval->DataUserGroup)->group_name;
+
+                    // Now, retrieve the transaction action name from the last pending approval
+                    if (isset($lastPendingApproval->transaction_actions_id)) {
+                        $atmTransactionAction = DataTransactionAction::find($lastPendingApproval->transaction_actions_id);
+
+                        if ($atmTransactionAction) {
+                            $atmTransactionActionName = htmlspecialchars($atmTransactionAction->name);
+                        }
+                    }
+                }
+
+                $row->setAttribute('pending_to', $groupName ?: null);
+                $row->setAttribute('transaction_action', $atmTransactionActionName ?: null);
+                return $row;
+            });
+
+
+
+            return response()->json([
+                'request_number' => $request_number,
+                'passbook_collection_data' => $PassbookCollectionData
+            ]);
+    }
+
+
 
 
 }
