@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('pages_name');
             $table->enum('status', ['yes', 'no'])->default('no');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
