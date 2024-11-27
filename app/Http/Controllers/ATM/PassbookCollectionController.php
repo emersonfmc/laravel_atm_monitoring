@@ -63,7 +63,7 @@ class PassbookCollectionController extends Controller
 
                 if ($row->PassbookForCollectionTransaction) {
                     $ongoingTransactions = $row->PassbookForCollectionTransaction->filter(function ($transaction) {
-                        return $transaction->status === 'ON GOING';
+                        return $transaction->status === 'On Going';
                     })->sortByDesc('id');
 
                     if ($ongoingTransactions->isNotEmpty()) {
@@ -88,7 +88,7 @@ class PassbookCollectionController extends Controller
                 if ($row->PassbookForCollectionTransaction) {
                     // Filter for ongoing transactions and sort by id in descending order
                     $ongoingTransactions = $row->PassbookForCollectionTransaction->filter(function ($transaction) {
-                        return $transaction->status === 'ON GOING';
+                        return $transaction->status === 'On Going';
                     })->sortByDesc('id'); // Sort by id in descending order
 
                     // Get the first ongoing transaction details if it exists
@@ -176,7 +176,7 @@ class PassbookCollectionController extends Controller
                     'remarks' => NULL,
                     'cancelled_by_employee_id' => NULL,
                     'cancelled_date' => NULL,
-                    'status' => 'ON GOING',
+                    'status' => 'On Going',
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ]);
@@ -220,7 +220,7 @@ class PassbookCollectionController extends Controller
 
     }
 
-    public function PassbookCollectionTransactionPage()
+    public function PassbookCollectionAllTransactionPage()
     {
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
@@ -228,10 +228,10 @@ class PassbookCollectionController extends Controller
 
         $Branches = Branch::where('status', 'Active')->get();
 
-        return view('pages.pages_backend.passbook.passbook_transactions',compact('userBranchId','userGroup','Branches'));
+        return view('pages.pages_backend.passbook.passbook_transaction_all',compact('userBranchId','userGroup','Branches'));
     }
 
-    public function PassbookCollectionTransactionData(Request $request)
+    public function PassbookCollectionAllTransactionData(Request $request)
     {
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
@@ -256,18 +256,18 @@ class PassbookCollectionController extends Controller
                 });
 
                 // Handle overall status logic
-                if ($statusCount->has('CANCELLED') && $statusCount->get('CANCELLED') == $group->count()) {
-                    $latestRecord->setAttribute('overall_status', 'CANCELLED');
-                } elseif ($statusCount->has('COMPLETED') && $statusCount->get('COMPLETED') == $group->count()) {
-                    $latestRecord->setAttribute('overall_status', 'COMPLETED');
-                } elseif ($statusCount->has('ON GOING') && $statusCount->get('ON GOING') == $group->count()) {
-                    $latestRecord->setAttribute('overall_status', 'ON GOING');
-                } elseif ($statusCount->has('ON GOING') && $statusCount->get('ON GOING') > 0 && $statusCount->has('CANCELLED') && $statusCount->get('CANCELLED') == 1) {
-                    $latestRecord->setAttribute('overall_status', 'ON GOING');
-                } elseif ($statusCount->has('COMPLETED') && $statusCount->get('COMPLETED') > 0 && $statusCount->has('CANCELLED') && $statusCount->get('CANCELLED') == 1) {
-                    $latestRecord->setAttribute('overall_status', 'COMPLETED');
+                if ($statusCount->has('Cancelled') && $statusCount->get('Cancelled') == $group->count()) {
+                    $latestRecord->setAttribute('overall_status', 'Cancelled');
+                } elseif ($statusCount->has('Completed') && $statusCount->get('Completed') == $group->count()) {
+                    $latestRecord->setAttribute('overall_status', 'Completed');
+                } elseif ($statusCount->has('On Going') && $statusCount->get('On Going') == $group->count()) {
+                    $latestRecord->setAttribute('overall_status', 'On Going');
+                } elseif ($statusCount->has('On Going') && $statusCount->get('On Going') > 0 && $statusCount->has('Cancelled') && $statusCount->get('Cancelled') == 1) {
+                    $latestRecord->setAttribute('overall_status', 'On Going');
+                } elseif ($statusCount->has('Completed') && $statusCount->get('Completed') > 0 && $statusCount->has('Cancelled') && $statusCount->get('Cancelled') == 1) {
+                    $latestRecord->setAttribute('overall_status', 'Completed');
                 } else {
-                    $latestRecord->setAttribute('overall_status', 'ON GOING');
+                    $latestRecord->setAttribute('overall_status', 'On Going');
                 }
                 return $latestRecord;
             });
@@ -348,6 +348,72 @@ class PassbookCollectionController extends Controller
                 'request_number' => $request_number,
                 'passbook_collection_data' => $PassbookCollectionData
             ]);
+    }
+
+    public function PassbookCollectionTransactionPage()
+    {
+        $userBranchId = Auth::user()->branch_id;
+        $userGroup = Auth::user()->UserGroup->group_name;
+        $Branches = Branch::where('status', 'Active')->get();
+
+        return view('pages.pages_backend.passbook.passbook_transaction',compact('userBranchId','userGroup','Branches'));
+    }
+
+    public function PassbookCollectionTransactionData(Request $request)
+    {
+        $userBranchId = Auth::user()->branch_id;
+        $userGroup = Auth::user()->UserGroup->group_name;
+
+        $query = PassbookForCollectionTransaction::with(
+                'AtmClientBanks', 'AtmClientBanks.ClientInformation',
+                'Branch',
+                'DataTransactionAction',
+                'PassbookForCollectionTransactionApproval')
+            ->when($userBranchId, function ($query) use ($userBranchId) {
+                return $query->where('branch_id', $userBranchId); // Apply branch_id filter
+            })
+            ->orderBy('request_number');
+
+            // Apply branch filter based on user branch_id or request input
+            if ($userBranchId) {
+                $query->where('branch_id', $userBranchId);
+            } elseif ($request->filled('branch_id')) {
+                $query->where('branch_id', $request->branch_id);
+            }
+
+        // Get the filtered data
+        $PassbookCollectionData = $query->get();
+
+        return DataTables::of($PassbookCollectionData->values()) // Reset the keys for DataTables compatibility
+            ->setRowId('id') // Use the unique `id` column as the row ID
+            ->addColumn('branch_location', function ($row) {
+                return $row->Branch->branch_location ?? 'N/A'; // Handle null branch gracefully
+            })
+            ->addColumn('pending_to', function($row) {
+                $groupName = ''; // Variable to hold the group name
+                $atmTransactionActionName = ''; // Variable to hold the ATM transaction action name
+
+                // Check if there are pending approvals
+                $pendingApprovals = $row->PassbookForCollectionTransactionApproval->filter(function ($approval) {
+                    return $approval->status === 'Pending';
+                });
+
+                // If there are pending approvals, get the group name from the first one
+                if ($pendingApprovals->isNotEmpty()) {
+                    // Get the group name from the first approval's DataUserGroup relationship
+                    $groupName = optional($pendingApprovals->first()->DataUserGroup)->group_name ?? 'N/A';
+
+                    // Get the ATM transaction action using the first approval's transaction_actions_id
+                    $atmTransactionAction = DataTransactionAction::find($pendingApprovals->first()->transaction_actions_id);
+                    if ($atmTransactionAction) {
+                        $atmTransactionActionName = htmlspecialchars($atmTransactionAction->name);
+                    }
+                }
+                return $atmTransactionActionName . ' <div class="text-dark"> ' . $groupName . '</div>';
+            })
+            ->rawColumns(['branch_location']) // Allow rendering raw HTML for the request_number column
+            ->make(true);
+
     }
 
 
