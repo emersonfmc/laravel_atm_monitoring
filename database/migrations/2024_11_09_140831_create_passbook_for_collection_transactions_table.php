@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('cancelled_by_employee_id')->nullable();
             $table->dateTime('cancelled_date')->nullable();
 
-            $table->enum('status',['ON GOING','CANCELLED','COMPLETED'])->nullable();
+            $table->enum('status',['On Going','Cancelled','Completed','Returning to Branch'])->nullable();
 
             $table->foreign('branch_id')->references('id')->on('branches')->onDelete('set null')->onUpdate('cascade');
             $table->foreign('client_banks_id')->references('id')->on('atm_client_banks')->onDelete('set null')->onUpdate('cascade');

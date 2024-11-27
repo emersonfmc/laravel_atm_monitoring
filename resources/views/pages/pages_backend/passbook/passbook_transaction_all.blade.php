@@ -86,7 +86,7 @@
 
     <div class="modal fade" id="viewPassbookTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="viewPassbookTransactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 85%;" role="document">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 90%;" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-uppercase">
@@ -99,8 +99,7 @@
                     <div class="table-responsive mt-3">
                         <table class="table table-design" id="datatableViewTransaction">
                             <thead>
-                                <th>ID</th>
-                                <th style="width: 25%;">Pending By</th>
+                                <th><span class="ps-5 pe-5">Pending By</span></th>
                                 <th>Pension</th>
                                 <th>Releasing Image</th>
                                 <th>Branch</th>
@@ -109,7 +108,7 @@
                                 <th>Type</th>
                                 <th>Status</th>
                                 <th>Remarks</th>
-                                <th>Transaction</th>
+                                <th>View</th>
                             </thead>
                             <tbody id="TransactionApprovalBody">
 
@@ -131,7 +130,7 @@
             var FetchingDatatableBody = $('#FetchingDatatable tbody');
 
             const dataTable = new ServerSideDataTable('#FetchingDatatable');
-            var url = '{!! route('PassbookCollectionTransactionData') !!}';
+            var url = '{!! route('PassbookCollectionAllTransactionData') !!}';
             const buttons = [{
                 text: 'Delete',
                 action: function(e, dt, node, config) {
@@ -184,16 +183,20 @@
                         var textClass = '';
 
                         // Determine badge class based on the status
-                        if (data === 'ON GOING') {
+                        if (data === 'On Going') {
                             badgeClass = 'text-primary';
                             textClass = 'On Going';
-                        } else if (data === 'COMPLETED') {
+                        } else if (data === 'Completed') {
                             badgeClass = 'text-success';
                             textClass = 'Completed';
-                        } else if (data === 'CANCELLED') {
+                        } else if (data === 'Cancelled') {
                             badgeClass = 'text-danger';
                             textClass = 'Cancelled';
-                        } else {
+                        } else if (data === 'Returning to Branch') {
+                            badgeClass = 'text-success';
+                            textClass = 'Returning to Branch';
+                        }
+                        else {
                             badgeClass = 'text-secondary';
                             textClass = 'Unknown';
                         }
@@ -248,6 +251,7 @@
                             console.log(data);
                             $('#view_request_number').text(data.request_number);
 
+                            // Clear the table body to remove previously appended rows
                             $('#TransactionApprovalBody').empty();
 
                             data.passbook_collection_data.forEach(function (rows) {
@@ -261,8 +265,29 @@
                                 var pensionAccountType = rows.atm_client_banks.client_information.pension_account_type;
                                 var pensionType = rows.atm_client_banks.client_information.pension_type;
 
+                                var statusBadgeClass;
+                                var statusTextClass;
+                                var statusText = rows.status; // Assuming `rows.status` holds the status
+
+                                // Determine the badge class based on status
+                                if (statusText === "On Going") {
+                                    statusBadgeClass = 'badge bg-primary';
+                                    statusTextClass = 'On Going';
+                                } else if (statusText === "Cancelled") {
+                                    statusBadgeClass = 'badge bg-danger';
+                                    statusTextClass = 'Cancelled';
+                                } else if (statusText === "Returning to Branch") {
+                                    statusBadgeClass = 'badge bg-success';
+                                    statusTextClass = 'Returning to Branch';
+                                } else if (statusText === "Completed") {
+                                    statusBadgeClass = 'badge bg-success';
+                                    statusTextClass = 'Completed';
+                                } else {
+                                    statusBadgeClass = 'badge bg-secondary'; // Default for unknown statuses
+                                    statusTextClass = 'Unknown';
+                                }
+
                                 var newRow = '<tr>' +
-                                                '<td>' + rows.id + '</td>' +
                                                 '<td>'
                                                     + '<span class="fw-bold text-primary">' + rows.transaction_action + '</span><br>'
                                                     + '<span class="text-dark">' + rows.pending_to + '</span>' +
@@ -283,9 +308,14 @@
                                                     + '<span class="text-danger">' + rows.atm_client_banks.atm_type + '</span><br>'
                                                     + rows.atm_client_banks.atm_status +
                                                 '</td>' +
-                                                '<td>' + rows.id + '</td>' +
-                                                '<td>' + rows.id + '</td>' +
-                                                '<td>' + rows.id + '</td>' +
+                                                '<td>' + '<span class="' + statusBadgeClass + '">' + statusTextClass + '</span>' + '</td>' + // Status badge here
+                                                '<td>' + (rows.remarks !== null ? rows.remarks : '') + '</td>' +
+                                                '<td>' +
+                                                    '<a href="#" class="text-success viewPassbookTransaction" data-id="' + rows.id + '">' +
+                                                        '<i class="fas fa-eye fs-5"></i>' + // Add the icon here
+                                                    '</a>' +
+                                                '</td>' +
+
                                              '</tr>';
                                 $('#TransactionApprovalBody').append(newRow);
                             });

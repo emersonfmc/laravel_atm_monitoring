@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('sequence_no')->nullable();
             $table->unsignedBigInteger('transaction_actions_id')->nullable();
 
-            $table->enum('status', ['Completed', 'Pending', 'Stand By', 'Cancelled', 'Open to Others'])->nullable();
+            $table->enum('status', ['Completed','Pending','Stand By','Cancelled','Returning to Branch'])->nullable();
             $table->enum('type', ['Received', 'Released'])->nullable();
 
             $table->foreign('employee_id','employee_id')->references('employee_id')->on('users')->onDelete('set null')->onUpdate('cascade');
