@@ -68,7 +68,7 @@
                                     <th class="pe-4 ps-4">
                                         <input type="checkbox" id="selectAll" title="Select All">
                                     </th>
-                                    <th>Pending By</th>
+                                    <th style="width: 15%;">Pending By</th>
                                     <th>Reference No</th>
                                     <th>Client</th>
                                     <th>Branch</th>
