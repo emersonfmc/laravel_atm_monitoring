@@ -248,7 +248,6 @@
                         type: "GET",
                         data: { request_number : request_number },
                         success: function(data) {
-                            console.log(data);
                             $('#view_request_number').text(data.request_number);
 
                             // Clear the table body to remove previously appended rows
