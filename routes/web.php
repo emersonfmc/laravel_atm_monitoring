@@ -38,6 +38,7 @@ Route::controller(DefaultController::class)->group(function () {
     Route::get('/AtmClientFetch', 'AtmClientFetch')->name('AtmClientFetch');
     Route::get('/AtmClientBanksFetch', 'AtmClientBanksFetch')->name('AtmClientBanksFetch');
     Route::get('/UserSelect', 'UserSelect')->name('UserSelect');
+    Route::get('/UserSelectServerSide', 'UserSelectServerSide')->name('UserSelectServerSide');
     Route::get('/GenerateQRCode/{transaction_number}', 'GenerateQRCode')->name('generate_qr_code');
 });
 
@@ -181,14 +182,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/PassbookCollectionSetUpPage', 'PassbookCollectionSetUpPage')->name('PassbookCollectionSetUpPage');
         Route::get('/PassbookCollectionData', 'PassbookCollectionData')->name('PassbookCollectionData');
         Route::post('/PassbookForCollectionCreate', 'PassbookForCollectionCreate')->name('PassbookForCollectionCreate');
-
         Route::get('/PassbookCollectionAllTransactionPage', 'PassbookCollectionAllTransactionPage')->name('PassbookCollectionAllTransactionPage');
         Route::get('/PassbookCollectionAllTransactionData', 'PassbookCollectionAllTransactionData')->name('PassbookCollectionAllTransactionData');
-
-        Route::get('/PassbookCollectionTransactionGet', 'PassbookCollectionTransactionGet')->name('PassbookCollectionTransactionGet');
+        Route::get('/PassbookCollectionAllTransactionGet', 'PassbookCollectionAllTransactionGet')->name('PassbookCollectionAllTransactionGet');
 
         Route::get('/PassbookCollectionTransactionPage', 'PassbookCollectionTransactionPage')->name('PassbookCollectionTransactionPage');
         Route::get('/PassbookCollectionTransactionData', 'PassbookCollectionTransactionData')->name('PassbookCollectionTransactionData');
+        Route::get('/PassbookCollectionTransactionGet', 'PassbookCollectionTransactionGet')->name('PassbookCollectionTransactionGet');
 
     });
 });
