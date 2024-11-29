@@ -43,6 +43,7 @@ class PassbookCollectionController extends Controller
             ->whereHas('ClientInformation', function ($query) {
                 $query->where('passbook_for_collection', 'yes');
             })
+            ->where('atm_type','Passbook')
             ->where('status','1')
             ->latest('updated_at');
 
@@ -342,8 +343,6 @@ class PassbookCollectionController extends Controller
                 return $row;
             });
 
-
-
             return response()->json([
                 'request_number' => $request_number,
                 'passbook_collection_data' => $PassbookCollectionData
@@ -374,13 +373,14 @@ class PassbookCollectionController extends Controller
             })
             ->orderBy('request_number');
 
-            // Apply branch filter based on user branch_id or request input
+            // Apply branch filtering based on user or request
             if ($userBranchId) {
                 $query->where('branch_id', $userBranchId);
             } elseif ($request->filled('branch_id')) {
                 $query->where('branch_id', $request->branch_id);
+            } else {
+                // Default: No branch_id specified, fetch all records
             }
-
         // Get the filtered data
         $PassbookCollectionData = $query->get();
 
@@ -391,9 +391,7 @@ class PassbookCollectionController extends Controller
             })
             ->addColumn('pending_to', function($row) {
                 $groupName = ''; // Variable to hold the group name
-                $atmTransactionActionName = ''; // Variable to hold the ATM transaction action name
 
-                // Check if there are pending approvals
                 $pendingApprovals = $row->PassbookForCollectionTransactionApproval->filter(function ($approval) {
                     return $approval->status === 'Pending';
                 });
@@ -402,16 +400,49 @@ class PassbookCollectionController extends Controller
                 if ($pendingApprovals->isNotEmpty()) {
                     // Get the group name from the first approval's DataUserGroup relationship
                     $groupName = optional($pendingApprovals->first()->DataUserGroup)->group_name ?? 'N/A';
+                }
 
-                    // Get the ATM transaction action using the first approval's transaction_actions_id
+                return $groupName;
+            })
+            ->addColumn('transaction_name', function($row) {
+                $atmTransactionActionName = '';
+
+                $pendingApprovals = $row->PassbookForCollectionTransactionApproval->filter(function ($approval) {
+                    return $approval->status === 'Pending';
+                });
+
+                if ($pendingApprovals->isNotEmpty()) {
                     $atmTransactionAction = DataTransactionAction::find($pendingApprovals->first()->transaction_actions_id);
                     if ($atmTransactionAction) {
                         $atmTransactionActionName = htmlspecialchars($atmTransactionAction->name);
                     }
                 }
-                return $atmTransactionActionName . ' <div class="text-dark"> ' . $groupName . '</div>';
+
+                return $atmTransactionActionName;
             })
-            ->rawColumns(['branch_location']) // Allow rendering raw HTML for the request_number column
+            ->addColumn('action', function($row) use ($userGroup) {
+                $action = '';
+                if (in_array($userGroup, ['Developer','Admin', 'Everfirst Admin'])) {
+                    $action .= '<a href="#" class="text-success editTransaction me-2 mb-2"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="Edit Transaction"
+                                        data-transaction_id="' . $row->id . '">
+                                    <i class="fas fa-pencil fs-5"></i>
+                                 </a>';
+                }
+
+                $action .= '<a href="#" class="text-info viewTransaction me-2 mb-2"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="View Transaction"
+                                        data-transaction_id="' . $row->id . '">
+                                    <i class="fas fa-eye fs-5"></i>
+                                </a>';
+
+                return $action;
+            })
+            ->rawColumns(['branch_location','pending_to','transaction_name','action']) // Allow rendering raw HTML for the request_number column
             ->make(true);
 
     }
