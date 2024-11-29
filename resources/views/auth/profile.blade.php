@@ -49,8 +49,19 @@
                         <input type="hidden" name="item_id" value="{{ $user->id }}">
 
                         <div class="text-center">
-                            <span class="fw-bold h1 text-primary">{{ $user->user_types }}</span><br>
-                            <label class="fw-bold h6">User Types</label>
+                            <img id="image_preview"
+                                src="{{ $user->avatar ? asset('images/avatars/' . $user->avatar) : asset('images/no_image.jpg') }}"
+                                class="img-fluid"
+                                style="height: 200px; width: 210px;">
+
+                            <br>
+                            <label for="file_input" class="btn btn-primary mt-2 ps-5 pe-5">Select Image File</label>
+                            <input type="file" id="file_input" style="display: none;">
+                            <hr>
+                            <div class="mt-2">
+                                <span class="fw-bold h1 text-primary mt-2">{{ $user->user_types }}</span><br>
+                                <span class="fw-bold h6">User Types</span>
+                            </div>
                         </div>
                         <hr>
 
@@ -195,6 +206,91 @@
                     });
                 }
             });
+        });
+
+        // Validate and Compress Image
+        document.getElementById('file_input').addEventListener('change', async function (event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('image_preview');
+
+            // Reset the preview image if no file is selected
+            if (!file) {
+                preview.src = "{{ asset('images/no_image.jpg') }}";
+                return;
+            }
+
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid file type',
+                    text: 'Only JPG, JPEG, and PNG files are allowed.'
+                });
+                event.target.value = ''; // Clear the input
+                preview.src = "{{ asset('images/no_image.jpg') }}"; // Reset preview
+                return;
+            }
+
+            // Validate file size (4 MB = 4 * 1024 * 1024 bytes)
+            const maxSize = 4 * 1024 * 1024;
+            if (file.size > maxSize) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File size exceeds 4 MB',
+                    text: 'Please choose a smaller file.'
+                });
+                event.target.value = ''; // Clear the input
+                preview.src = "{{ asset('images/no_image.jpg') }}"; // Reset preview
+                return;
+            }
+
+            // Show loading indicator if compression is needed
+            const maxAllowedSize = 2 * 1024 * 1024;
+            let finalFile = file;
+
+            if (file.size > maxAllowedSize) {
+                // Show the SweetAlert loading indicator
+                Swal.fire({
+                    title: 'Compressing image...',
+                    text: 'Please wait while the image is being compressed.',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                try {
+                    const options = {
+                        maxSizeMB: 2, // Maximum size in MB
+                        maxWidthOrHeight: 1920, // Maintain aspect ratio
+                        useWebWorker: true
+                    };
+                    finalFile = await imageCompression(file, options);
+                    console.log('Compressed file size:', finalFile.size);
+
+                    // Close the loading indicator
+                    Swal.close();
+                } catch (error) {
+                    console.error('Image compression failed:', error);
+
+                    // Close the loading indicator and show error
+                    Swal.close();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Compression error',
+                        text: 'An error occurred during image compression. Please try again.'
+                    });
+                    return;
+                }
+            }
+
+            // Display the preview of the uploaded image
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+            };
+            reader.readAsDataURL(finalFile);
         });
     </script>
 

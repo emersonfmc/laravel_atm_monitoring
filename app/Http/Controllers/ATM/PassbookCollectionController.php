@@ -300,7 +300,7 @@ class PassbookCollectionController extends Controller
 
     }
 
-    public function PassbookCollectionTransactionGet(Request $request)
+    public function PassbookCollectionAllTransactionGet(Request $request)
     {
         $request_number = $request->request_number;
 
@@ -422,30 +422,116 @@ class PassbookCollectionController extends Controller
             })
             ->addColumn('action', function($row) use ($userGroup) {
                 $action = '';
-                if (in_array($userGroup, ['Developer','Admin', 'Everfirst Admin'])) {
+
+                // Error handling: Check if $row is valid and $userGroup exists
+                if (!$row || !$userGroup) {
+                    return '<span class="text-danger">Error: Invalid data</span>';
+                }
+
+                // Add Edit button for specific user groups
+                if (in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin'])) {
                     $action .= '<a href="#" class="text-success editTransaction me-2 mb-2"
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
                                         title="Edit Transaction"
-                                        data-transaction_id="' . $row->id . '">
-                                    <i class="fas fa-pencil fs-5"></i>
+                                        data-transaction_id="' . ($row->id ?? 'N/A') . '">
+                                     <i class="fas fa-edit fs-5"></i>
                                  </a>';
                 }
 
+                // Add View button for all transactions
                 $action .= '<a href="#" class="text-info viewTransaction me-2 mb-2"
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="top"
                                         title="View Transaction"
-                                        data-transaction_id="' . $row->id . '">
+                                        data-transaction_id="' . ($row->id ?? 'N/A') . '">
                                     <i class="fas fa-eye fs-5"></i>
                                 </a>';
 
+                // Add Cancel button for specific user groups with pending approvals
+                if (in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin', 'Branch Head'])) {
+                    // Error handling: Check if PassbookForCollectionTransactionApproval exists and is iterable
+                    if (isset($row->PassbookForCollectionTransactionApproval)) {
+                        $pendingApprovals = $row->PassbookForCollectionTransactionApproval->filter(function ($approval) {
+                            return $approval->status === 'Pending' && $approval->sequence_no == 1;
+                        });
+
+                        if ($pendingApprovals->isNotEmpty()) {
+                            $action .= '<a href="#" class="text-danger cancelTransaction me-2 mb-2"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                title="Cancel Transaction"
+                                                data-transaction_id="' . ($row->id ?? 'N/A') . '">
+                                           <i class="fas fa-times-circle fs-5"></i>
+                                        </a>';
+                        }
+                    } else {
+                        // Log error or handle invalid PassbookForCollectionTransactionApproval
+                        $action .= '';
+                    }
+                }
+
                 return $action;
             })
-            ->rawColumns(['branch_location','pending_to','transaction_name','action']) // Allow rendering raw HTML for the request_number column
+            ->addColumn('full_name', function ($row) {
+                // Check if the relationships and fields exist
+                $clientInfo = $row->AtmClientBanks->ClientInformation ?? null;
+
+                if ($clientInfo) {
+                    $lastName = $clientInfo->last_name ?? '';
+                    $firstName = $clientInfo->first_name ?? '';
+                    $middleName = $clientInfo->middle_name ? ' ' . $clientInfo->middle_name : ''; // Add space if middle_name exists
+                    $suffix = $clientInfo->suffix ? ', ' . $clientInfo->suffix : ''; // Add comma if suffix exists
+
+                    // Combine the parts into the full name
+                    $fullName = "{$lastName}, {$firstName}{$middleName}{$suffix}";
+                } else {
+                    // Fallback if client information is missing
+                    $fullName = 'N/A';
+                }
+
+                return $fullName;
+            })
+            ->rawColumns(['full_name','branch_location','pending_to','transaction_name','action']) // Allow rendering raw HTML for the request_number column
             ->make(true);
 
     }
+
+    public function PassbookCollectionTransactionGet(Request $request)
+    {
+        $id = $request->transaction_id;
+
+        // Fetch the data along with the relationships
+        $PassbookCollectionData = PassbookForCollectionTransaction::with([
+            'AtmClientBanks',
+            'AtmClientBanks.ClientInformation',
+            'Branch',
+            'DataTransactionAction',
+            'PassbookForCollectionTransactionApproval.DataUserGroup',
+            'PassbookForCollectionTransactionApproval.Employee',
+            'PassbookForCollectionTransactionApproval.DataTransactionAction'
+        ])->findOrFail($id);
+
+        // Generate full name from related data
+        $clientInfo = $PassbookCollectionData->AtmClientBanks->ClientInformation ?? null;
+
+        if ($clientInfo) {
+            $lastName = $clientInfo->last_name ?? '';
+            $firstName = $clientInfo->first_name ?? '';
+            $middleName = $clientInfo->middle_name ? ' ' . $clientInfo->middle_name : ''; // Add space if middle_name exists
+            $suffix = $clientInfo->suffix ? ', ' . $clientInfo->suffix : ''; // Add comma if suffix exists
+
+            $fullName = "{$lastName}, {$firstName}{$middleName}{$suffix}";
+        } else {
+            $fullName = 'N/A'; // Fallback if client information is missing
+        }
+
+        // Append the full_name to the response
+        $PassbookCollectionData->full_name = $fullName;
+
+        return response()->json($PassbookCollectionData);
+    }
+
 
 
 

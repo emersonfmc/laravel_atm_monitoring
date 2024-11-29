@@ -244,7 +244,7 @@
                     var request_number = $(this).data('request_number');
 
                     $.ajax({
-                        url: "/PassbookCollectionTransactionGet",
+                        url: "/PassbookCollectionAllTransactionGet",
                         type: "GET",
                         data: { request_number : request_number },
                         success: function(data) {
