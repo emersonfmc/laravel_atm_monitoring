@@ -11,7 +11,7 @@
                 <li class="menu-title" key="t-menu">Menu</li>
 
                 <li>
-                    <a href="{{ route('dashboard') }}" class="waves-effect">
+                    <a href="{{ route('atm_monitoring_dashboard') }}" class="waves-effect">
                         <i class="fas fa-desktop text-info"></i>
                         <span key="t-dashboard">Dashboard</span>
                     </a>
@@ -323,7 +323,7 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('dashboard') }}" class="waves-effect">
+                    <a href="{{ route('atm_monitoring_dashboard') }}" class="waves-effect">
                         <i class="far fa-question-circle text-warning"></i>
                         <span key="how_it_works">How it Works ?</span>
                     </a>

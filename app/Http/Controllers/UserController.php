@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\DataUserGroup;
+use App\Models\DataDistrict;
 use Illuminate\Http\Request;
+use App\Models\DataUserGroup;
 use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
-use App\Models\DataDistrict;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Intervention\Image\Facades\Image;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
@@ -291,6 +294,35 @@ class UserController extends Controller
                     ->with($notification);
             }
 
+            if ($request->hasFile('image_file')) {
+                // Handle the new image upload
+                $image = $request->file('image_file');
+
+                // Generate a unique name based on employee ID and the current date
+                $employeeId = str_pad($request->employee_id, 6, '0', STR_PAD_LEFT); // Ensure employee ID is 6 digits
+                $timestamp = Carbon::now()->format('mdyHi'); // Format: MMDDYYHHmm
+                $imageName = $employeeId . $timestamp . '.' . $image->getClientOriginalExtension();
+                $imagePath = 'upload/user_profile/' . $imageName;
+
+                // Ensure directory exists in the public folder
+                $folderPath = public_path('upload/user_profile');
+                if (!File::exists($folderPath)) {
+                    File::makeDirectory($folderPath, 0755, true);
+                }
+
+                // Delete the existing profile image if it exists
+                if ($User->avatar && File::exists(public_path($User->avatar))) {
+                    File::delete(public_path($User->avatar));
+                }
+                $image->move($folderPath, $imageName);
+                $userProfile = $imagePath;
+            } else {
+                $userProfile = $User->avatar;
+            }
+
+            // dd($userProfile);
+
+            // Sanitize contact number to allow only numeric values
             $contact_no = preg_replace('/[^0-9]/', '', $request->contact_no);
 
             // If password is provided, hash and update it; otherwise, keep the old password
@@ -300,6 +332,7 @@ class UserController extends Controller
             $User->update([
                 'name' => $request->name,
                 'email' => $request->email,
+                'avatar' => $userProfile,
                 'employee_id' => $request->employee_id,
                 'contact_no' => $contact_no,
                 'address' => $request->address,

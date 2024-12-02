@@ -44,19 +44,18 @@
                     </div>
                     <hr>
 
-                    <form action="{{ route('users.profile.update',$user->employee_id) }}" method="POST" id="updateProfileForm">
+                    <form action="{{ route('users.profile.update',$user->employee_id) }}" method="POST" id="updateProfileForm" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="item_id" value="{{ $user->id }}">
 
                         <div class="text-center">
                             <img id="image_preview"
-                                src="{{ $user->avatar ? asset('images/avatars/' . $user->avatar) : asset('images/no_image.jpg') }}"
-                                class="img-fluid"
-                                style="height: 200px; width: 210px;">
-
+                                    src="{{ $user->avatar ? asset('upload/user_profile/' . basename($user->avatar)) : asset('images/no_image.jpg') }}"
+                                    class="img-fluid"
+                                    style="height: 200px; width: 210px;">
                             <br>
                             <label for="file_input" class="btn btn-primary mt-2 ps-5 pe-5">Select Image File</label>
-                            <input type="file" id="file_input" style="display: none;">
+                            <input type="file" id="file_input" name="image_file" style="display: none;" accept=".jpg, .png, .jpeg">
                             <hr>
                             <div class="mt-2">
                                 <span class="fw-bold h1 text-primary mt-2">{{ $user->user_types }}</span><br>

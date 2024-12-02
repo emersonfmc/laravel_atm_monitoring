@@ -28,7 +28,8 @@ Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang'
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(DashboardController::class)->group(function () {
-        Route::get('/index', 'dashboard')->name('dashboard');
+        Route::get('/atm_monitoring_dashboard', 'atm_monitoring_dashboard')->name('atm_monitoring_dashboard');
+        Route::get('/atm_monitoring_dashboard_display', 'atm_monitoring_dashboard_display')->name('atm_monitoring_dashboard_display');
         Route::get('/SidebarCount', 'SidebarCount')->name('SidebarCount');
     });
 });
