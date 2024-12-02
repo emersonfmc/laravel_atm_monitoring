@@ -51,6 +51,33 @@ class DefaultController extends Controller
         return response()->json($User);
     }
 
+    public function UserSelectServerSide(Request $request)
+    {
+        $search = $request->input('search');
+        $page = $request->input('page', 1);
+        $perPage = 10;
+
+        $query = User::query();
+
+        if ($search) {
+            $query->where('name', 'LIKE', "%{$search}%")
+                ->orWhere('employee_id', 'LIKE', "%{$search}%");
+        }
+
+        $total = $query->count();
+        $users = $query->offset(($page - 1) * $perPage)
+                    ->limit($perPage)
+                    ->get(['employee_id', 'name']);
+
+        return response()->json([
+            'users' => $users,
+            'pagination' => [
+                'more' => ($page * $perPage) < $total
+            ]
+        ]);
+    }
+
+
     public function GenerateQRCode($transaction_number)
     {
         // Generate QR code
