@@ -18,6 +18,11 @@ class DashboardController extends Controller
         return view('index');
     }
 
+    public function display_atm_monitoring_dashboard()
+    {
+        return view('index');
+    }
+
     public function SidebarCount()
     {
         $userBranchId = Auth::user()->branch_id;
