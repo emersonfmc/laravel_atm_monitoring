@@ -41,3 +41,73 @@
 .modal_100 {
     max-width: 100%;
 }
+
+
+.border-left-primary {
+   border-left: 4px solid #4e73df !important;
+   border-bottom: 4px solid #4e73df !important;
+} .hoverPrimary:hover{
+   border-bottom: 4px solid #4e73df !important;
+}
+
+.border-left-danger {
+   border-left: 4px solid #F32F53 !important;
+   border-bottom: 4px solid #F32F53 !important;
+} .hoverDanger:hover{
+   border-bottom: 4px solid #F32F53 !important;
+}
+
+.border-left-info {
+   border-left: 4px solid #68FFFF !important;
+   border-bottom: 4px solid #68FFFF !important;
+} .hoverInfo:hover{
+   border-bottom: 4px solid #68FFFF !important;
+}
+
+.border-left-warning {
+   border-left: 4px solid #FFC107 !important;
+   border-bottom: 4px solid #FFC107 !important;
+} .hoverWarning:hover{
+   border-bottom: 4px solid #FFC107 !important;
+}
+
+.border-left-secondary {
+   border-left: 4px solid #6C757D !important;
+   border-bottom: 4px solid #6C757D !important;
+} .hoverSecondary:hover{
+   border-bottom: 4px solid #6C757D !important;
+}
+
+.border-left-success {
+   border-left: 4px solid #28A745 !important;
+   border-bottom: 4px solid #28A745 !important;
+} .hoverSuccess:hover{
+   border-bottom: 4px solid #28A745 !important;
+}
+
+.border-left-area {
+      border-left: 4px solid #000066 !important;
+      border-bottom: 4px solid #000066 !important;
+} .hoverArea:hover{
+      border-bottom: 4px solid #000066 !important;
+} .text-area {
+      color: #000066;
+}
+
+.border-left-branches {
+   border-left: 4px solid #EB9CFF !important;
+   border-bottom: 4px solid #EB9CFF !important;
+} .hoverBranches:hover{
+   border-bottom: 4px solid #EB9CFF !important;
+} .text-branches{
+   color : #EB9CFF !important;
+}
+
+.border-left-user-group {
+   border-left: 4px solid #808000 !important;
+   border-bottom: 4px solid #808000 !important;
+} .hoverUserGroup:hover{
+   border-bottom: 4px solid #808000 !important;
+} .text-user-group{
+   color : #808000 !important;
+}

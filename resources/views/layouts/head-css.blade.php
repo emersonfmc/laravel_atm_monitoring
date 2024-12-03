@@ -21,3 +21,10 @@
 <link href="{{ URL::asset('assets/libs/select2/select2.min.css') }}" rel="stylesheet" type="text/css" />
 <link href="{{ URL::asset('assets/libs/select2/select2_style.css') }}" rel="stylesheet" type="text/css" />
 
+<style>
+        .table_scrollable {
+            max-height: 400px; /* Adjust the height as needed */
+            overflow-y: auto;
+        }
+</style>
+

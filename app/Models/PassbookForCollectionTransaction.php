@@ -31,4 +31,9 @@ class PassbookForCollectionTransaction extends Model
     {
         return $this->hasMany(PassbookForCollectionTransactionApproval::class, 'passbook_transactions_id','id');
     }
+
+    public function CancelledBy()
+    {
+        return $this->belongsTo(User::class, 'cancelled_by_employee_id','employee_id');
+    }
 }
