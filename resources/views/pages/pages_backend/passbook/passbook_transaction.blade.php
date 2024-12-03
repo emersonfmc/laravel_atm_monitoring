@@ -136,6 +136,9 @@
                                 <div class="fw-bold">
                                     Bank Type : <span class="text-danger" id="view_atm_type"></span>
                                 </div>
+                                <div class="fw-bold">
+                                    Collection Date : <span class="text-primary" id="view_collection_date"></span>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <a href="#" id="view_display_image"></a>
@@ -180,7 +183,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="#" method="POST" id="updateTransactionValidateForm">
+                    <form action="{{ route('PassbookCollectionTransactionUpdate') }}" method="POST" id="updateTransactionValidateForm">
+                        @csrf
+                        <input type="hidden" name="transaction_id" id="edit_transaction_id">
                         <div class="h6 text-uppercase fw-bold">REQUEST NUMBER : <span class="fw-bold text-primary" id="edit_request_number"></span></div>
                         <hr>
                         <div class="row">
@@ -218,32 +223,36 @@
                                 <div class="fw-bold">
                                     Bank Type : <span class="text-danger" id="edit_atm_type"></span>
                                 </div>
+                                <div class="fw-bold">
+                                    Collection Date : <span class="text-primary" id="edit_collection_date"></span>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <a href="#" id="edit_display_image"></a>
                             </div>
                         </div>
                         <hr>
+
                         <div class="row">
                             <div class="form-group col-2 mb-3">
                             <label class="fw-bold h6">Transaction Status</label>
                             <select name="transaction_status" id="edit_transaction_status" class="form-select" required>
                                     <option value="">Select Status</option>
-                                    <option value="1">On Going</option>
-                                    <option value="2">Received by Branch</option>
-                                    <option value="0">Completed</option>
-                                    <option value="10">Cancelled</option>
+                                    <option value="On Going">On Going</option>
+                                    <option value="Returning to Branch">Returning to Branch</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
                             </select>
                             </div>
 
                             <!-- Cancellation Remarks -->
-                            <div class="form-group col-2 mb-3 d-none" id="cancellation_remarks_group">
+                            <div class="form-group col-2 mb-3" id="cancellation_remarks_group" style="display:none;">
                                 <label class="fw-bold h6">Cancellation Remarks</label>
                                 <input type="text" class="form-control" name="cancellation_remarks" id="edit_passbook_remarks" placeholder="Cancellation Remarks">
                             </div>
 
                             <!-- Cancellation Date -->
-                            <div class="form-group col-2 mb-3 d-none" id="cancellation_date_group">
+                            <div class="form-group col-2 mb-3" id="cancellation_date_group" style="display:none;">
                                 <label class="fw-bold h6">Cancellation Date</label>
                                 <input type="datetime-local" class="form-control" name="cancellation_date" id="edit_date_of_decline">
                             </div>
@@ -284,12 +293,14 @@
             <div class="modal-content">
             <div class="modal-header">
                     <div class="modal-title">
-                    <div class="h5 text-uppercase fw-bold">VIEW PASSBOOK FOR COLLECTION</div>
+                    <div class="h5 text-uppercase fw-bold">CANCELLED PASSBOOK FOR COLLECTION</div>
                     </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
                 <div class="modal-body">
-                    <form action="#" method="POST" id="cancelledTransactionValidateForm">
+                    <form action="{{ route('PassbookCollectionTransactionCancelled') }}" method="POST" id="cancelledTransactionValidateForm">
+                        @csrf
+                        <input type="hidden" name="transaction_id" id="cancelled_transaction_id">
                         <div class="h6 text-uppercase fw-bold">REQUEST NUMBER : <span class="fw-bold text-primary" id="cancelled_request_number"></span></div>
                         <hr>
                         <div class="row">
@@ -327,21 +338,49 @@
                                 <div class="fw-bold">
                                     Bank Type : <span class="text-danger" id="cancelled_atm_type"></span>
                                 </div>
+                                <div class="fw-bold">
+                                    Collection Date : <span class="text-primary" id="cancelled_collection_date"></span>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <a href="#" id="cancelled_display_image"></a>
                             </div>
                         </div>
                         <hr>
-                        <div class="col-md-5 form-group mb-3">
-                            <textarea name="cancellation_remarks" id="cancellation_remarks" rows="5"
-                                minlength="0" maxlength="250" style="resize: none;" placeholder="Remarks"
-                                class="form-control" required></textarea>
+                        <div class="col-md-12">
+                            <div id="forCancellation" style="display:none;">
+                                <div class="row">
+                                    <div class="col-md-5 form-group mb-3">
+                                        <label class="fw-bold h6">Cancellation Remarks</label>
+                                                    <textarea id="cancelled_remarks_value" name="cancellation_remarks" rows="5" cols="50"
+                                                            class="form-control" style="resize:none;" minlength="0" maxlength="200" placeholder="Remarks"></textarea>
+                                    </div>
+                            </div>
+                            </div>
+                            <div id="AlreadyCancelled" style="display:none;">
+                                <div class="row">
+                                    <div class="col-md-4 form-group mb-3">
+                                        <label class="fw-bold h6">Cancellation Remarks</label>
+                                                    <textarea id="cancelled_remarks_value_cancelled" name="cancellation_remarks_value" rows="5" cols="50"
+                                                            class="form-control" style="resize:none;" minlength="0" maxlength="200" placeholder="Remarks" readonly></textarea>
+                                    </div>
+                                    <div class="col-md-4 form-group mb-3">
+                                        <label class="fw-bold h6">Cancellation Date</label>
+                                            <input type="text" class="form-control" id="cancelled_date_cancelled" readonly>
+                                    </div>
+                                    <div class="col-md-4 form-group mb-3">
+                                        <label class="fw-bold h6">Cancelled By</label>
+                                            <input type="text" class="form-control" id="cancelled_by_name" readonly>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
-                            <button type="submit" class="btn btn-danger">Cancelled</button>
+                            <span id="ForCancellationButton" style="display:none;">
+                                <button type="submit" class="btn btn-danger">Cancelled</button>
+                            </span>
                         </div>
                     </form>
                 </div>
@@ -548,28 +587,28 @@
                         // Determine the badge class and status label based on status value
                         switch (row.status) {
                             case 'On Going':
-                                badgeClass = 'pt-1 pb-1 ps-2 ps-2 pe-2 badge bg-warning fw-bold h6';
+                                badgeClass = 'pt-1 pb-1 ps-2 ps-2 pe-2 badge bg-warning';
                                 statusClass = 'On Going';
                                 break;
                             case 'Cancelled':
-                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-danger fw-bold h6';
+                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-danger';
                                 statusClass = 'Cancelled';
                                 break;
                             case 'Completed':
-                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-success fw-bold h6';
+                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-success';
                                 statusClass = 'Completed';
                                 break;
                             case 'Returning to Branch':
-                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-success fw-bold h6';
+                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-success';
                                 statusClass = 'Returning to Branch';
                                 break;
                             default:
-                                badgeClass = 'badge bg-secondary fw-bold h6'; // Default badge class
+                                badgeClass = 'badge bg-secondary'; // Default badge class
                                 statusClass = 'Unknown Status';
                         }
 
                         // Return the status wrapped in a span with the appropriate badge and status class
-                        return `<span class="${badgeClass} fw-bold h6">${statusClass}</span>`;
+                        return `<span class="${badgeClass}">${statusClass}</span>`;
                     },
                     orderable: true,
                     searchable: true,
@@ -614,17 +653,18 @@
                         type: "GET",
                         data: { transaction_id : transaction_id },
                         success: function(data) {
-                            $('#view_bank_account_no').text(data.atm_client_banks.bank_account_no ?? NULL);
-                            $('#view_bank_name').text(data.atm_client_banks.bank_name ?? NULL);
-                            $('#view_atm_type').text(data.atm_client_banks.atm_type ?? NULL);
-                            $('#view_atm_status').val(data.atm_client_banks.atm_status ?? NULL);
-                            $('#view_replacement_count').val(data.atm_client_banks.replacement_count ?? NULL);
+                            $('#view_collection_date').text(data.atm_client_banks?.collection_date ?? NULL);
+                            $('#view_bank_account_no').text(data.atm_client_banks?.bank_account_no ?? NULL);
+                            $('#view_bank_name').text(data.atm_client_banks?.bank_name ?? NULL);
+                            $('#view_atm_type').text(data.atm_client_banks?.atm_type ?? NULL);
+                            $('#view_atm_status').val(data.atm_client_banks?.atm_status ?? NULL);
+                            $('#view_replacement_count').val(data.atm_client_banks?.replacement_count ?? NULL);
 
                             $('#view_request_number').text(data.request_number);
                             $('#view_full_name').text(data.full_name);
-                            $('#view_pension_number_display').text(data.atm_client_banks.client_information.pension_number ?? '');
-                            $('#view_pension_type_display').text(data.atm_client_banks.client_information.pension_type ?? '');
-                            $('#view_pension_account_type_display').text(data.atm_client_banks.client_information.pension_account_type ?? '');
+                            $('#view_pension_number_display').text(data.atm_client_banks?.client_information.pension_number ?? '');
+                            $('#view_pension_type_display').text(data.atm_client_banks?.client_information.pension_type ?? '');
+                            $('#view_pension_account_type_display').text(data.atm_client_banks?.client_information.pension_account_type ?? '');
 
                             let formattedCreatedDate = data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
                             $('#view_reference_no').text(data.reference_no);
@@ -647,7 +687,7 @@
                                     switch (rows.status) {
                                         case 'Completed':
                                             badgeClass = 'badge bg-success';
-                                            StatusName = 'Stand By';
+                                            StatusName = 'Completed';
                                             break;
                                         case 'Pending':
                                             badgeClass = 'badge bg-warning';
@@ -709,17 +749,32 @@
                         type: "GET",
                         data: { transaction_id : transaction_id },
                         success: function(data) {
-                            $('#edit_bank_account_no').text(data.atm_client_banks.bank_account_no ?? NULL);
-                            $('#edit_bank_name').text(data.atm_client_banks.bank_name ?? NULL);
-                            $('#edit_atm_type').text(data.atm_client_banks.atm_type ?? NULL);
-                            $('#edit_atm_status').val(data.atm_client_banks.atm_status ?? NULL);
-                            $('#edit_replacement_count').val(data.atm_client_banks.replacement_count ?? NULL);
+                            $('#edit_transaction_id').val(data.id);
+                            $('#edit_collection_date').text(data.atm_client_banks?.collection_date ?? '');
+                            $('#edit_bank_account_no').text(data.atm_client_banks?.bank_account_no ?? '');
+                            $('#edit_bank_name').text(data.atm_client_banks?.bank_name ?? '');
+                            $('#edit_atm_type').text(data.atm_client_banks?.atm_type ?? '');
+                            $('#edit_atm_status').val(data.atm_client_banks?.atm_status ?? '');
+                            $('#edit_replacement_count').val(data.atm_client_banks?.replacement_count ?? '');
+
+                            $('#edit_transaction_status').val(data.status).trigger('change');
+
+                            if (data.status == 'Cancelled'){
+                                $('#cancellation_remarks_group').show();
+                                $('#cancellation_date_group').show();
+                            } else {
+                                $('#cancellation_remarks_group').hide();
+                                $('#cancellation_date_group').hide();
+                            }
+
+                            $('#edit_passbook_remarks').val(data.remarks)
+                            $('#edit_date_of_decline').val(data.cancelled_date)
 
                             $('#edit_request_number').text(data.request_number);
                             $('#edit_full_name').text(data.full_name);
-                            $('#edit_pension_number_display').text(data.atm_client_banks.client_information.pension_number ?? '');
-                            $('#edit_pension_type_display').text(data.atm_client_banks.client_information.pension_type ?? '');
-                            $('#edit_pension_account_type_display').text(data.atm_client_banks.client_information.pension_account_type ?? '');
+                            $('#edit_pension_number_display').text(data.atm_client_banks?.client_information.pension_number ?? '');
+                            $('#edit_pension_type_display').text(data.atm_client_banks?.client_information.pension_type ?? '');
+                            $('#edit_pension_account_type_display').text(data.atm_client_banks?.client_information.pension_account_type ?? '');
 
                             let formattedCreatedDate = data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
                             $('#edit_reference_no').text(data.reference_no);
@@ -735,14 +790,7 @@
 
                                     $('#EditTransactionApprovalBody').empty();
                                         $.each(data.passbook_for_collection_transaction_approval, function(key, rows) {
-                                            var dateApproved = rows.date_approved ? new Date(rows.date_approved).toLocaleString('en-US', {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric',
-                                                hour: 'numeric',
-                                                minute: 'numeric',
-                                                hour12: true
-                                            }) : ''; // Leave blank if null
+                                            var dateApprovedFormatted = rows.date_approved ? rows.date_approved.replace(' ', 'T').slice(0, 16) : '';
 
                                             var statusOptions = {
                                                 'Completed': 'Completed',
@@ -752,14 +800,7 @@
                                                 'Stand By': 'Stand By'
                                             };
 
-                                            var selectedStatus = rows.status || 0;
-
-                                            var statusSelect = '<select class="form-control" name="status[]">';
-                                            $.each(statusOptions, function(value, text) {
-                                                statusSelect += '<option value="' + value + '" ' + (value == selectedStatus ? 'selected' : '') + '>' + text + '</option>';
-                                            });
-                                            statusSelect += '</select>';
-
+                                            var selectedStatus = rows.status || '';
                                             var statusSelect = '<select class="form-control" name="status[]">';
                                             $.each(statusOptions, function(value, text) {
                                                 statusSelect += '<option value="' + value + '" ' + (value == selectedStatus ? 'selected' : '') + '>' + text + '</option>';
@@ -789,13 +830,16 @@
 
                                             // Append new row to the table
                                             var newRow = '<tr>' +
-                                                            '<td>'  + (rows.id || '') + '</td>' +
+                                                            '<td>'
+                                                                + rows.id +
+                                                                '<input type="hidden" name="approval_id[]" value="'+ rows.id +'">' +
+                                                            '</td>' +
                                                             '<td>' +
                                                                 '<div class="form-group">' + employeeSelect + '</div>' +
                                                             '</td>' +
                                                             '<td>'  + '<span class="fw-bold h6 text-primary">' + employeeName + '</span><br>' + groupName + '</td>' +
                                                             '<td>' + (rows.sequence_no || '') + '</td>' +
-                                                            '<td>' + dateApproved + '</td>' +
+                                                            '<td>' + '<input type="datetime-local" class="form-control" name="date_approved[]" value="'+ dateApprovedFormatted +'"</td>' +
                                                             '<td>' + statusSelect + '</td>' +
                                                             '<td>' + transactionAction + '</td>' +
                                                         '</tr>';
@@ -856,6 +900,17 @@
                     $('#editTransactionModal').modal('hide');
                     $('#FetchingDatatable tbody').empty();
                 }
+
+                $("#edit_transaction_status").on("change", function() {
+                    const transaction_status = $("#edit_transaction_status").val();
+                    if(transaction_status == 'Cancelled'){
+                        $('#cancellation_remarks_group').show();
+                        $('#cancellation_date_group').show();
+                    } else {
+                        $('#cancellation_remarks_group').hide();
+                        $('#cancellation_date_group').hide();
+                    }
+                });
 
                 $('#updateTransactionValidateForm').validate({
                     rules: {
@@ -993,12 +1048,36 @@
                         type: "GET",
                         data: { transaction_id : transaction_id },
                         success: function(data) {
-                            $('#cancelled_bank_account_no').text(data.atm_client_banks.bank_account_no ?? NULL);
-                            $('#cancelled_bank_name').text(data.atm_client_banks.bank_name ?? NULL);
-                            $('#cancelled_atm_type').text(data.atm_client_banks.atm_type ?? NULL);
-                            $('#cancelled_atm_status').val(data.atm_client_banks.atm_status ?? NULL);
-                            $('#cancelled_replacement_count').val(data.atm_client_banks.replacement_count ?? NULL);
+                            $('#cancelled_transaction_id').val(data.id);
+                            $('#cancelled_bank_account_no').text(data.atm_client_banks?.bank_account_no ?? '');
+                            $('#cancelled_bank_name').text(data.atm_client_banks?.bank_name ?? '');
+                            $('#cancelled_collection_date').text(data.atm_client_banks?.collection_date ?? '');
+                            $('#cancelled_atm_type').text(data.atm_client_banks?.atm_type ?? '');
+                            $('#cancelled_atm_status').val(data.atm_client_banks?.atm_status ?? '');
+                            $('#cancelled_replacement_count').val(data.atm_client_banks?.replacement_count ?? '');
                             $('#cancellation_remarks').val(data.remarks ?? '');
+
+                            if (data.status === 'Cancelled'){
+                                $('#AlreadyCancelled').show();
+                                $('#forCancellation').hide();
+                                $('#ForCancellationButton').hide();
+                            } else {
+                                $('#AlreadyCancelled').hide();
+                                $('#forCancellation').show();
+                                $('#ForCancellationButton').show();
+                            }
+
+                            $('#cancelled_remarks_value_cancelled').val(data.remarks ?? '');
+                            $('#cancelled_by_cancelled').val(data.cancelled_by_employee_id ?? '');
+                            $('#cancelled_by_name').val((data.cancelled_by_employee_id ?? '') + ' - ' + (data.cancelled_by?.name ?? ''));
+
+                            $('#cancelled_date_cancelled').val(
+                                data.cancelled_date
+                                    ? new Date(data.cancelled_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) +
+                                    ' - ' +
+                                    new Date(data.cancelled_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+                                    : ''
+                            );
 
                             $('#cancelled_request_number').text(data.request_number);
                             $('#cancelled_full_name').text(data.full_name);

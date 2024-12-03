@@ -28,8 +28,8 @@ Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang'
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(DashboardController::class)->group(function () {
-        Route::get('/atm_monitoring_dashboard', 'atm_monitoring_dashboard')->name('atm_monitoring_dashboard');
-        Route::get('/atm_monitoring_dashboard_display', 'atm_monitoring_dashboard_display')->name('atm_monitoring_dashboard_display');
+        Route::get('/elog_monitoring_dashboard', 'elog_monitoring_dashboard')->name('elog_monitoring_dashboard');
+        Route::get('/elog_monitoring_dashboard_data', 'elog_monitoring_dashboard_data')->name('elog_monitoring_dashboard_data');
         Route::get('/SidebarCount', 'SidebarCount')->name('SidebarCount');
     });
 });
@@ -40,7 +40,7 @@ Route::controller(DefaultController::class)->group(function () {
     Route::get('/AtmClientBanksFetch', 'AtmClientBanksFetch')->name('AtmClientBanksFetch');
     Route::get('/UserSelect', 'UserSelect')->name('UserSelect');
     Route::get('/UserSelectServerSide', 'UserSelectServerSide')->name('UserSelectServerSide');
-    Route::get('/GenerateQRCode/{transaction_number}', 'GenerateQRCode')->name('generate_qr_code');
+    Route::get('/GenerateQRCode/{print_number}/{transaction_number}', 'GenerateQRCode')->name('generate_qr_code');
 });
 
 
@@ -190,6 +190,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/PassbookCollectionTransactionPage', 'PassbookCollectionTransactionPage')->name('PassbookCollectionTransactionPage');
         Route::get('/PassbookCollectionTransactionData', 'PassbookCollectionTransactionData')->name('PassbookCollectionTransactionData');
         Route::get('/PassbookCollectionTransactionGet', 'PassbookCollectionTransactionGet')->name('PassbookCollectionTransactionGet');
+        Route::post('/PassbookCollectionTransactionUpdate', 'PassbookCollectionTransactionUpdate')->name('PassbookCollectionTransactionUpdate');
+        Route::post('/PassbookCollectionTransactionCancelled', 'PassbookCollectionTransactionCancelled')->name('PassbookCollectionTransactionCancelled');
 
     });
 });
