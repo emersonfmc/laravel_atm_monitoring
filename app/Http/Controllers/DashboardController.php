@@ -38,6 +38,13 @@ class DashboardController extends Controller
         $UserGroupCount = DataUserGroup::where('status', 'Active')->count();
         $BanksCount = DataBankLists::where('status', 'Active')->count();
 
+        $TopBranchesCount = ClientInformation::selectRaw('branch_id, COUNT(*) as client_count')
+            ->with('branch') // Include branch relationship
+            ->groupBy('branch_id')
+            ->orderByDesc('client_count') // Sort by count in descending order
+            ->limit(3) // Get top 3
+            ->get();
+
         // Return the counts as a JSON response
         return response()->json([
             'UserCount' => $UserCount,
@@ -45,7 +52,8 @@ class DashboardController extends Controller
             'DistrictCount' => $DistrictCount,
             'BranchCount' => $BranchCount,
             'UserGroupCount' => $UserGroupCount,
-            'BanksCount' => $BanksCount
+            'BanksCount' => $BanksCount,
+            'TopBranchesCount' => $TopBranchesCount
         ]);
 }
 

@@ -11,8 +11,8 @@
 
 <div class="row">
     <div class="col-xl-4">
-        <div class="card overflow-hidden">
-            <div class="bg-primary bg-soft p-3">
+        <div class="card shadow-lg overflow-hidden">
+            <div class="bg-primary bg-soft p-2">
                 <div class="row align-items-center">
                     <!-- Text Section -->
                     <div class="col-12 col-sm-6 col-md-6 col-lg-5 col-xl-5">
@@ -37,15 +37,15 @@
 
             <div class="card-body pt-0">
                 <div class="row">
-                    <div class="col-sm-5">
-                        <div class="avatar-md profile-user-wid mb-4">
+                    <div class="col-sm-4">
+                        <div class="avatar-md profile-user-wid mb-3">
                             <img src="{{ isset(Auth::user()->avatar) ? asset(Auth::user()->avatar) : asset('images/no_image.jpg') }}" alt="" class="img-thumbnail rounded-circle">
                         </div>
                         <h5 class="font-size-15 text-truncate">{{ Str::ucfirst(Auth::user()->name) }}</h5>
                         <p class="mb-0 text-truncate text-danger ms-2">{{ Auth::user()->UserGroup->group_name }}</p>
                     </div>
 
-                    <div class="col-sm-7">
+                    <div class="col-sm-8">
                         <div class="pt-4">
 
                             <div class="row">
@@ -63,34 +63,11 @@
                 </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title mb-4">Monthly Earning</h4>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <p class="text-muted">This month</p>
-                        <h3>$34,252</h3>
-                        <p class="text-muted"><span class="text-success me-2"> 12% <i class="mdi mdi-arrow-up"></i>
-                            </span> From previous period</p>
-
-                        <div class="mt-4">
-                            <a href="" class="btn btn-primary waves-effect waves-light btn-sm">View More <i class="mdi mdi-arrow-right ms-1"></i></a>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="mt-4 mt-sm-0">
-                            <div id="radialBar-chart" class="apex-charts"></div>
-                        </div>
-                    </div>
-                </div>
-                <p class="text-muted mb-0">We craft digital, graphic and dimensional thinking.</p>
-            </div>
-        </div>
     </div>
     <div class="col-xl-8">
         <div class="row">
             <div class="col-md-4">
-                <div class="card border-left-primary mini-stats-wid">
+                <div class="card shadow border-left-primary mini-stats-wid">
                     <div class="card-body">
                         <div class="d-flex">
                             <div class="flex-grow-1">
@@ -106,7 +83,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-left-info mini-stats-wid">
+                <div class="card shadow border-left-info mini-stats-wid">
                     <div class="card-body">
                         <div class="d-flex">
                             <div class="flex-grow-1">
@@ -122,7 +99,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-left-area mini-stats-wid">
+                <div class="card shadow border-left-area mini-stats-wid">
                     <div class="card-body">
                         <div class="d-flex">
                             <div class="flex-grow-1">
@@ -138,7 +115,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-left-branches mini-stats-wid">
+                <div class="card shadow border-left-branches mini-stats-wid">
                     <div class="card-body">
                         <div class="d-flex">
                             <div class="flex-grow-1">
@@ -154,7 +131,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-left-user-group mini-stats-wid">
+                <div class="card shadow border-left-user-group mini-stats-wid">
                     <div class="card-body">
                         <div class="d-flex">
                             <div class="flex-grow-1">
@@ -170,7 +147,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card border-left-warning mini-stats-wid">
+                <div class="card shadow border-left-warning mini-stats-wid">
                     <div class="card-body">
                         <div class="d-flex">
                             <div class="flex-grow-1">
@@ -188,7 +165,7 @@
         </div>
         <!-- end row -->
 
-        <div class="card">
+        {{-- <div class="card">
             <div class="card-body">
                 <div class="d-sm-flex flex-wrap">
                     <h4 class="card-title mb-4">Email Sent</h4>
@@ -209,12 +186,38 @@
 
                 <div id="stacked-column-chart" class="apex-charts" dir="ltr"></div>
             </div>
-        </div>
+        </div> --}}
     </div>
 </div>
 <!-- end row -->
 
 <div class="row">
+    <div class="col-xl-4">
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <h4 class="card-title mb-4">Top Branch Most Clients</h4>
+
+                <div class="text-center">
+                    <div class="mb-4">
+                        {{-- <i class="bx bx-map-pin text-primary display-4"></i> --}}
+                        <i class="fas fa-code-branch display-4" style="color: #E684FF;"></i>
+                    </div>
+
+                    <!-- Placeholder for Top 1 Branch -->
+                    <h3 id="TopBranchClientCount">0</h3>
+                    <p id="TopBranchName">N/A</p>
+                </div>
+
+                <div class="table-responsive mt-4">
+                    <table class="table align-middle table-nowrap">
+                        <tbody id="TopBranchesTableBody">
+                            <!-- Dynamic rows will be added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="col-xl-4">
         <div class="card">
             <div class="card-body">
@@ -338,71 +341,6 @@
                     </li>
                 </ul>
                 <div class="text-center mt-4"><a href="javascript: void(0);" class="btn btn-primary waves-effect waves-light btn-sm">View More <i class="mdi mdi-arrow-right ms-1"></i></a></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-4">
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title mb-4">Top Cities Selling Product</h4>
-
-                <div class="text-center">
-                    <div class="mb-4">
-                        <i class="bx bx-map-pin text-primary display-4"></i>
-                    </div>
-                    <h3>1,456</h3>
-                    <p>San Francisco</p>
-                </div>
-
-                <div class="table-responsive mt-4">
-                    <table class="table align-middle table-nowrap">
-                        <tbody>
-                            <tr>
-                                <td style="width: 30%">
-                                    <p class="mb-0">San Francisco</p>
-                                </td>
-                                <td style="width: 25%">
-                                    <h5 class="mb-0">1,456</h5>
-                                </td>
-                                <td>
-                                    <div class="progress bg-transparent progress-sm">
-                                        <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 94%" aria-valuenow="94" aria-valuemin="0" aria-valuemax="100">
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <p class="mb-0">Los Angeles</p>
-                                </td>
-                                <td>
-                                    <h5 class="mb-0">1,123</h5>
-                                </td>
-                                <td>
-                                    <div class="progress bg-transparent progress-sm">
-                                        <div class="progress-bar bg-success rounded" role="progressbar" style="width: 82%" aria-valuenow="82" aria-valuemin="0" aria-valuemax="100">
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <p class="mb-0">San Diego</p>
-                                </td>
-                                <td>
-                                    <h5 class="mb-0">1,026</h5>
-                                </td>
-                                <td>
-                                    <div class="progress bg-transparent progress-sm">
-                                        <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
     </div>
@@ -717,6 +655,59 @@
                 $('#BranchCount').text(formatNumber(response.BranchCount ?? 0));
                 $('#UserGroupCount').text(formatNumber(response.UserGroupCount ?? 0));
                 $('#BanksCount').text(formatNumber(response.BanksCount ?? 0));
+
+                // Handle Top Branches Count
+                    const topBranches = response.TopBranchesCount ?? [];
+                        if (topBranches.length > 0) {
+                            // Update the top branch card (Top 1)
+                            $('#TopBranchName').text(topBranches[0]?.branch?.branch_location ?? "N/A");
+                            $('#TopBranchClientCount').text(formatNumber(topBranches[0]?.client_count ?? 0));
+
+                            // Update the table rows dynamically
+                            const tableBody = $('#TopBranchesTableBody'); // Target the <tbody> element
+                            tableBody.empty(); // Clear existing rows
+
+                            topBranches.forEach((branch, index) => {
+                                const progressBarColor = index === 0 ? 'bg-primary' :
+                                                        index === 1 ? 'bg-success' :
+                                                        index === 2 ? 'bg-warning' : 'bg-secondary';
+
+                                const progressPercentage = topBranches[0]?.client_count ? (branch.client_count / topBranches[0].client_count) * 100 : 0;
+
+                                // Add a row for each branch
+                                tableBody.append(`
+                                    <tr>
+                                        <td style="width: 30%">
+                                            <p class="mb-0">${branch.branch?.branch_location ?? "N/A"}</p>
+                                        </td>
+                                        <td style="width: 25%">
+                                            <h5 class="mb-0">${formatNumber(branch.client_count)}</h5>
+                                        </td>
+                                        <td>
+                                            <div class="progress bg-transparent progress-sm">
+                                                <div class="progress-bar ${progressBarColor} rounded" role="progressbar"
+                                                    style="width: ${progressPercentage}%"
+                                                    aria-valuenow="${branch.client_count}"
+                                                    aria-valuemin="0"
+                                                    aria-valuemax="${topBranches[0]?.client_count}">
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                        } else {
+                            // Handle case where no branches are found
+                            $('#TopBranchName').text("No Branches Found");
+                            $('#TopBranchClientCount').text("0");
+
+                            $('#TopBranchesTableBody').html(`
+                                <tr>
+                                    <td colspan="3" class="text-center">No data available</td>
+                                </tr>
+                            `);
+                        }
+                // Handle Top Branches Count
             },
             error: function(xhr, status, error) {
                 console.error("Error fetching counts:", error);
