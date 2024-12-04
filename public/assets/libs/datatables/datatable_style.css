@@ -27,3 +27,45 @@
 .table-design tbody tr:hover {
     background-color: #f5f5f5;
 }
+
+/* Adjust the padding of the search input */
+.dataTables_filter input {
+    padding: 7px 70px 7px 10px; /* Adjust the padding to match Show entries */
+    font-size: 14px; /* Optional: Adjust font size */
+    border-radius: 5px; /* Optional: Adjust border radius */
+    border: 1px solid #ccc; /* Optional: Adjust border style */
+    position: relative; /* Required for positioning the X icon */
+}
+
+/* Adjust the X icon position */
+.dataTables_filter input::-webkit-search-cancel-button {
+    position: absolute;
+    right: 10px; /* Adjust position of the X icon */
+    top: 50%;
+    transform: translateY(-50%); /* Center the icon vertically */
+}
+
+/* Target other browsers for X icon */
+.dataTables_filter input::-ms-clear {
+    display: none; /* Hide the X icon for IE */
+}
+
+/* Custom fallback for the X icon */
+.dataTables_filter input::after {
+    position: absolute;
+    right: 10px; /* Adjust right padding for X icon */
+    top: 50%;
+    transform: translateY(-50%); /* Center the icon vertically */
+    content: '\00d7'; /* Unicode for the X icon */
+    font-size: 16px;
+    color: #aaa; /* Optional: Adjust icon color */
+}
+
+/* Ensure Show entries has matching padding */
+.dataTables_length select {
+    padding: 7px 25px 7px 10px; /* Adjust padding to match search input */
+    font-size: 14px; /* Optional: Adjust font size */
+    border-radius: 5px; /* Optional: Adjust border radius */
+    border: 1px solid #ccc; /* Optional: Adjust border style */
+}
+

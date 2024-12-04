@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ATM;
 
 use App\Models\Branch;
+use App\Models\SystemLogs;
 use Illuminate\Http\Request;
 use App\Models\AtmClientBanks;
 use Illuminate\Support\Carbon;
@@ -366,6 +367,7 @@ class PassbookCollectionController extends Controller
         $query = PassbookForCollectionTransaction::with(
                 'AtmClientBanks', 'AtmClientBanks.ClientInformation',
                 'Branch',
+                'CancelledBy',
                 'DataTransactionAction',
                 'PassbookForCollectionTransactionApproval')
             ->when($userBranchId, function ($query) use ($userBranchId) {
@@ -462,10 +464,26 @@ class PassbookCollectionController extends Controller
                                                 data-bs-placement="top"
                                                 title="Cancel Transaction"
                                                 data-transaction_id="' . ($row->id ?? 'N/A') . '">
-                                           <i class="fas fa-times-circle fs-5"></i>
+
+                                                <i class="fas fa-times-circle fs-5"></i>
                                         </a>';
                         }
-                    } else {
+                        else if($row->status === 'Cancelled'){
+                            $action .= '<a href="#" class="text-danger cancelTransaction me-2 mb-2"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                title="Cancel Transaction"
+                                                data-transaction_id="' . ($row->id ?? 'N/A') . '">
+                                               <i class="fas fa-times-circle fs-5"></i>
+                                        </a>';
+                        }
+                        else {
+                            // Log error or handle invalid PassbookForCollectionTransactionApproval
+                            $action .= '';
+                        }
+                    }
+
+                    else {
                         // Log error or handle invalid PassbookForCollectionTransactionApproval
                         $action .= '';
                     }
@@ -506,6 +524,7 @@ class PassbookCollectionController extends Controller
             'AtmClientBanks',
             'AtmClientBanks.ClientInformation',
             'Branch',
+            'CancelledBy',
             'DataTransactionAction',
             'PassbookForCollectionTransactionApproval.DataUserGroup',
             'PassbookForCollectionTransactionApproval.Employee',
@@ -531,6 +550,106 @@ class PassbookCollectionController extends Controller
 
         return response()->json($PassbookCollectionData);
     }
+
+    public function PassbookCollectionTransactionUpdate(Request $request)
+    {
+        $transaction_id = $request->transaction_id;
+
+        $PassbookForCollectionTransaction = PassbookForCollectionTransaction::with('AtmClientBanks')->findOrFail($transaction_id);
+
+        $TransactionAction = $PassbookForCollectionTransaction->transaction_actions_id;
+        $TransactionRequestNumber = $PassbookForCollectionTransaction->request_number;
+        $TransactionReferenceNo = $PassbookForCollectionTransaction->reference_no;
+        $PassbookNumber = $PassbookForCollectionTransaction->AtmClientBanks->bank_account_no;
+
+        $transaction_status = $request->transaction_status ?? NULL;
+        $cancellation_remarks = $request->cancellation_remarks ?? NULL;
+        $cancellation_date = $request->cancellation_date ?? NULL;
+
+        if ($transaction_status == 'Cancelled') { // Status is Cancelled
+            $declined_by = Auth::user()->employee_id;
+            $remarks = $cancellation_remarks;
+            $cancellation_date = $cancellation_date;  // Store as string
+        } else { // For other statuses
+            $declined_by = NULL; // Get the employee ID from the session
+            $remarks = NULL;
+            $cancellation_date = NULL;
+        }
+
+        $PassbookForCollectionTransaction->update([
+            'status' => $request->transaction_status,
+            'cancelled_date' => $cancellation_date ?? NULL,
+            'remarks' => $remarks ?? NULL,
+            'cancelled_by_employee_id' => $declined_by ?? NULL,
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // Update approvals for each approval record
+        foreach ($request->approval_id as $key => $approval_id) {
+            $AtmBanksTransactionApproval = PassbookForCollectionTransactionApproval::findOrFail($approval_id);
+            $AtmBanksTransactionApproval->update([
+                'employee_id' => $request->employee_id[$key],
+                'date_approved' => $request->date_approved[$key],
+                'status' => $request->status[$key],
+            ]);
+        }
+
+        // Log the transaction update in the system logs
+        SystemLogs::create([
+            'system' => 'ATM Monitoring',
+            'action' => 'Update',
+            'title' => 'Update Passbook Transaction',
+            'description' => 'Request Number : ' . $TransactionRequestNumber . ' | Reference No : ' . $TransactionReferenceNo . ' | Passbook No :' . $PassbookNumber . ' | Transaction : Passbook For Collection',
+            'employee_id' => Auth::user()->employee_id,
+            'ip_address' => $request->ip(),
+            'created_at' => Carbon::now(),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        // Return a successful response
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Transaction updated successfully!'
+        ]);
+    }
+
+    public function PassbookCollectionTransactionCancelled(Request $request)
+    {
+        $transaction_id = $request->transaction_id;
+
+        $PassbookForCollectionTransaction = PassbookForCollectionTransaction::with('AtmClientBanks')->findOrFail($transaction_id);
+        $TransactionRequestNumber = $PassbookForCollectionTransaction->request_number;
+        $TransactionReferenceNo = $PassbookForCollectionTransaction->reference_no;
+        $PassbookNumber = $PassbookForCollectionTransaction->AtmClientBanks->bank_account_no;
+
+        $PassbookForCollectionTransaction->update([
+            'status' => 'Cancelled',
+            'cancelled_date' => Carbon::now(),
+            'remarks' => $request->cancellation_remarks ?? NULL,
+            'cancelled_by_employee_id' =>Auth::user()->employee_id,
+            'updated_at' => Carbon::now(),
+        ]);
+
+        SystemLogs::create([
+            'system' => 'ATM Monitoring',
+            'action' => 'Update',
+            'title' => 'Cancelled Passbook Transaction',
+            'description' => 'Request Number : ' . $TransactionRequestNumber . ' | Reference No : ' . $TransactionReferenceNo . ' | Passbook No :' . $PassbookNumber . ' | Transaction : Passbook For Collection',
+            'employee_id' => Auth::user()->employee_id,
+            'ip_address' => $request->ip(),
+            'created_at' => Carbon::now(),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        // Return a successful response
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Transaction Cancelled successfully!'
+        ]);
+    }
+
+
+
 
 
 

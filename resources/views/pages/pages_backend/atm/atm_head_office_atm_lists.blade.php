@@ -667,6 +667,42 @@
         </div>
     </div>
 
+    <div class="modal fade" id="choose_slot_print_qr_modal" tabindex="-1" aria-labelledby="exampleModalLabel" data-bs-backdrop='static' aria-hidden="true" data-keyboard="false">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+
+              <h5 class="modal-title fw-bold text-uppercase" id="exampleModalLabel">Select Printing Area
+                <input type="hidden" id="reference_number_slot">
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+            <div class="container">
+                <div class="row justify-content-center">
+                    <?php
+                    for ($i = 1; $i <= 77; $i++) {
+                    ?>
+                        <div class="col-auto mb-3">
+                            <div class="slot_number text-center" style="width:75px; height:75px; padding:10px;">
+                                <button type="button" class="btn btn-primary w-100" id='print_number_receiving' value="<?= $i ?>">Slot <?= $i ?></button>
+                            </div>
+                        </div>
+                    <?php
+                    }
+                    ?>
+                </div>
+            </div>
+
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
     <script>
         $(document).ready(function () {
             var FetchingDatatableBody = $('#FetchingDatatable tbody');
@@ -1808,10 +1844,35 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // Open the QR code in a new tab
-                        window.open(`/GenerateQRCode/${transaction_number}`, '_blank');
+                        console.log(transaction_number);
+                        $("#reference_number_slot").val(transaction_number);
+                        $('#choose_slot_print_qr_modal').modal('show');
                     }
                 });
             });
+
+            $(document).on("click", "#print_number_receiving", function () {
+                const print_area_number = $(this).val(); // Value of print number
+                const transaction_number = $("#reference_number_slot").val(); // Reference number
+
+                // Open a new window to generate and display the QR Code
+                const printWindow = window.open(`/GenerateQRCode/${print_area_number}/${transaction_number}`,'','width=500,height=500,top=200,left=600');
+
+                // Trigger the print action after the PDF is loaded
+                printWindow.onload = function () {
+                    printWindow.print();
+                };
+            });
+
+
+                // const printWindow = window.open('printing_qr.php?print_number='+print_area_number+'&ref_number='+referenceNUM, '', 'width=500,height=500,top=200,left=600');
+                //     printWindow.onload = function()
+                //     {
+                //         // Trigger the print action
+                //         printWindow.print();
+                //     }
+                // location.reload();
+
 
 
 

@@ -261,7 +261,7 @@
                     searchable: true,
                 }
             ];
-            dataTable.initialize(url, columns);
+            dataTable.initialize(url, columns, { pageLength: 200, lengthMenu: [200,250,300,350,400,500], });
             // Filtering of Transaction
                 var branchId = @json($branch_id);
                 var userHasBranchId = {!! Auth::user()->branch_id ? 'true' : 'false' !!};

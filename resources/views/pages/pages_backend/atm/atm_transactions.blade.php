@@ -425,7 +425,6 @@
                 <form action="{{ route('TransactionUpdate') }}" method="POST" id="updateTransactionValidateForm">
                     @csrf
                     <input type="hidden" name="transanction_id" id="update_transaction_id">
-                    <input type="hidden" name="atm_id" id="update_atm_id">
 
                     <div class="modal-body">
                         <div class="row">
@@ -506,8 +505,9 @@
                             <hr>
                         {{-- update_transaction_number --}}
 
-                        <div class="table-responsive mt-3">
-                            <table class="table table-design">
+                        <div class="table-responsive table_scrollable mt-3">
+                            <table class="table table-border dt-responsive wrap table-design">
+                                <thead class="table-light">
                                 <thead>
                                     <th style="width: 5%;">ID</th>
                                     <th style="width: 18%;">Employee ID</th>

@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\ATM;
 
 use App\Models\User;
+use Mpdf\QrCode\QrCode;
+use Mpdf\QrCode\Output\Png;
+use Mpdf\QrCode\Output\Mpdf;
 use Illuminate\Http\Request;
 use App\Models\AtmClientBanks;
 use App\Models\ClientInformation;
 use App\Http\Controllers\Controller;
 use App\Models\DataPensionTypesLists;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class DefaultController extends Controller
 {
@@ -78,18 +80,27 @@ class DefaultController extends Controller
     }
 
 
-    public function GenerateQRCode($transaction_number)
+    public function GenerateQRCode($print_area_number, $transaction_number)
     {
-        // Generate QR code
-        $qrCode = QrCode::format('png') // Use PNG format
-            ->size(200)                // Set the size of the QR code
-            ->generate($transaction_number);
+        $SlotNumber = $print_area_number;
+        $TransactionNumber = $transaction_number;
+        // Create a new instance of MPDF
+        $mpdf = new Mpdf();
 
-        // Return the QR code as a response
-        return view('pages.pages_backend.atm.atm_generate_qr_code', [
-            'transactionNumber' => $transaction_number, // Ensure the variable name matches
-            'qrCode' => $qrCode,
-        ]);
+        // Generate QR Code
+        $qrCode = new QrCode($transaction_number); // Create QR Code with transaction number
+        $output = new Png(); // Set output format as PNG
+        $qrImage = $output->output($qrCode, 200); // Generate QR code with size 200px
+
+        dd($qrImage);
+
+        // Embed the QR Code in MPDF
+        $mpdf->WriteHTML('<h3>Transaction Number: ' . $transaction_number . '</h3>');
+        $mpdf->WriteHTML('<h4>Print Number: ' . $print_area_number . '</h4>');
+        $mpdf->WriteHTML('<img src="data:image/png;base64,' . base64_encode($qrImage) . '" alt="QR Code">');
+
+        // Output the PDF in browser
+        $mpdf->Output('QRCode.pdf', 'I'); // 'I' for inline display in browser
     }
 
 
