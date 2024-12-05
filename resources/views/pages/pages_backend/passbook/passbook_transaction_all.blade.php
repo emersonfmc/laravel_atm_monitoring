@@ -4,7 +4,7 @@
 
     @component('components.breadcrumb')
         @slot('li_1') Passbook Transaction @endslot
-        @slot('title') Passbook Transaction @endslot
+        @slot('title') Passbook Transaction All @endslot
     @endcomponent
 
     <div class="row">
@@ -14,7 +14,7 @@
 
                     <div class="row">
                         <div class="col-md-8 text-start">
-                            <h4 class="card-title">Passbook For Collection Transaction</h4>
+                            <h4 class="card-title">Passbook For Collection Transaction All</h4>
                             <p class="card-title-desc ms-2">
                                 Where Head Offices and Branches can view their Overall Transactions.
                             </p>
@@ -55,11 +55,9 @@
                                     </span>
                                 </div>
                             </div>
-
                         </form>
+                        <hr>
                     @endif
-                    <hr>
-
 
                     <div class="table-responsive">
                         <table id="FetchingDatatable" class="table table-border dt-responsive wrap table-design" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -344,9 +342,12 @@
                                     {
                                         data: null, // Custom rendering for transaction action and pending_to
                                         render: function (row) {
+                                            const transactionAction = row.transaction_action ?? ''; // Allow null/undefined, default to empty string
+                                            const pendingTo = row.pending_to ?? ''; // Allow null/undefined, default to empty string
+
                                             return (
-                                                '<span class="fw-bold text-primary">' + row.transaction_action + '</span><br>' +
-                                                '<span class="text-dark">' + row.pending_to + '</span>'
+                                                '<span class="fw-bold text-primary">' + transactionAction + '</span><br>' +
+                                                '<span class="text-dark">' + pendingTo + '</span>'
                                             );
                                         },
                                     },

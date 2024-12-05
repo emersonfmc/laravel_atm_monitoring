@@ -1,44 +1,54 @@
 <?php
 
 namespace App\Http\Controllers\ATM;
+use App\Models\Branch;
+
 use App\Models\SystemLogs;
 
 use Illuminate\Http\Request;
+use App\Models\DataBankLists;
+use App\Models\AtmClientBanks;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-
-use App\Http\Controllers\Controller;
-use Yajra\DataTables\Facades\DataTables;
+use App\Models\MaintenancePage;
 
 use App\Models\ClientInformation;
 use App\Models\DataCollectionDate;
+use Illuminate\Support\Facades\DB;
 use App\Models\AtmBanksTransaction;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Models\AtmTransactionSequence;
+use App\Models\DataTransactionSequence;
+use Yajra\DataTables\Facades\DataTables;
 use App\Models\AtmTransactionBalanceLogs;
 use App\Models\AtmBanksTransactionApproval;
-use App\Models\DataBankLists;
-use App\Models\AtmClientBanks;
-use App\Models\Branch;
-use App\Models\DataTransactionSequence;
 
 class ClientContoller extends Controller
 {
     public function client_page()
     {
-        $userGroup = Auth::user()->UserGroup->group_name;  // Assuming the group name is stored in the 'name' field
+        $userGroup = Auth::user()->UserGroup->group_name;
 
         if (in_array($userGroup, ['Developer','Admin','Everfirst Admin'])) {
             $branches = Branch::where('status', 'Active')->get();
         } else {
             $branches = collect();  // Return an empty collection if not authorized
         }
-
         $DataCollectionDates = DataCollectionDate::where('status', 'Active')->get();
         $DataBankLists = DataBankLists::where('status', 'Active')->get();
 
-        return view('pages.pages_backend.atm.atm_clients_page', compact('branches','userGroup','DataCollectionDates','DataBankLists'));
+        $MaintenancePage = MaintenancePage::where('pages_name', 'Client Lists Page')->first();
+
+        if ($MaintenancePage->status == 'yes') {
+            if (in_array($userGroup, ['Developer', 'Admin'])) {
+                return view('pages.pages_backend.atm.atm_clients_page', compact('branches','userGroup','DataCollectionDates','DataBankLists'));
+            } else {
+                return view('pages.pages_validate.pages-maintenance');
+            }
+        } else {
+            return view('pages.pages_backend.atm.atm_clients_page', compact('branches','userGroup','DataCollectionDates','DataBankLists'));
+        }
     }
 
     public function client_data()

@@ -13,6 +13,35 @@
             <div class="card">
                 <div class="card-body">
 
+                    <div class="text-center">
+                        <video id="preview" width="500px"></video>
+                    </div>
+
+                    <div class="d-flex justify-content-center mt-2 mb-3">
+                        <div class="btn-group btn-group-toggle me-3" data-toggle="buttons">
+                            <label class="btn btn-primary active">
+                            <input type="radio" name="options" value="1" class="form-control" checked> Front Camera
+                            </label>
+                        </div>
+                    <div>
+                        <label class="btn btn-secondary">
+                        <input type="radio" name="options" value="2" class="form-control"> Back Camera
+                        </label>
+                    </div>
+                    </div>
+
+                    <div class="d-flex justify-content-center align-items-center">
+                        <button type="button" class="btn btn-primary position-relative capture_image me-3" data-bs-toggle="modal" data-bs-target="#multiple_receiving">
+                        Release Multiple Transactions
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="count_checked">
+                            <span class="visually-hidden">unread messages</span>
+                            </span>
+                        </button>
+
+                        <button type="button" class="btn btn-primary position-relative refresh_data_table ml-3">Refresh List</button>
+                    </div>
+                    <hr>
+
                     <div class="table-responsive">
                         <table id="FetchingDatatable" class="table table-border dt-responsive wrap table-design" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                             <thead class="table-light">
@@ -300,6 +329,43 @@
 
             ];
             dataTable.initialize(url, columns);
+        });
+    </script>
+
+    <script>
+        let scanner = new Instascan.Scanner({
+            video: document.getElementById('preview'),
+            mirror: false
+        });
+        scanner.addListener('scan', function(content) {
+            const referenceNUM = content;
+        });
+
+        Instascan.Camera.getCameras().then(function(cameras) {
+            if (cameras.length > 0) {
+            scanner.start(cameras[0]);
+            $('[name="options"]').on('change', function() {
+                if ($(this).val() == 1) {
+                if (cameras[0] != "") {
+                    scanner.start(cameras[0]);
+                } else {
+                    // alert('No Front camera found!');
+                }
+                } else if ($(this).val() == 2) {
+                if (cameras[1] != "") {
+                    scanner.start(cameras[1]);
+                } else {
+                    // alert('No Back camera found!');
+                }
+                }
+            });
+            } else {
+            // console.error('No cameras found.');
+            // alert('No cameras found.');
+            }
+        }).catch(function(e) {
+            // console.error(e);
+            // alert(e);
         });
     </script>
 

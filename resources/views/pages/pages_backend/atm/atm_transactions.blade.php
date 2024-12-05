@@ -424,6 +424,7 @@
                 </div>
                 <form action="{{ route('TransactionUpdate') }}" method="POST" id="updateTransactionValidateForm">
                     @csrf
+                    <input type="hidden" name="atm_id" id="update_atm_id">
                     <input type="hidden" name="transanction_id" id="update_transaction_id">
 
                     <div class="modal-body">
@@ -582,18 +583,8 @@
                     data: 'client_banks_id',
                     name: 'client_banks_id',
                     render: function(data, type, row, meta) {
-                        let clientName = '';
                         let branchLocation = '';
-
-                        // Construct the client's full name
-                        if (row.atm_client_banks && row.atm_client_banks.client_information) {
-                            const firstName = row.atm_client_banks.client_information.first_name || '';
-                            const middleName = row.atm_client_banks.client_information.middle_name ? ' ' + row.atm_client_banks.client_information.middle_name : '';
-                            const lastName = row.atm_client_banks.client_information.last_name ? ' ' + row.atm_client_banks.client_information.last_name : '';
-                            const suffix = row.atm_client_banks.client_information.suffix ? ', ' + row.atm_client_banks.client_information.suffix : '';
-
-                            clientName = `${firstName}${middleName}${lastName}${suffix}`;
-                        }
+                        let clientName = `${row.full_name}`;
 
                         // Get branch location
                         if (row.branch && row.branch.branch_location) {
@@ -606,21 +597,11 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
-                    data: 'client_banks_id',
-                    name: '',
+                    data: 'pension_details',
+                    name: 'pension_details',
                     render: function(data, type, row, meta) {
-                        if (row.atm_client_banks && row.atm_client_banks.client_information) {
-                            const PensionNumber = row.atm_client_banks.client_information.pension_number || '';
-                            const PensionType = row.atm_client_banks.client_information.pension_type ? ' ' + row.atm_client_banks.client_information.pension_type : '';
-                            const PensionAccountType = row.atm_client_banks.client_information.pension_account_type ? ' ' + row.atm_client_banks.client_information.pension_account_type : '';
-
-                            return `<span class="fw-bold text-primary h6 pension_number_mask_display">${PensionNumber}</span><br>
-                                <span class="fw-bold">${PensionType}</span><br>
-                                <span class="fw-bold text-success">${PensionAccountType}</span>`;
-                        }
-                        return '';
+                        return '<span>' + data + '</span>';
                     },
                     orderable: true,
                     searchable: true,
