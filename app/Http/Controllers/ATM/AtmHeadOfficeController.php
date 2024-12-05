@@ -2,69 +2,55 @@
 
 namespace App\Http\Controllers\ATM;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 use App\Models\Branch;
 use App\Models\SystemLogs;
-use Illuminate\Http\Request;
 use App\Models\DataBankLists;
-
 use App\Models\AtmClientBanks;
-use Illuminate\Support\Carbon;
 use App\Models\MaintenancePage;
 use App\Models\ClientInformation;
 use App\Models\DataReleaseOption;
 use App\Models\DataCollectionDate;
 use App\Http\Controllers\Controller;
-use App\Models\AtmTransactionAction;
-use Illuminate\Support\Facades\Auth;
 use App\Models\DataPensionTypesLists;
 use App\Models\DataTransactionAction;
-use Yajra\DataTables\Facades\DataTables;
 
 class AtmHeadOfficeController extends Controller
 {
     public function HeadOfficePage()
     {
         $userGroup = Auth::user()->UserGroup->group_name;
+        $branch_id = Auth::user()->branch_id;
 
-        // Allow "Developer" group to bypass maintenance mode
-        if (in_array($userGroup, ['Developer', 'Admin'])) {
-            $branch_id = Auth::user()->branch_id;
+        $Branches = Branch::where('status', 'Active')->get();
+        $DataBankLists = DataBankLists::where('status', 'Active')->get();
+        $DataCollectionDate = DataCollectionDate::where('status', 'Active')->get();
+        $DataTransactionAction = DataTransactionAction::where('transaction', '1')->where('status', 'Active')->get();
+        $DataReleaseOption = DataReleaseOption::where('status', 'Active')->get();
+        $DataPensionTypesLists = DataPensionTypesLists::where('status', 'Active')->get();
 
-            $Branches = Branch::where('status', 'Active')->get();
-            $DataBankLists = DataBankLists::where('status', 'Active')->get();
-            $DataCollectionDate = DataCollectionDate::where('status', 'Active')->get();
-            $DataTransactionAction = DataTransactionAction::where('transaction', '1')
-                ->where('status', 'Active')
-                ->get();
-            $DataReleaseOption = DataReleaseOption::where('status', 'Active')->get();
-            $DataPensionTypesLists = DataPensionTypesLists::where('status', 'Active')->get();
+        $MaintenancePage = MaintenancePage::where('pages_name', 'Head Office Page')->first();
 
-            return view('pages.pages_backend.atm.atm_head_office_atm_lists', compact(
-                'DataTransactionAction',
-                'DataReleaseOption',
-                'DataBankLists',
-                'DataCollectionDate',
-                'Branches',
-                'DataPensionTypesLists',
-                'userGroup',
-                'branch_id'
-            ));
-        }
-
-        $MaintenancePage = MaintenancePage::where('pages_name', 'Head Office')->first();
         if ($MaintenancePage->status == 'yes') {
-            return view('pages.pages_validate.pages-maintenance');
+            // Allow "Developer" group to bypass maintenance mode
+            if (in_array($userGroup, ['Developer', 'Admin'])) {
+                return view('pages.pages_backend.atm.atm_head_office_atm_lists', compact(
+                    'DataTransactionAction',
+                    'DataReleaseOption',
+                    'DataBankLists',
+                    'DataCollectionDate',
+                    'Branches',
+                    'DataPensionTypesLists',
+                    'userGroup',
+                    'branch_id'
+                ));
+            } else {
+                return view('pages.pages_validate.pages-maintenance');
+            }
         } else {
-            $branch_id = Auth::user()->branch_id;
-
-            $Branches = Branch::where('status', 'Active')->get();
-            $DataBankLists = DataBankLists::where('status', 'Active')->get();
-            $DataCollectionDate = DataCollectionDate::where('status', 'Active')->get();
-            $DataTransactionAction = DataTransactionAction::where('transaction', '1')
-                ->where('status', 'Active')
-                ->get();
-            $DataReleaseOption = DataReleaseOption::where('status', 'Active')->get();
-            $DataPensionTypesLists = DataPensionTypesLists::where('status', 'Active')->get();
 
             return view('pages.pages_backend.atm.atm_head_office_atm_lists', compact(
                 'DataTransactionAction',
@@ -163,72 +149,16 @@ class AtmHeadOfficeController extends Controller
                                     data-id="' . $row->id . '">
                                     <i class="fas fa-edit"></i>
                                  </a>';
+                } else {
+                     $action .= '';
                 }
-                // // Only show the button for users in specific groups
-                // if (in_array($userGroup, ['Developer', 'Admin', 'Branch Head', 'Everfirst Admin'])) {
-                //     if ($hasOngoingTransaction) {
-                //         // Show spinning gear icon if there are ongoing transactions
-                //         return '<i class="fas fa-spinner fa-spin fs-3 text-success"></i>';
-                //     } else {
-                //         // Add buttons for creating a transaction and adding ATM transaction
-                //         $action .= '<a href="#" class="text-primary createTransaction me-2 mb-2"
-                //                             data-bs-toggle="tooltip"
-                //                             data-bs-placement="top"
-                //                             title="Create Transaction"
-                //                             data-id="' . $row->id . '">
-                //                         <i class="fas fa-plus-circle fs-4"></i>
-                //                     </a>
-                //                         <a href="#" class="text-success addAtmTransaction me-2 mb-2"
-                //                             data-bs-toggle="tooltip"
-                //                             data-bs-placement="top"
-                //                             title="Add ATM"
-                //                         data-id="' . $row->id . '">
-                //                         <i class="fas fa-credit-card fs-4"></i>
-                //                         </a>';
-                //     }
-                // }
-
-                // // Add buttons for users in Collection Staff and others
-                // if (in_array($userGroup, ['Collection Staff', 'Developer', 'Admin', 'Everfirst Admin'])) {
-                //     // Show the button to transfer branch transaction and edit information
-                //     $action .= '<a href="#" class="text-danger transferBranchTransaction me-2 mb-2"
-                //                         data-bs-toggle="tooltip"
-                //                         data-bs-placement="top"
-                //                         title="Transfer to Other Branch"
-                //                         data-id="' . $row->id . '">
-                //                     <i class="fas fa-redo-alt fs-4"></i>
-                //                 </a>
-                //                 <a href="#" class="text-warning EditInformationTransaction me-2 mb-2"
-                //                         data-bs-toggle="tooltip"
-                //                         data-bs-placement="top"
-                //                         title="Edit ATM / Client Information"
-                //                         data-id="' . $row->id . '">
-                //                     <i class="fas fa-edit fs-4"></i>
-                //                 </a>';
-                // }
-
-                // // Add buttons for users in Collection Staff and others
-                // if (in_array($userGroup, ['Collection Staff', 'Developer', 'Admin', 'Everfirst Admin'])) {
-                //     // Show the button to transfer branch transaction and edit information
-                //     if($row->atm_type === 'Passbook' && $row->passbook_for_collection === 'no')
-                //     {
-                //         $action .= '<a href="#" class="text-danger passbookForCollection me-2 mb-2"
-                //                     data-bs-toggle="tooltip"
-                //                     data-bs-placement="top"
-                //                     title="Passbook For Collection"
-                //                     data-id="' . $row->id . '">
-                //                     <i class="fas fa-book fs-4"></i>
-                //                 </a>';
-                //     }
-                // }
-
                 return $action; // Return all the accumulated buttons
             })
             ->addColumn('passbook_for_collection', function($row) use ($userGroup) {
                 $passbook_for_collection = ''; // Initialize a variable to hold the buttons
 
                 // Add buttons for users in Collection Staff and others
-                if (in_array($userGroup, ['Collection Staff', 'Developer', 'Admin', 'Everfirst Admin','Branch Head'])) {
+                if (in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin','Branch Head'])) {
                     if($row->atm_type === 'Passbook' && $row->ClientInformation->passbook_for_collection === 'no')
                     {
                         $passbook_for_collection .= '<a href="#" class="btn btn-info passbookForCollection me-2 mb-2"
@@ -238,7 +168,11 @@ class AtmHeadOfficeController extends Controller
                                     data-id="' . $row->id . '">
                                     <i class="fas fa-book"></i>
                                 </a>';
+                    } else {
+                        $passbook_for_collection = '';
                     }
+                } else {
+                    $passbook_for_collection = '';
                 }
                 return $passbook_for_collection; // Return all the accumulated buttons
             })
@@ -291,6 +225,9 @@ class AtmHeadOfficeController extends Controller
                                 <i class="fas fa-qrcode fs-5"></i>
                                 </button>';
                 }
+                else {
+                    $qr_code = '';
+                }
                 return $qr_code; // Return the action content
             })
             ->rawColumns(['action', 'pending_to','passbook_for_collection','qr_code']) // Render HTML in both the action and pending_to columns
@@ -340,7 +277,19 @@ class AtmHeadOfficeController extends Controller
 
     public function SafekeepPage()
     {
-        return view('pages.pages_backend.atm.atm_safekeep_lists');
+        $userGroup = Auth::user()->UserGroup->group_name;
+
+        $MaintenancePage = MaintenancePage::where('pages_name', 'Safekeep Page')->first();
+
+        if ($MaintenancePage->status == 'yes') {
+            if (in_array($userGroup, ['Developer', 'Admin'])) {
+                return view('pages.pages_backend.atm.atm_safekeep_lists');
+            } else {
+                return view('pages.pages_validate.pages-maintenance');
+            }
+        } else {
+            return view('pages.pages_backend.atm.atm_safekeep_lists');
+        }
     }
 
     public function SafekeepData()
@@ -446,9 +395,20 @@ class AtmHeadOfficeController extends Controller
 
     public function ReleasedPage()
     {
-        $DataBankLists = DataBankLists::where('status','Active')->get();
+        $userGroup = Auth::user()->UserGroup->group_name;
 
-        return view('pages.pages_backend.atm.atm_released_lists', compact('DataBankLists'));
+        $DataBankLists = DataBankLists::where('status','Active')->get();
+        $MaintenancePage = MaintenancePage::where('pages_name', 'Released Page')->first();
+
+        if ($MaintenancePage->status == 'yes') {
+            if (in_array($userGroup, ['Developer', 'Admin'])) {
+                return view('pages.pages_backend.atm.atm_released_lists', compact('DataBankLists'));
+            } else {
+                return view('pages.pages_validate.pages-maintenance');
+            }
+        } else {
+            return view('pages.pages_backend.atm.atm_released_lists', compact('DataBankLists'));
+        }
     }
 
     public function ReleasedData()

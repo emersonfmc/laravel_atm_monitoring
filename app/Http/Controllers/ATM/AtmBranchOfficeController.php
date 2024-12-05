@@ -5,6 +5,7 @@ namespace App\Http\Controllers\ATM;
 use Illuminate\Http\Request;
 use App\Models\DataBankLists;
 use App\Models\AtmClientBanks;
+use App\Models\MaintenancePage;
 use App\Models\DataCollectionDate;
 use App\Http\Controllers\Controller;
 use App\Models\AtmTransactionAction;
@@ -16,10 +17,21 @@ class AtmBranchOfficeController extends Controller
 {
     public function BranchOfficePage()
     {
+        $userGroup = Auth::user()->UserGroup->group_name;
+
         $DataCollectionDate = DataCollectionDate::where('status','Active')->get();
         $DataBankLists = DataBankLists::where('status','Active')->get();
+        $MaintenancePage = MaintenancePage::where('pages_name', 'Branch Office Page')->first();
 
-        return view('pages.pages_backend.atm.atm_branch_office_atm_lists', compact('DataCollectionDate','DataBankLists'));
+        if ($MaintenancePage->status == 'yes') {
+            if (in_array($userGroup, ['Developer', 'Admin'])) {
+                return view('pages.pages_backend.atm.atm_branch_office_atm_lists', compact('DataCollectionDate','DataBankLists'));
+            } else {
+                return view('pages.pages_validate.pages-maintenance');
+            }
+        } else {
+            return view('pages.pages_backend.atm.atm_branch_office_atm_lists', compact('DataCollectionDate','DataBankLists'));
+        }
     }
 
     public function BranchOfficeData()
@@ -206,6 +218,8 @@ class AtmBranchOfficeController extends Controller
                                     title="Generate QR Code">
                                 <i class="fas fa-qrcode fs-5"></i>
                                 </button>';
+                } else {
+                    $qr_code = '';
                 }
                 return $qr_code; // Return the action content
             })
@@ -215,7 +229,18 @@ class AtmBranchOfficeController extends Controller
 
     public function CancelledLoanPage()
     {
-        return view('pages.pages_backend.atm.atm_cancelled_loan_page');
+        $userGroup = Auth::user()->UserGroup->group_name;
+        $MaintenancePage = MaintenancePage::where('pages_name', 'Cancelled Loan Page')->first();
+
+        if ($MaintenancePage->status == 'yes') {
+            if (in_array($userGroup, ['Developer', 'Admin'])) {
+                 return view('pages.pages_backend.atm.atm_cancelled_loan_page');
+            } else {
+                return view('pages.pages_validate.pages-maintenance');
+            }
+        } else {
+             return view('pages.pages_backend.atm.atm_cancelled_loan_page');
+        }
     }
 
     public function CancelledLoanData()

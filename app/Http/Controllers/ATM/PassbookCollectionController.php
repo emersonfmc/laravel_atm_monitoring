@@ -7,6 +7,7 @@ use App\Models\SystemLogs;
 use Illuminate\Http\Request;
 use App\Models\AtmClientBanks;
 use Illuminate\Support\Carbon;
+use App\Models\MaintenancePage;
 use App\Http\Controllers\Controller;
 use App\Models\AtmTransactionAction;
 use Illuminate\Support\Facades\Auth;
@@ -20,19 +21,21 @@ class PassbookCollectionController extends Controller
 {
     public function PassbookCollectionSetUpPage()
     {
-        // $AtmClientBanks = AtmClientBanks::with('ClientInformation', 'Branch', 'AtmBanksTransaction')
-        // ->where('passbook_for_collection', 'yes')
-        // ->latest('updated_at')
-        // ->get();
-
-        // dd($AtmClientBanks);
-
         $userGroup = Auth::user()->UserGroup->group_name;
-
         $branch_id = Auth::user()->branch_id;
         $Branches = Branch::where('status','Active')->get();
 
-        return view('pages.pages_backend.passbook.passbook_setup',compact('branch_id','Branches','userGroup'));
+        $MaintenancePage = MaintenancePage::where('pages_name', 'PB Collection Setup Page')->first();
+
+        if ($MaintenancePage->status == 'yes') {
+            if (in_array($userGroup, ['Developer', 'Admin'])) {
+                 return view('pages.pages_backend.passbook.passbook_setup',compact('branch_id','Branches','userGroup'));
+            } else {
+                return view('pages.pages_validate.pages-maintenance');
+            }
+        } else {
+             return view('pages.pages_backend.passbook.passbook_setup',compact('branch_id','Branches','userGroup'));
+        }
     }
 
     public function PassbookCollectionData(Request $request)
@@ -224,13 +227,21 @@ class PassbookCollectionController extends Controller
 
     public function PassbookCollectionAllTransactionPage()
     {
-        $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
 
-
+        $userBranchId = Auth::user()->branch_id;
         $Branches = Branch::where('status', 'Active')->get();
+        $MaintenancePage = MaintenancePage::where('pages_name', 'PB Collection All Transaction')->first();
 
-        return view('pages.pages_backend.passbook.passbook_transaction_all',compact('userBranchId','userGroup','Branches'));
+        if ($MaintenancePage->status == 'yes') {
+            if (in_array($userGroup, ['Developer', 'Admin'])) {
+                 return view('pages.pages_backend.passbook.passbook_transaction_all',compact('userBranchId','userGroup','Branches'));
+            } else {
+                return view('pages.pages_validate.pages-maintenance');
+            }
+        } else {
+             return view('pages.pages_backend.passbook.passbook_transaction_all',compact('userBranchId','userGroup','Branches'));
+        }
     }
 
     public function PassbookCollectionAllTransactionData(Request $request)
@@ -352,11 +363,21 @@ class PassbookCollectionController extends Controller
 
     public function PassbookCollectionTransactionPage()
     {
-        $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
+        $userBranchId = Auth::user()->branch_id;
         $Branches = Branch::where('status', 'Active')->get();
 
-        return view('pages.pages_backend.passbook.passbook_transaction',compact('userBranchId','userGroup','Branches'));
+        $MaintenancePage = MaintenancePage::where('pages_name', 'PB Collection Transaction')->first();
+
+        if ($MaintenancePage->status == 'yes') {
+            if (in_array($userGroup, ['Developer', 'Admin'])) {
+                  return view('pages.pages_backend.passbook.passbook_transaction',compact('userBranchId','userGroup','Branches'));
+            } else {
+                return view('pages.pages_validate.pages-maintenance');
+            }
+        } else {
+              return view('pages.pages_backend.passbook.passbook_transaction',compact('userBranchId','userGroup','Branches'));
+        }
     }
 
     public function PassbookCollectionTransactionData(Request $request)
@@ -510,7 +531,27 @@ class PassbookCollectionController extends Controller
 
                 return $fullName;
             })
-            ->rawColumns(['full_name','branch_location','pending_to','transaction_name','action']) // Allow rendering raw HTML for the request_number column
+            ->addColumn('pension_details', function ($row) {
+                // Check if the relationships and fields exist
+                $pensionDetails = $row->AtmClientBanks->ClientInformation ?? null;
+
+                if ($pensionDetails) {
+                    $PensionNumber = $pensionDetails->pension_number ?? '';
+                    $PensionType = $pensionDetails->pension_account_type ?? '';
+                    $AccountType = $pensionDetails->pension_type ?? '';
+
+                    // Combine the parts into the full name
+                    $pension_details = "<span class='fw-bold text-primary h6 pension_number_mask_display'>{$PensionNumber}</span><br>
+                                       <span class='fw-bold'>{$PensionType}</span><br>
+                                       <span class='fw-bold text-success'>{$AccountType}</span>";
+                } else {
+                    // Fallback if client information is missing
+                    $pension_details = 'N/A';
+                }
+
+                return $pension_details;
+            })
+            ->rawColumns(['full_name','branch_location','pending_to','transaction_name','action','pension_details']) // Allow rendering raw HTML for the request_number column
             ->make(true);
 
     }
@@ -648,10 +689,62 @@ class PassbookCollectionController extends Controller
         ]);
     }
 
+    public function PassbookCollectionReceivingPage()
+    {
+        $userGroup = Auth::user()->UserGroup->group_name;
+        $userBranchId = Auth::user()->branch_id;
+        $Branches = Branch::where('status', 'Active')->get();
 
+        $MaintenancePage = MaintenancePage::where('pages_name', 'PB Collection For Receiving')->first();
 
+        if ($MaintenancePage->status == 'yes') {
+            if (in_array($userGroup, ['Developer', 'Admin'])) {
+                  return view('pages.pages_backend.passbook.passbook_received',compact('userBranchId','userGroup','Branches'));
+            } else {
+                return view('pages.pages_validate.pages-maintenance');
+            }
+        } else {
+              return view('pages.pages_backend.passbook.passbook_received',compact('userBranchId','userGroup','Branches'));
+        }
+    }
 
+    public function PassbookCollectionReleasingPage()
+    {
+        $userGroup = Auth::user()->UserGroup->group_name;
+        $userBranchId = Auth::user()->branch_id;
+        $Branches = Branch::where('status', 'Active')->get();
 
+        $MaintenancePage = MaintenancePage::where('pages_name', 'PB Collection For Releasing')->first();
+
+        if ($MaintenancePage->status == 'yes') {
+            if (in_array($userGroup, ['Developer', 'Admin'])) {
+                  return view('pages.pages_backend.passbook.passbook_releasing',compact('userBranchId','userGroup','Branches'));
+            } else {
+                return view('pages.pages_validate.pages-maintenance');
+            }
+        } else {
+              return view('pages.pages_backend.passbook.passbook_releasing',compact('userBranchId','userGroup','Branches'));
+        }
+    }
+
+    public function PassbookCollectionReturningPage()
+    {
+        $userGroup = Auth::user()->UserGroup->group_name;
+        $userBranchId = Auth::user()->branch_id;
+        $Branches = Branch::where('status', 'Active')->get();
+
+        $MaintenancePage = MaintenancePage::where('pages_name', 'PB Collection For Returning')->first();
+
+        if ($MaintenancePage->status == 'yes') {
+            if (in_array($userGroup, ['Developer', 'Admin'])) {
+                  return view('pages.pages_backend.passbook.passbook_returning',compact('userBranchId','userGroup','Branches'));
+            } else {
+                return view('pages.pages_validate.pages-maintenance');
+            }
+        } else {
+              return view('pages.pages_backend.passbook.passbook_returning',compact('userBranchId','userGroup','Branches'));
+        }
+    }
 
 
 
