@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Branch;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\DataTransactionAction;
 use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
@@ -36,7 +38,11 @@ class HomeController extends Controller
 
     public function root()
     {
-        return view('pages.pages_backend.dashboard');
+        $branch_id = Auth::user()->branch_id;
+        $Branches = Branch::where('status', 'Active')->get();
+        $DataTransactionAction = DataTransactionAction::where('status', 'Active')->get();
+
+        return view('pages.pages_backend.dashboard',compact('branch_id','Branches','DataTransactionAction'));
     }
 
     /*Language Translation*/

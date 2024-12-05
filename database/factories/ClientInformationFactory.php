@@ -13,8 +13,11 @@ class ClientInformationFactory extends Factory
 
     public function definition()
     {
+        $randomMonth = $this->faker->numberBetween(1, 12); // Random month between 1 and 12
+        $randomDay = $this->faker->numberBetween(1, 28); // Random day between 1 and 28 (to avoid month length issues)
+
         return [
-            'branch_id' => $this->faker->randomElement([5, 6, 7, 8]), // Select branch_id from 5 or 6
+            'branch_id' => $this->faker->randomElement([4, 5, 6, 8]), // Select branch_id from 5 or 6
             'pension_number' => $this->faker->unique()->numerify('###########'), // Generate 11-digit pension number
             'pension_type' => $this->faker->randomElement(['SSS','GSIS']), // Select from predefined pension types
             'pension_account_type' => DB::table('data_pension_types_lists')->inRandomOrder()->value('pension_name'), // Randomly select pension_name from atm_pension_types
@@ -24,6 +27,7 @@ class ClientInformationFactory extends Factory
             'suffix' => $this->faker->optional()->randomElement(['Jr.', 'Sr.', 'Ma.', 'I', 'II', 'III', 'IV']), // Random suffix or null
             'birth_date' => $this->faker->dateTimeBetween('1950-01-01', '1960-12-31')->format('Y-m-d'), // Random birth date
             'passbook_for_collection' => 'no',
+            'created_at' => "2024-{$randomMonth}-{$randomDay} 00:00:00",
         ];
     }
 

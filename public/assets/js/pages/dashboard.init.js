@@ -6,6 +6,7 @@ var __webpack_exports__ = {};
 setTimeout(function () {
   $("#subscribeModal").modal("show");
 }, 2e3);
+
 var options = {
   chart: {
     height: 360,
@@ -49,8 +50,56 @@ var options = {
     opacity: 1
   }
 },
-    chart = new ApexCharts(document.querySelector("#stacked-column-chart"), options);
+chart = new ApexCharts(document.querySelector("#stacked-column-chart"), options);
 chart.render();
+
+
+var options2 = {
+    chart: {
+      height: 360,
+      type: "bar",
+      stacked: !0,
+      toolbar: {
+        show: !1
+      },
+      zoom: {
+        enabled: !0
+      }
+    },
+    plotOptions: {
+      bar: {
+        horizontal: !1,
+        columnWidth: "15%",
+        endingShape: "rounded"
+      }
+    },
+    dataLabels: {
+      enabled: !1
+    },
+    series: [{
+      name: "ATM's",
+      data: [44, 55, 41, 67, 22, 43, 36, 52, 24, 18, 36, 48]
+    }, {
+      name: "Passbooks",
+      data: [13, 23, 20, 8, 13, 27, 18, 22, 10, 16, 24, 22]
+    }, {
+      name: "Simcards",
+      data: [11, 17, 15, 15, 21, 14, 11, 18, 17, 12, 20, 18]
+    }],
+    xaxis: {
+      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    },
+    colors: ["#4e73df", "#F32F53", "#68FFFF"],
+    legend: {
+      position: "bottom"
+    },
+    fill: {
+      opacity: 1
+    }
+  },
+  chart = new ApexCharts(document.querySelector("#stacked-column-chart2"), options2);
+chart.render();
+
 options = {
   chart: {
     height: 200,

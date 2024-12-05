@@ -55,10 +55,10 @@
                                     </span>
                                 </div>
                             </div>
-
                         </form>
+                        <hr>
                     @endif
-                    <hr>
+
 
 
                     <div class="table-responsive">

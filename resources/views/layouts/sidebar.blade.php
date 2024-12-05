@@ -64,12 +64,12 @@
                     <ul class="sub-menu" aria-expanded="true">
                         <li>
                             <a href="#" key="atm_reports_daily_report">
-                                <i class="fas fa-print fs-6 text-success"></i>Daily ATM Report
+                                <i class="fas fa-print fs-6 text-success"></i>Daily Report
                             </a>
                         </li>
                         <li>
                             <a href="#" key="atm_reports_released_report">
-                                <i class="fas fa-print fs-6 text-success"></i>Release ATM <br> Report
+                                <i class="fas fa-print fs-6 text-success"></i>Released Report
                             </a>
                         </li>
                         <li>
@@ -190,19 +190,19 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" key="pb_for_receiving">
+                                    <a href="{{ route('PassbookCollectionReceivingPage') }}" key="pb_for_receiving">
                                         <i class="fas fa-undo fs-6 text-success"></i>
                                         For Receiving
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" key="pb_for_returning">
+                                    <a href="{{ route('PassbookCollectionReleasingPage') }}" key="pb_for_releasing">
                                         <i class="fas fa-redo fs-6 text-danger"></i>
                                         For Releasing
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" key="pb_for_returning">
+                                    <a href="{{ route('PassbookCollectionReturningPage') }}" key="pb_for_returning">
                                         <i class="fas fa-sync fs-6 text-warning"></i>
                                         For Returning
                                     </a>
@@ -318,6 +318,13 @@
                             <a href="#" key="sub-documents">
                                 <i class="fas fa-print fs-6 text-success fs-6"></i>Documents</a>
                         </li>
+
+                        <li>
+                            <a href="{{ route('settings.maintenance.page') }}" key="sub-maintenance_mode">
+                                <i class="fas fa-tools fs-6 text-info "></i>Maintenance</a>
+                        </li>
+
+
 
                     </ul>
                 </li>

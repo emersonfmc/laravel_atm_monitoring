@@ -144,7 +144,46 @@ class AtmTransactionController extends Controller
                 // Return the ATM transaction action name and group name
                 return $atmTransactionActionName . ' <div class="text-dark"> ' . $groupName . '</div>';
             })
-            ->rawColumns(['action','pending_to']) // Render HTML in the pending_to column
+            ->addColumn('full_name', function ($row) {
+                // Check if the relationships and fields exist
+                $clientInfo = $row->AtmClientBanks->ClientInformation ?? null;
+
+                if ($clientInfo) {
+                    $lastName = $clientInfo->last_name ?? '';
+                    $firstName = $clientInfo->first_name ?? '';
+                    $middleName = $clientInfo->middle_name ? ' ' . $clientInfo->middle_name : ''; // Add space if middle_name exists
+                    $suffix = $clientInfo->suffix ? ', ' . $clientInfo->suffix : ''; // Add comma if suffix exists
+
+                    // Combine the parts into the full name
+                    $fullName = "{$lastName}, {$firstName}{$middleName}{$suffix}";
+                } else {
+                    // Fallback if client information is missing
+                    $fullName = 'N/A';
+                }
+
+                return $fullName;
+            })
+            ->addColumn('pension_details', function ($row) {
+                // Check if the relationships and fields exist
+                $pensionDetails = $row->AtmClientBanks->ClientInformation ?? null;
+
+                if ($pensionDetails) {
+                    $PensionNumber = $pensionDetails->pension_number ?? '';
+                    $PensionType = $pensionDetails->pension_account_type ?? '';
+                    $AccountType = $pensionDetails->pension_type ?? '';
+
+                    // Combine the parts into the full name
+                    $pension_details = "<span class='fw-bold text-primary h6 pension_number_mask_display'>{$PensionNumber}</span><br>
+                                       <span class='fw-bold'>{$PensionType}</span><br>
+                                       <span class='fw-bold text-success'>{$AccountType}</span>";
+                } else {
+                    // Fallback if client information is missing
+                    $pension_details = 'N/A';
+                }
+
+                return $pension_details;
+            })
+            ->rawColumns(['action','pending_to','full_name','pension_details']) // Render HTML in the pending_to column
             ->make(true);
     }
 
@@ -1763,7 +1802,6 @@ class AtmTransactionController extends Controller
         // Retrieve ATM ID and Transaction ID from the request, defaulting to NULL if not provided
         $atm_id = $request->atm_id ?? NULL;
         $transanction_id = $request->transanction_id ?? NULL;
-
         // Clean up the bank account number by removing hyphens
         $BankAccountNo = str_replace('-', '', $request->update_atm_bank_no);
 

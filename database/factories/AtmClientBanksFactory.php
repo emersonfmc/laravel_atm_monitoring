@@ -11,7 +11,10 @@ class AtmClientBanksFactory extends Factory
 
     public function definition()
     {
-        $atmType = $this->faker->randomElement(['ATM', 'Passbook']);
+        $atmType = $this->faker->randomElement(['ATM', 'Passbook', 'Sim Card']);
+
+        $randomMonth = $this->faker->numberBetween(1, 12); // Random month between 1 and 12
+        $randomDay = $this->faker->numberBetween(1, 28); // Random day between 1 and 28 (to avoid month length issues)
 
         return [
             'client_information_id' => null, // This will be filled in by ClientInformationFactory
@@ -27,6 +30,7 @@ class AtmClientBanksFactory extends Factory
             'location' => 'Head Office',
             'branch_id' => null, // This will be set to the client's branch_id in ClientInformationFactory
             'status' => '1',
+            'created_at' => "2024-{$randomMonth}-{$randomDay} 00:00:00",
         ];
     }
 }
