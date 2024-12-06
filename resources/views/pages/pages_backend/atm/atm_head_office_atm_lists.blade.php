@@ -684,9 +684,9 @@
                     <?php
                     for ($i = 1; $i <= 77; $i++) {
                     ?>
-                        <div class="col-auto mb-3">
-                            <div class="slot_number text-center" style="width:75px; height:75px; padding:10px;">
-                                <button type="button" class="btn btn-primary w-100" id='print_number_receiving' value="<?= $i ?>">Slot <?= $i ?></button>
+                        <div class="col-auto mb-2">
+                            <div class="slot_number text-center" style="width:75px; height:75px; padding:5px;">
+                                <button type="button" class="btn btn-primary w-100" id='print_number_receiving' value="<?= $i ?>">Slot <br><?= $i ?></button>
                             </div>
                         </div>
                     <?php
@@ -726,7 +726,6 @@
                     orderable: false,
                     searchable: false,
                 },
-
                 // Transaction Type and Pending By
                 {
                     data: 'pending_to',
@@ -747,7 +746,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'client_information_id',
                     name: 'client_information.first_name',
@@ -764,7 +762,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'branch_id',
                     name: 'branch.branch_location',
@@ -774,8 +771,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
-
                 {
                     data: 'client_information_id',
                     name: 'client_information.pension_number',
@@ -794,7 +789,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'client_information_id',
                     name: 'client_information.created_at',
@@ -816,8 +810,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
-
                 {
                     data: 'client_information_id',
                     name: 'client_information.birth_date',
@@ -839,7 +831,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'cash_box_no',
                     name: 'cash_box_no',
@@ -882,7 +873,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'atm_status',
                     name: 'atm_status',
@@ -913,7 +903,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'qr_code',
                     name: 'qr_code',
@@ -923,8 +912,6 @@
                     orderable: true,
                     searchable: true,
                 }
-
-
             ];
             dataTable.initialize(url, columns);
 
@@ -1829,52 +1816,42 @@
 
             // Edit Transaction
 
-            $(document).on('click', '.generate_qr_code', function (e) {
-                e.preventDefault();
+            // Generating of QR Code
+                $(document).on('click', '.generate_qr_code', function (e) {
+                    e.preventDefault();
 
-                const transaction_number = $(this).data('transaction_number');
+                    const transaction_number = $(this).data('transaction_number');
 
-                // SweetAlert confirmation
-                Swal.fire({
-                    icon: "question",
-                    title: 'Do you want to Generate QR Code?',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes',
-                    cancelButtonText: 'No'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Open the QR code in a new tab
-                        console.log(transaction_number);
-                        $("#reference_number_slot").val(transaction_number);
-                        $('#choose_slot_print_qr_modal').modal('show');
-                    }
+                    // SweetAlert confirmation
+                    Swal.fire({
+                        icon: "question",
+                        title: 'Do you want to Generate QR Code?',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes',
+                        cancelButtonText: 'No'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Open the QR code in a new tab
+                            console.log(transaction_number);
+                            $("#reference_number_slot").val(transaction_number);
+                            $('#choose_slot_print_qr_modal').modal('show');
+                        }
+                    });
                 });
-            });
 
-            $(document).on("click", "#print_number_receiving", function () {
-                const print_area_number = $(this).val(); // Value of print number
-                const transaction_number = $("#reference_number_slot").val(); // Reference number
+                $(document).on("click", "#print_number_receiving", function () {
+                    const print_area_number = $(this).val(); // Value of print number
+                    const transaction_number = $("#reference_number_slot").val(); // Reference number
 
-                // Open a new window to generate and display the QR Code
-                const printWindow = window.open(`/GenerateQRCode/${print_area_number}/${transaction_number}`,'','width=500,height=500,top=200,left=600');
+                    // Open a new window to generate and display the QR Code
+                    const printWindow = window.open(`/GenerateQRCode/${print_area_number}/${transaction_number}`,'','width=500,height=500,top=200,left=600');
 
-                // Trigger the print action after the PDF is loaded
-                printWindow.onload = function () {
-                    printWindow.print();
-                };
-            });
-
-
-                // const printWindow = window.open('printing_qr.php?print_number='+print_area_number+'&ref_number='+referenceNUM, '', 'width=500,height=500,top=200,left=600');
-                //     printWindow.onload = function()
-                //     {
-                //         // Trigger the print action
-                //         printWindow.print();
-                //     }
-                // location.reload();
-
-
-
+                    // Trigger the print action after the PDF is loaded
+                    printWindow.onload = function () {
+                        printWindow.print();
+                    };
+                });
+            // Generating of QR Code
 
             $(document).on('click', '.passbookForCollection', function(e) {
                 e.preventDefault(); // Prevent the default anchor behavior

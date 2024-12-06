@@ -716,24 +716,24 @@
                         // Determine the badge class and status label based on status value
                         switch (row.status) {
                             case 'ON GOING':
-                                badgeClass = 'pt-1 pb-1 ps-2 ps-2 pe-2 badge bg-warning fw-bold h6';
+                                badgeClass = 'pt-1 pb-1 ps-2 ps-2 pe-2 badge bg-warning';
                                 statusClass = 'On Going';
                                 break;
                             case 'CANCELLED':
-                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-danger fw-bold h6';
+                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-danger';
                                 statusClass = 'Cancelled';
                                 break;
                             case 'COMPLETED':
-                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-success fw-bold h6';
+                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-success';
                                 statusClass = 'Completed';
                                 break;
                             default:
-                                badgeClass = 'badge bg-secondary fw-bold h6'; // Default badge class
+                                badgeClass = 'badge bg-secondary'; // Default badge class
                                 statusClass = 'Unknown Status';
                         }
 
                         // Return the status wrapped in a span with the appropriate badge and status class
-                        return `<span class="${badgeClass} fw-bold h6">${statusClass}</span>`;
+                        return `<span class="${badgeClass}">${statusClass}</span>`;
                     },
                     orderable: true,
                     searchable: true,

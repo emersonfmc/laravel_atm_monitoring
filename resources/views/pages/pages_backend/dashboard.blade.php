@@ -421,130 +421,41 @@
     <!-- end modal -->
 
 <script>
-    // Selection Year for ATMs Passbooks and Simcards
+// Selection Year for ATMs Passbooks and Simcards
     $(document).ready(function () {
-        var startYear = 2000; // Starting year
-        var endYear = new Date().getFullYear(); // Current year
-
-        // Populate the dropdown with years
-        for (var year = startYear; year <= endYear; year++) {
-            $('#yearDropdownAtm').append(`<option value="${year}">${year}</option>`);
-        }
-    });
-
-    // Selection Year for Clients
-    $(document).ready(function () {
-        var startYear = 2000; // Starting year
-        var endYear = new Date().getFullYear(); // Current year
+        var startYearAtm = 2000; // Starting year
+        var endYearAtm = new Date().getFullYear(); // Current year
 
         // Populate the dropdown with years and set the current year as selected
-        for (var year = startYear; year <= endYear; year++) {
-            if (year === endYear) {
-                $('#yearDropdownClient').append(`<option value="${year}" selected>${year}</option>`);
-            } else {
-                $('#yearDropdownClient').append(`<option value="${year}">${year}</option>`);
-            }
+        for (var year = startYearAtm; year <= endYearAtm; year++) {
+            $('#yearDropdownAtm').append(`<option value="${year}" ${year === endYearAtm ? "selected" : ""}>${year}</option>`);
         }
 
-        // Trigger the AJAX request immediately with the current year
-        var selectedYear = $('#yearDropdownClient').val(); // Get the default selected year
-        fetchDataForYear(selectedYear);
+        var chart;
+        fetchDataForYearATM(null);
 
-        // Add event listener for year selection
-        $('#yearDropdownClient').change(function () {
-            selectedYear = $(this).val(); // Get the selected year
-            fetchDataForYear(selectedYear);
+        $('#yearDropdownAtm').change(function () {
+            var selectedYear = $(this).val(); // Get the selected year
+            fetchDataForYearATM(selectedYear); // Fetch data for the selected year
         });
 
         // Function to make the AJAX request
-        function fetchDataForYear(year) {
+        function fetchDataForYearATM(year) {
             $.ajax({
                 url: "/elog_monitoring_dashboard_data", // Your route to handle the request
                 type: "GET",
-                data: {
-                    yearClient: year // Pass the selected year as a parameter
-                },
+                data: year ? { yearAtm: year } : {}, // Send yearAtm if year is provided
                 success: function (response) {
-                    console.log("Response for year " + year + ":", response);
-                    // Handle the response here
-                },
-                error: function (error) {
-                    console.error("Error:", error);
-                }
-            });
-        }
-    });
+                    // Destroy the previous chart instance if it exists
+                    if (chart) {
+                        chart.destroy();
+                    }
 
-    $(document).ready(function () {
-        $.ajax({
-            url: "/elog_monitoring_dashboard_data",  // Your route to get the counts
-            type: "GET",
-            success: function(response) {
-                console.log(response);
-                // Format the numbers with comma as thousand separator
-                const formatNumber = (number) => {
-                    return number.toLocaleString(); // Formats the number with commas (e.g., 1,000)
-                };
-
-                $('#UserCount').text(formatNumber(response.UserCount ?? 0));
-                $('#AreaCount').text(formatNumber(response.AreaCount ?? 0));
-                $('#DistrictCount').text(formatNumber(response.DistrictCount ?? 0));
-                $('#BranchCount').text(formatNumber(response.BranchCount ?? 0));
-                $('#UserGroupCount').text(formatNumber(response.UserGroupCount ?? 0));
-                $('#BanksCount').text(formatNumber(response.BanksCount ?? 0));
-
-                // Clients Graph
-                    var year = response.ClientCounts[0] ? response.ClientCounts[0].year : ''; // Extract the year from the first item, default to 2024 if empty
-                    var months = response.ClientCounts.map(function(item) {
-                        // Convert the month number (1-12) to abbreviated month names ('Jan', 'Feb', ...)
-                        return new Date(year, item.month - 1).toLocaleString('default', { month: 'short' });
-                    });
-
-                    var clientCounts = response.ClientCounts.map(function(item) {
-                        return item.client_monthly_counts;
-                    });
-
-                    var client_all_options = {
-                        chart: {
-                            type: 'area', // You can change this to 'bar' if you prefer a bar chart
-                            height: 350
-                        },
-                        stroke: {
-                            curve: 'smooth'
-                        },
-                        series: [{
-                            name: 'Client Counts',
-                            data: clientCounts, // Data for each month
-                            color: '#1129DE' // Define the color here
-                        }],
-                        xaxis: {
-                            categories: months, // Dynamic month names from response
-                            title: {
-                                text: 'Month'
-                            }
-                        },
-                        yaxis: {
-                            title: {
-                                text: 'Number of Clients'
-                            }
-                        },
-                        title: {
-                            text: `MONTHLY CLIENTS - ${year}`, // Display the year dynamically
-                            align: 'center',
-                            style: {
-                                color: '#FFFFFF' // Set the title color to white
-                            }
-                        }
-                    };
-                    var chart = new ApexCharts(document.querySelector("#client_all_chart"), client_all_options);
-                    chart.render();
-                // Clients Graph
-
-                // ATM's Passbooks and Sim Cards Graph
+                    // ATM's Passbooks and Sim Cards Graph
                     var atm_year = response.AtmClientBanksCounts[0] ? response.AtmClientBanksCounts[0].year : ''; // Extract the year from the first item
                     var atm_months = response.AtmClientBanksCounts.map(function(item) {
-                        // Convert the month number (1-12) to abbreviated month names ('Jan', 'Feb', ...)
-                        return new Date(atm_year, item.month - 1).toLocaleString('default', { month: 'short' });
+                        // Format the month and year together (e.g., 'Jan 2024')
+                        return new Date(atm_year, item.month - 1).toLocaleString('default', { month: 'short' }) + ' ' + atm_year;
                     });
 
                     var atm_counts = response.AtmClientBanksCounts.map(function(item) {
@@ -579,7 +490,7 @@
                             color: '#50B9F6' // Define the color for Sim Card count
                         }],
                         xaxis: {
-                            categories: atm_months, // Dynamic month names from response
+                            categories: atm_months, // Dynamic month-year labels (e.g., 'Jan 2024')
                             title: {
                                 text: 'Month'
                             }
@@ -598,9 +509,127 @@
                         }
                     };
 
-                    var chart = new ApexCharts(document.querySelector("#atms_all_chart"), atm_all_options);
+                    // Initialize the chart with updated data
+                    chart = new ApexCharts(document.querySelector("#atms_all_chart"), atm_all_options);
                     chart.render();
-                // ATM's Passbooks and Sim Cards Graph
+                    // ATM's Passbooks and Sim Cards Graph
+                },
+                error: function (error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+    });
+
+    // Selection Year for Clients
+    $(document).ready(function () {
+        var startYear = 2000; // Starting year
+        var endYear = new Date().getFullYear(); // Current year
+
+        // Populate the dropdown with years and set the current year as selected
+        for (var year = startYear; year <= endYear; year++) {
+            $('#yearDropdownClient').append(`<option value="${year}" ${year === endYear ? "selected" : ""}>${year}</option>`);
+        }
+
+        var chart; // Declare a global variable to hold the chart instance
+
+        // Fetch data for all years initially
+        fetchDataForYear(null); // Pass `null` or omit `yearClient` for all years
+
+        // Add event listener for year selection
+        $('#yearDropdownClient').change(function () {
+            var selectedYear = $(this).val(); // Get the selected year
+            fetchDataForYear(selectedYear); // Fetch data for the selected year
+        });
+
+        // Function to make the AJAX request
+        function fetchDataForYear(year) {
+            $.ajax({
+                url: "/elog_monitoring_dashboard_data", // Your route to handle the request
+                type: "GET",
+                data: year ? { yearClient: year } : {}, // Send yearClient if year is provided
+                success: function (response) {
+                    // Destroy the previous chart instance if it exists
+                    if (chart) {
+                        chart.destroy();
+                    }
+
+                    // Process response data
+                    var months = response.ClientCounts.length
+                        ? response.ClientCounts.map(function (item) {
+                            // Format the month and year for each entry
+                            return new Date(item.year, item.month - 1).toLocaleString('default', { month: 'short' }) + ' ' + item.year;
+                        })
+                        : ['No Data'];
+
+                    var clientCounts = response.ClientCounts.length
+                        ? response.ClientCounts.map(function (item) {
+                            return item.client_monthly_counts;
+                        })
+                        : [0];
+
+                    // Define chart options
+                    var client_all_options = {
+                        chart: {
+                            type: 'area', // Change to 'bar' if preferred
+                            height: 350
+                        },
+                        stroke: {
+                            curve: 'smooth'
+                        },
+                        series: [{
+                            name: 'Client Counts',
+                            data: clientCounts, // Data for each month
+                            color: '#1129DE' // Define the color here
+                        }],
+                        xaxis: {
+                            categories: months, // Dynamic month names with the correct year for each entry
+                            title: {
+                                text: 'Month'
+                            }
+                        },
+                        yaxis: {
+                            title: {
+                                text: 'Number of Clients'
+                            }
+                        },
+                        title: {
+                            text: `MONTHLY CLIENTS`, // Display the year or "ALL YEARS"
+                            align: 'center',
+                            style: {
+                                color: '#FFFFFF' // Set the title color to white
+                            }
+                        }
+                    };
+
+                    // Initialize the chart with updated data
+                    chart = new ApexCharts(document.querySelector("#client_all_chart"), client_all_options);
+                    chart.render();
+                },
+                error: function (error) {
+                    console.error("Error:", error);
+                }
+            });
+        }
+    });
+
+    $(document).ready(function () {
+        $.ajax({
+            url: "/elog_monitoring_dashboard_data",  // Your route to get the counts
+            type: "GET",
+            success: function(response) {
+                console.log(response);
+                // Format the numbers with comma as thousand separator
+                const formatNumber = (number) => {
+                    return number.toLocaleString(); // Formats the number with commas (e.g., 1,000)
+                };
+
+                $('#UserCount').text(formatNumber(response.UserCount ?? 0));
+                $('#AreaCount').text(formatNumber(response.AreaCount ?? 0));
+                $('#DistrictCount').text(formatNumber(response.DistrictCount ?? 0));
+                $('#BranchCount').text(formatNumber(response.BranchCount ?? 0));
+                $('#UserGroupCount').text(formatNumber(response.UserGroupCount ?? 0));
+                $('#BanksCount').text(formatNumber(response.BanksCount ?? 0));
 
                 // Handle Top Branches Count
                     const topBranches = response.TopBranchesCount ?? [];

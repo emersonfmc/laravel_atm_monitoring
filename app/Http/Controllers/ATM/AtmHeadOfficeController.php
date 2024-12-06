@@ -65,7 +65,6 @@ class AtmHeadOfficeController extends Controller
         }
     }
 
-
     public function HeadOfficeData(Request $request)
     {
         $userBranchId = Auth::user()->branch_id;
@@ -121,16 +120,18 @@ class AtmHeadOfficeController extends Controller
                                             data-id="' . $row->id . '
                                             data-client_id="' . $row->ClientInformation->id . '">
                                         <i class="fas fa-plus-circle"></i>
-                                     </a>
-                                     <a href="#" class="btn btn-success addAtmTransaction me-2 mb-2"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-placement="top"
-                                            title="Add ATM"
-                                        data-id="' . $row->id . '">
-                                        <i class="fas fa-credit-card"></i>
                                      </a>';
                     }
+
+                    $action .= '<a href="#" class="btn btn-success addAtmTransaction me-2 mb-2"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="Add ATM"
+                                    data-id="' . $row->id . '">
+                                    <i class="fas fa-credit-card"></i>
+                                </a>';
                 }
+
 
                 // Add buttons for users in Collection Staff and others
                 if (in_array($userGroup, ['Collection Staff', 'Developer', 'Admin', 'Everfirst Admin'])) {
