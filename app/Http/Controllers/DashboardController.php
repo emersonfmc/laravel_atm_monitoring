@@ -54,28 +54,33 @@ class DashboardController extends Controller
             ->get();
 
 
-
-
         // Count By Client Monthly
-            $yearClient = $request->yearClient ?? now()->year;
+            $yearClient = $request->yearClient ?? ''; // Requested year or empty for all
+            // $yearClient = $request->yearClient ?? now()->year; // Use this if want to display all current year data
 
             // Count By Client Monthly
             $ClientCounts = ClientInformation::selectRaw('
                 YEAR(created_at) as year,
                 MONTH(created_at) as month,
-                COUNT(*) as client_monthly_counts')
-
+                COUNT(*) as client_monthly_counts
+            ')
             ->whereNotNull('created_at') // Exclude NULL created_at values
             ->when($branchId, function ($query) use ($branchId) {
                 // Apply branch_id filter only if the user has a branch_id
                 return $query->where('branch_id', $branchId);
             })
-            ->whereYear('created_at', $yearClient) // Always filter by the year (default or requested)
+            ->when($yearClient, function ($query) use ($yearClient) {
+                // Apply year filter only if $yearClient is provided
+                return $query->whereYear('created_at', $yearClient);
+            })
             ->groupByRaw('YEAR(created_at), MONTH(created_at)') // Group by year and month
             ->get();
         // Count By Client Monthly
 
         // Count By ATM Passbook Simcard Monthly
+            $yearAtm = $request->yearAtm ?? '';
+            // $yearAtm = $request->yearAtm ?? now()->year; // Use this if want to display all current year data
+
             $AtmClientBanksCounts = AtmClientBanks::selectRaw('
                 YEAR(created_at) as year,
                 MONTH(created_at) as month,
@@ -88,21 +93,32 @@ class DashboardController extends Controller
                 // Apply branch_id filter only if the user has a branch_id
                 return $query->where('branch_id', $branchId);
             })
+            ->when($yearAtm, function ($query) use ($yearAtm) {
+                return $query->whereYear('created_at', $yearAtm);
+            })
             ->groupByRaw('YEAR(created_at), MONTH(created_at)') // Group by year and month
             ->get();
         // Count By ATM Passbook Simcard Monthly
 
         // Pending Transaction with subquery for branch filtering
-            $PendingReceivingTransaction = AtmBanksTransactionApproval::with('AtmBanksTransaction','AtmBanksTransaction.DataTransactionAction','AtmBanksTransaction.Branch')
+
+        $userGroup = Auth::user()->UserGroup->group_name;
+
+        $PendingReceivingTransaction = AtmBanksTransactionApproval::with('AtmBanksTransaction', 'AtmBanksTransaction.DataTransactionAction', 'AtmBanksTransaction.Branch')
             ->where('status', 'Pending')
-            ->where('user_groups_id', Auth::user()->user_group_id)
-            ->whereHas('AtmBanksTransaction', function ($query) use ($branchId) {
-                if ($branchId !== null && $branchId !== 0) {
-                    $query->where('branch_id', $branchId);
-                }
+            ->when($userGroup !== 'Developer', function ($query) use ($branchId) {
+                // Apply the filtering logic only if the user is not a Developer
+                $query->where('user_groups_id', Auth::user()->user_group_id)
+                      ->whereHas('AtmBanksTransaction', function ($subQuery) use ($branchId) {
+                          if ($branchId !== null && $branchId !== 0) {
+                              $subQuery->where('branch_id', $branchId);
+                          }
+                      });
             })
+            ->latest('created_at') // Correctly reference the created_at column of the AtmBanksTransaction model
             ->limit(5)
             ->get();
+        // Pending Transaction with subquery for branch filtering
 
         // Return the counts as a JSON response
         return response()->json([

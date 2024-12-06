@@ -29,6 +29,7 @@ class ClientContoller extends Controller
     public function client_page()
     {
         $userGroup = Auth::user()->UserGroup->group_name;
+        $branch_id = Auth::user()->branch_id;
 
         if (in_array($userGroup, ['Developer','Admin','Everfirst Admin'])) {
             $branches = Branch::where('status', 'Active')->get();
@@ -47,7 +48,7 @@ class ClientContoller extends Controller
                 return view('pages.pages_validate.pages-maintenance');
             }
         } else {
-            return view('pages.pages_backend.atm.atm_clients_page', compact('branches','userGroup','DataCollectionDates','DataBankLists'));
+            return view('pages.pages_backend.atm.atm_clients_page', compact('branches','userGroup','DataCollectionDates','DataBankLists','branch_id'));
         }
     }
 

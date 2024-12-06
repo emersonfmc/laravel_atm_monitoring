@@ -20,32 +20,55 @@
                                     class="pension_number_mask form-control" placeholder="Enter SSS Number"
                                     required>
                         </div>
-                        <div class="col-md-2 ms-3 mt-4">
+                        <div class="col-md-3 ms-3 mt-4">
                             <button type="submit" class="btn btn-primary">Validate</button>
+                            <span id="AddClientButton" style="display: none;">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createClientModal"><i
+                                    class="fas fa-plus-circle me-1"></i> Create Client Information
+                                </button>
+                            </span>
                         </div>
+
                     </form>
                     <hr>
                     <div class="row">
-                        <div class="col-md-8 text-start">
+                        <div class="col-md-6 text-start">
                             <h4 class="card-title">Clients</h4>
                             <p class="card-title-desc">
                                 Clients financial assets are carefully monitored, including their ATM transactions, Passbook updates,
                                 and SIM card management to ensure seamless and secure banking operations.
                             </p>
                         </div>
-                        <div class="col-md-4 text-end">
-                            <button class="btn btn-success me-2">
-                                <i class="fas fa-download me-1"></i> Generate Reports
-                            </button>
-                            <span id="AddClientButton" style="display: none;">
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createClientModal"><i
-                                    class="fas fa-plus-circle me-1"></i> Create Client
-                                </button>
-                            </span>
+                        <div class="col-md-6 text-start">
+                            @if(in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin','Branch Head']))
+                                <form id="filterForm">
+                                    @csrf
+                                    <div class="row ms-3">
+                                        <div class="col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label class="fw-bold h6">Branch</label>
+                                                <select name="branch_id" id="branch_id_select" class="form-select select2" required>
+                                                    <option value="">Select Branches</option>
+                                                    @foreach($branches as $branch)
+                                                        <option value="{{ $branch->id }}" {{ $branch->id == $branch_id ? 'selected' : '' }}>
+                                                            {{ $branch->branch_location }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4" style="margin-top: 25px;">
+                                            <div class="form-group">
+                                                <button type="submit" class="btn btn-primary">Filter</button>
+                                                <button type="button" class="btn btn-success">Generate Reports</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            @endif
                         </div>
                     </div>
                     <hr>
-
 
                     <div class="table-responsive">
                         <table id="FetchingDatatable" class="table table-border dt-responsive wrap table-design" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
