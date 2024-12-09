@@ -19,21 +19,39 @@ class PassbookForCollectionTransaction extends Model
 
     public function Branch()
     {
-        return $this->belongsTo(Branch::class, 'branch_id','id');
+        return $this->belongsTo(Branch::class,'branch_id','id')->select(['id', 'branch_location','branch_abbreviation']);
     }
 
     public function DataTransactionAction()
     {
-        return $this->belongsTo(DataTransactionAction::class, 'transaction_actions_id','id');
+        return $this->belongsTo(DataTransactionAction::class, 'transaction_actions_id','id')
+            ->select(['id',
+                      'name',
+                      'transaction',
+                      'status']);
     }
 
     public function PassbookForCollectionTransactionApproval()
     {
-        return $this->hasMany(PassbookForCollectionTransactionApproval::class, 'passbook_transactions_id','id');
+        return $this->hasMany(PassbookForCollectionTransactionApproval::class, 'passbook_transactions_id','id')
+            ->select(['id',
+                      'passbook_transactions_id',
+                      'employee_id',
+                      'date_approved',
+                      'user_groups_id',
+                      'sequence_no',
+                      'transaction_actions_id',
+                      'status',
+                      'type',
+                      'created_at']);
     }
 
     public function CancelledBy()
     {
-        return $this->belongsTo(User::class, 'cancelled_by_employee_id','employee_id');
+        return $this->belongsTo(User::class, 'cancelled_by_employee_id','employee_id')
+        ->select(['id',
+                  'employee_id',
+                  'user_group_id',
+                  'name']);
     }
 }

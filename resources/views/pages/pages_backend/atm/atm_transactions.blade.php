@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layouts.atm_monitoring_master')
 
 @section('content')
 
@@ -342,7 +342,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="#" method="POST" id="#">
+                    <form action="#" method="POST" id="cancelledTransactionForm">
                         @csrf
                         <div class="row">
                             <input type="hidden" name="atm_id" id="cancelled_atm_id">

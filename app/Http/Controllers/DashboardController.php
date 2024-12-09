@@ -106,7 +106,7 @@ class DashboardController extends Controller
 
         $PendingReceivingTransaction = AtmBanksTransactionApproval::with('AtmBanksTransaction', 'AtmBanksTransaction.DataTransactionAction', 'AtmBanksTransaction.Branch')
             ->where('status', 'Pending')
-            ->when($userGroup !== 'Developer', function ($query) use ($branchId) {
+            ->when(!in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin']), function ($query) use ($branchId) {
                 // Apply the filtering logic only if the user is not a Developer
                 $query->where('user_groups_id', Auth::user()->user_group_id)
                       ->whereHas('AtmBanksTransaction', function ($subQuery) use ($branchId) {
@@ -256,12 +256,15 @@ class DashboardController extends Controller
         $SafekeepCounts = AtmClientBanks::where('location', 'Safekeep')->where('status', '6');
         $OnGoingTransaction = AtmBanksTransaction::where('status', 'ON GOING');
 
+        $userBranchId = Auth::user()->branch_id;
+        $userGroup = Auth::user()->UserGroup->group_name;
 
-        // Pending Transaction with subquery for branch filtering
         $PendingReceivingTransaction = AtmBanksTransactionApproval::with('AtmBanksTransaction')
             ->where('status', 'Pending')
             ->where('type', 'Received')
-            ->where('user_groups_id', Auth::user()->user_group_id)
+            ->when(!in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin']), function($query) {
+                return $query->where('user_groups_id', Auth::user()->user_group_id);
+            })
             ->whereHas('AtmBanksTransaction', function ($query) use ($userBranchId) {
                 if ($userBranchId !== null && $userBranchId !== 0) {
                     $query->where('branch_id', $userBranchId);
@@ -270,7 +273,9 @@ class DashboardController extends Controller
 
         $PendingReleasingTransaction = AtmBanksTransactionApproval::where('status', 'Pending')
             ->where('type', 'Released')
-            ->where('user_groups_id', Auth::user()->user_group_id);
+            ->when(!in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin']), function($query) {
+                return $query->where('user_groups_id', Auth::user()->user_group_id);
+            });
 
         // Apply branch_id filter to all queries if branch_id is set
         if ($userBranchId !== null && $userBranchId !== 0) {

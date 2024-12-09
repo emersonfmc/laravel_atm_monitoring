@@ -30,12 +30,8 @@ class ClientContoller extends Controller
     {
         $userGroup = Auth::user()->UserGroup->group_name;
         $branch_id = Auth::user()->branch_id;
+        $branches = Branch::where('status', 'Active')->get();
 
-        if (in_array($userGroup, ['Developer','Admin','Everfirst Admin'])) {
-            $branches = Branch::where('status', 'Active')->get();
-        } else {
-            $branches = collect();  // Return an empty collection if not authorized
-        }
         $DataCollectionDates = DataCollectionDate::where('status', 'Active')->get();
         $DataBankLists = DataBankLists::where('status', 'Active')->get();
 

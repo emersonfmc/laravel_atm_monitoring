@@ -10,7 +10,9 @@ class ServerSideDataTable {
             processing: true,
             ajax: url,
             columns: columns,
-            ordering: true, // Enable ordering to display sorting arrows
+            pageLength: 20, // Default to 10 rows per page
+            lengthMenu: [20, 25, 50, 100], // Allow user to select number of rows
+            ordering: true,
             drawCallback: function () {
                 $('[data-bs-toggle="tooltip"]').tooltip();
                 $(".dataTables_paginate > .pagination").addClass("pagination-rounded");
