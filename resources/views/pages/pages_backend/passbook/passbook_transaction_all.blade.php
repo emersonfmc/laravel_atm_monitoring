@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layouts.atm_monitoring_master')
 
 @section('content')
 
@@ -338,6 +338,8 @@
                             $('#TransactionApprovalTable').DataTable({
                                 destroy: true, // Destroy any existing instance before re-initializing
                                 data: data.passbook_collection_data, // Use the array of data directly
+                                pageLength: 50, // Set minimum display entries to 50
+                                lengthMenu: [ [50, 55, 60, 70, 100], [50, 55, 60, 70, 100] ], // Custom length menu options
                                 columns: [
                                     {
                                         data: null, // Custom rendering for transaction action and pending_to

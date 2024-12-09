@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layouts.atm_monitoring_master')
 
 @section('content')
 
@@ -33,7 +33,7 @@
                                         <div class="form-group mb-3">
                                             <label class="fw-bold h6">Branch</label>
                                             <select name="branch_id" id="branch_id_select" class="form-select select2" required>
-                                                <option value="">Select Branches</option>
+                                                <option value="0">Select Branches</option>
                                                 @foreach($Branches as $branch)
                                                     <option value="{{ $branch->id }}" {{ $branch->id == $branch_id ? 'selected' : '' }}>
                                                         {{ $branch->branch_location }}
@@ -747,17 +747,9 @@
                     searchable: true,
                 },
                 {
-                    data: 'client_information_id',
-                    name: 'client_information.first_name',
+                    data: null,
                     render: function(data, type, row, meta) {
-                        if (row.client_information) {
-                            const firstName = row.client_information.first_name || '';
-                            const middleName = row.client_information.middle_name ? ' ' + row.client_information.middle_name : '';
-                            const lastName = row.client_information.last_name ? ' ' + row.client_information.last_name : '';
-                            const suffix = row.client_information.suffix ? ', ' + row.client_information.suffix : '';
-                            return `<span>${firstName}${middleName}${lastName}${suffix}</span>`;
-                        }
-                        return '';
+                        return '<span>' + row.full_name + '</span>'; // Check if company exists
                     },
                     orderable: true,
                     searchable: true,
@@ -772,19 +764,9 @@
                     searchable: true,
                 },
                 {
-                    data: 'client_information_id',
-                    name: 'client_information.pension_number',
+                    data: null,
                     render: function(data, type, row, meta) {
-                        if (row.client_information) {
-                            const PensionNumber = row.client_information.pension_number || '';
-                            const PensionType = row.client_information.pension_type ? ' ' + row.client_information.pension_type : '';
-                            const PensionAccountType = row.client_information.pension_account_type ? ' ' + row.client_information.pension_account_type : '';
-
-                            return `<span class="fw-bold text-primary h6 pension_number_mask_display">${PensionNumber}</span><br>
-                                <span class="fw-bold">${PensionType}</span><br>
-                                <span class="fw-bold text-success">${PensionAccountType}</span>`;
-                        }
-                        return '';
+                        return '<span>' + row.pension_details + '</span>'; // Check if company exists
                     },
                     orderable: true,
                     searchable: true,

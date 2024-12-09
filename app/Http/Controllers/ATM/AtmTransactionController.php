@@ -1580,12 +1580,20 @@ class AtmTransactionController extends Controller
 
     public function TransactionReceivingPage()
     {
-        return view('pages.pages_backend.atm.atm_receiving_of_transaction');
+        $branch_id = Auth::user()->branch_id;
+        $Branches = Branch::where('status', 'Active')->get();
+        $DataTransactionAction = DataTransactionAction::where('status', 'Active')->get();
+
+        return view('pages.pages_backend.atm.atm_receiving_of_transaction', compact('branch_id','Branches','DataTransactionAction'));
     }
 
     public function TransactionReleasingPage()
     {
-        return view('pages.pages_backend.atm.atm_releasing_of_transaction');
+        $branch_id = Auth::user()->branch_id;
+        $Branches = Branch::where('status', 'Active')->get();
+        $DataTransactionAction = DataTransactionAction::where('status', 'Active')->get();
+
+        return view('pages.pages_backend.atm.atm_releasing_of_transaction', compact('branch_id','Branches','DataTransactionAction'));
     }
 
     public function TransactionReceivingData(Request $request)
@@ -1593,35 +1601,130 @@ class AtmTransactionController extends Controller
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
 
-        $query = AtmBanksTransactionApproval::with('DataUserGroup','Employee','DataTransactionAction',
-                    'AtmBanksTransaction',
-                    'AtmBanksTransaction.Branch',
-                    'AtmBanksTransaction.AtmClientBanks',
-                    'AtmBanksTransaction.AtmClientBanks.ClientInformation')
-            ->whereIn('status', ['Pending', 'Completed']) // Use whereIn for multiple values
+        $query = AtmBanksTransactionApproval::with('DataUserGroup', 'Employee', 'DataTransactionAction',
+                'AtmBanksTransaction',
+                'AtmBanksTransaction.Branch',
+                'AtmBanksTransaction.AtmClientBanks',
+                'AtmBanksTransaction.AtmClientBanks.ClientInformation')
+            ->whereIn('status', ['Pending','Completed','Cancelled']) // Use whereIn for multiple values
             ->where('type', 'Received')
-            ->where('user_groups_id', Auth::user()->user_group_id)
-            // ->where(function ($query) use ($userGroup) {
-            //     if (in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin'])) {
-            //         $query->whereIn('user_groups_id', [1, 2, 56]);
-            //     } else {
-            //         $query->where('user_groups_id', Auth::user()->user_group_id);
-            //     }
-            // })
-            ->whereHas('AtmBanksTransaction', function ($query) use ($userBranchId, $request) {
-                // Apply branch filter based on user branch_id or request input
-                if ($userBranchId) {
-                    $query->where('branch_id', $userBranchId);
-                } elseif ($request->filled('branch_id')) {
-                    $query->where('branch_id', $request->branch_id);
+            ->orderBy('id', 'asc'); // Corrected syntax for descending order
+
+            // Apply user group filter unless the user group is Developer
+            if (!in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin'])) {
+                $query->where('user_groups_id', Auth::user()->user_group_id);
+            }
+
+        // Apply branch filter based on user branch_id or request input
+        $query->whereHas('AtmBanksTransaction', function ($query) use ($userBranchId, $request) {
+            if ($userBranchId) {
+                $query->where('branch_id', $userBranchId);
+            } elseif ($request->filled('branch_id')) {
+                $query->where('branch_id', $request->branch_id);
+            }
+        });
+
+        $pendingReceivingTransaction = $query->get();
+
+        return DataTables::of($pendingReceivingTransaction)
+            ->setRowId('id')
+            ->addColumn('checkbox', function($row){
+                $checkbox = '';
+                if($row->status == 'Completed'){
+                    $checkbox = '';
+                } else if ($row->status == 'Pending'){
+                    $checkbox = '<input type="checkbox" class="check check-item" data-id="' . $row->id . '"/>';
+                } else if ($row->status == 'Cancelled') {
+                    $checkbox = '';
+                } else {
+                    $checkbox = '';
                 }
-            });
+                return $checkbox;
+            })
+            ->addColumn('action', function($row) use ($userGroup){
+                $action = '';
+                if($row->status == 'Pending'){
+                    $action .= '<a href="#" class="btn btn-success btn-sm receivedTransaction me-2 mb-2"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Receive Transaction"
+                                    data-id="' . $row->id . '"
+                                    data-transaction_id="' . $row->banks_transactions_id . '">
+                                    Receive
+                                </a>';
 
-            $pendingReceivingTransaction = $query->get();
+                    if($userGroup == 'Rider')
+                    {
+                        $action .= '';
+                    } else {
+                        // Cancelled Loan Has no Cancelled
+                        if($row->transaction_actions_id == 13){
+                            $action .= '';
+                        } else {
+                            $action .= '<a href="#" class="btn btn-danger btn-sm cancelledTransaction me-2 mb-2"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Cancel Transaction"
+                                            data-id="' . $row->id . '"
+                                            data-transaction_id="' . $row->banks_transactions_id . '"
+                                            data-transaction_number="' . $row->AtmBanksTransaction->transaction_number . '">
+                                            <i class="fas fa-times-circle"></i>
+                                        </a>';
+                        }
+                    }
+                }
+                else if ($row->status == 'Completed'){
+                        $dateApproved = $row->date_approved ? Carbon::parse($row->date_approved)->format('M j, Y - h:i A') : 'N/A';
+                        $action = '<span class="fw-bold text-danger">Already Received</span><br>' .$dateApproved;
+                } else if ($row->status == 'Cancelled') {
+                    $action = 'Cancelled';
+                } else {
+                    $action = '';
+                }
+                return $action;
+            })
+            ->addColumn('full_name', function ($row) {
+                // Check if the relationships and fields exist
+                $clientInfo = $row->AtmBanksTransaction->AtmClientBanks->ClientInformation ?? null;
+                $branchLocation = $row->AtmBanksTransaction->Branch->branch_location ?? 'N/A'; // Default to 'N/A' if branch_location is missing
 
-            return DataTables::of($pendingReceivingTransaction)
-                ->setRowId('id')
-                ->make(true);
+                if ($clientInfo) {
+                    $lastName = $clientInfo->last_name ?? '';
+                    $firstName = $clientInfo->first_name ?? '';
+                    $middleName = $clientInfo->middle_name ? ' ' . $clientInfo->middle_name : ''; // Add space if middle_name exists
+                    $suffix = $clientInfo->suffix ? ', ' . $clientInfo->suffix : ''; // Add comma if suffix exists
+
+                    // Combine the parts into the full name
+                    $fullName = "{$lastName}, {$firstName}{$middleName}{$suffix}";
+                } else {
+                    // Fallback if client information is missing
+                    $fullName = 'N/A';
+                }
+
+                return "<span>{$fullName}</span> <br> <span class='text-primary'>{$branchLocation}</span>";
+            })
+            ->addColumn('pension_details', function ($row) {
+                // Check if the relationships and fields exist
+                $pensionDetails = $row->AtmBanksTransaction->AtmClientBanks->ClientInformation ?? null;
+
+                if ($pensionDetails) {
+                    $PensionNumber = $pensionDetails->pension_number ?? '';
+                    $PensionType = $pensionDetails->pension_account_type ?? '';
+                    $AccountType = $pensionDetails->pension_type ?? '';
+
+                    // Combine the parts into the full name
+                    $pension_details = "<span class='fw-bold text-primary h6 pension_number_mask_display'>{$PensionNumber}</span><br>
+                                       <span class='fw-bold'>{$PensionType}</span><br>
+                                       <span class='text-success'>{$AccountType}</span>";
+                } else {
+                    // Fallback if client information is missing
+                    $pension_details = 'N/A';
+                }
+
+                return $pension_details;
+            })
+            ->rawColumns(['checkbox','action','full_name','pension_details']) // Render HTML in both the action and pending_to columns
+            ->make(true);
     }
 
     public function TransactionReleasingData(Request $request)
@@ -1629,35 +1732,130 @@ class AtmTransactionController extends Controller
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
 
-        $query = AtmBanksTransactionApproval::with('DataUserGroup','Employee','DataTransactionAction',
-                    'AtmBanksTransaction',
-                    'AtmBanksTransaction.Branch',
-                    'AtmBanksTransaction.AtmClientBanks',
-                    'AtmBanksTransaction.AtmClientBanks.ClientInformation')
-            ->whereIn('status', ['Pending', 'Completed']) // Use whereIn for multiple values
+        $query = AtmBanksTransactionApproval::with('DataUserGroup', 'Employee', 'DataTransactionAction',
+                'AtmBanksTransaction',
+                'AtmBanksTransaction.Branch',
+                'AtmBanksTransaction.AtmClientBanks',
+                'AtmBanksTransaction.AtmClientBanks.ClientInformation')
+            ->whereIn('status', ['Pending','Completed','Cancelled']) // Use whereIn for multiple values
             ->where('type', 'Released')
-            ->where('user_groups_id', Auth::user()->user_group_id)
-            // ->where(function ($query) use ($userGroup) {
-            //     if (in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin'])) {
-            //         $query->whereIn('user_groups_id', [1, 2, 56]);
-            //     } else {
-            //         $query->where('user_groups_id', Auth::user()->user_group_id);
-            //     }
-            // })
-            ->whereHas('AtmBanksTransaction', function ($query) use ($userBranchId, $request) {
-                // Apply branch filter based on user branch_id or request input
-                if ($userBranchId) {
-                    $query->where('branch_id', $userBranchId);
-                } elseif ($request->filled('branch_id')) {
-                    $query->where('branch_id', $request->branch_id);
+            ->orderBy('id', 'desc'); // Corrected syntax for descending order
+
+            // Apply user group filter unless the user group is Developer
+            if (!in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin'])) {
+                $query->where('user_groups_id', Auth::user()->user_group_id);
+            }
+
+        // Apply branch filter based on user branch_id or request input
+        $query->whereHas('AtmBanksTransaction', function ($query) use ($userBranchId, $request) {
+            if ($userBranchId) {
+                $query->where('branch_id', $userBranchId);
+            } elseif ($request->filled('branch_id')) {
+                $query->where('branch_id', $request->branch_id);
+            }
+        });
+
+        $pendingReceivingTransaction = $query->get();
+
+        return DataTables::of($pendingReceivingTransaction)
+            ->setRowId('id')
+            ->addColumn('checkbox', function($row){
+                $checkbox = '';
+                if($row->status == 'Completed'){
+                    $checkbox = '';
+                } else if ($row->status == 'Pending'){
+                    $checkbox = '<input type="checkbox" class="check check-item" data-id="' . $row->id . '"/>';
+                } else if ($row->status == 'Cancelled') {
+                    $checkbox = '';
+                } else {
+                    $checkbox = '';
                 }
-            });
+                return $checkbox;
+            })
+            ->addColumn('action', function($row) use ($userGroup){
+                $action = '';
+                if($row->status == 'Pending'){
+                    $action .= '<a href="#" class="btn btn-success btn-sm receivedTransaction me-2 mb-2"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Receive Transaction"
+                                    data-id="' . $row->id . '"
+                                    data-transaction_id="' . $row->banks_transactions_id . '">
+                                    Receive
+                                </a>';
 
-            $pendingReleasingTransaction = $query->get();
+                    if($userGroup == 'Rider')
+                    {
+                        $action .= '';
+                    } else {
+                        // Cancelled Loan Has no Cancelled
+                        if($row->transaction_actions_id == 13){
+                            $action .= '';
+                        } else {
+                            $action .= '<a href="#" class="btn btn-danger btn-sm cancelledTransaction me-2 mb-2"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Cancel Transaction"
+                                            data-id="' . $row->id . '"
+                                            data-transaction_id="' . $row->banks_transactions_id . '"
+                                            data-transaction_number="' . $row->AtmBanksTransaction->transaction_number . '">
+                                            <i class="fas fa-times-circle"></i>
+                                        </a>';
+                        }
+                    }
+                }
+                else if ($row->status == 'Completed'){
+                        $dateApproved = $row->date_approved ? Carbon::parse($row->date_approved)->format('M j, Y - h:i A') : 'N/A';
+                        $action = '<span class="fw-bold text-danger">Already Received</span><br>' .$dateApproved;
+                } else if ($row->status == 'Cancelled') {
+                    $action = 'Cancelled';
+                } else {
+                    $action = '';
+                }
+                return $action;
+            })
+            ->addColumn('full_name', function ($row) {
+                // Check if the relationships and fields exist
+                $clientInfo = $row->AtmBanksTransaction->AtmClientBanks->ClientInformation ?? null;
+                $branchLocation = $row->AtmBanksTransaction->Branch->branch_location ?? 'N/A'; // Default to 'N/A' if branch_location is missing
 
-            return DataTables::of($pendingReleasingTransaction)
-                ->setRowId('id')
-                ->make(true);
+                if ($clientInfo) {
+                    $lastName = $clientInfo->last_name ?? '';
+                    $firstName = $clientInfo->first_name ?? '';
+                    $middleName = $clientInfo->middle_name ? ' ' . $clientInfo->middle_name : ''; // Add space if middle_name exists
+                    $suffix = $clientInfo->suffix ? ', ' . $clientInfo->suffix : ''; // Add comma if suffix exists
+
+                    // Combine the parts into the full name
+                    $fullName = "{$lastName}, {$firstName}{$middleName}{$suffix}";
+                } else {
+                    // Fallback if client information is missing
+                    $fullName = 'N/A';
+                }
+
+                return "<span>{$fullName}</span> <br> <span class='text-primary'>{$branchLocation}</span>";
+            })
+            ->addColumn('pension_details', function ($row) {
+                // Check if the relationships and fields exist
+                $pensionDetails = $row->AtmBanksTransaction->AtmClientBanks->ClientInformation ?? null;
+
+                if ($pensionDetails) {
+                    $PensionNumber = $pensionDetails->pension_number ?? '';
+                    $PensionType = $pensionDetails->pension_account_type ?? '';
+                    $AccountType = $pensionDetails->pension_type ?? '';
+
+                    // Combine the parts into the full name
+                    $pension_details = "<span class='fw-bold text-primary h6 pension_number_mask_display'>{$PensionNumber}</span><br>
+                                       <span class='fw-bold'>{$PensionType}</span><br>
+                                       <span class='text-success'>{$AccountType}</span>";
+                } else {
+                    // Fallback if client information is missing
+                    $pension_details = 'N/A';
+                }
+
+                return $pension_details;
+            })
+            ->rawColumns(['checkbox','action','full_name','pension_details']) // Render HTML in both the action and pending_to columns
+            ->make(true);
     }
 
     public function TransactionTransferBranch(Request $request)
