@@ -10,7 +10,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ URL::asset('assets/images/favicon.ico') }}">
-    @include('layouts.head-css')
+    @include('layouts.atm_monitoring_head-css')
 </head>
 
 @section('body')
@@ -18,8 +18,8 @@
 @show
     <!-- Begin page -->
     <div id="layout-wrapper">
-        @include('layouts.topbar')
-        @include('layouts.sidebar')
+        @include('layouts.atm_monitoring_topbar')
+        @include('layouts.atm_monitoring_sidebar')
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
@@ -43,7 +43,7 @@
     <!-- /Right-bar -->
 
     <!-- JAVASCRIPT -->
-    @include('layouts.vendor-scripts')
+    @include('layouts.atm_monitoring_vendor-scripts')
 </body>
 
 </html>

@@ -14,17 +14,35 @@ class AtmBanksTransactionApproval extends Model
 
     public function AtmBanksTransaction()
     {
-        return $this->belongsTo(AtmBanksTransaction::class, 'banks_transactions_id', 'id');
+        return $this->belongsTo(AtmBanksTransaction::class, 'banks_transactions_id', 'id')
+            ->whereIn('status', ['ON GOING','COMPLETED','CANCELLED']) // Add a filter for the "On Going" status
+            ->select([
+                'id',
+                'branch_id',
+                'transaction_actions_id',
+                'created_at',
+                'client_banks_id',
+                'transaction_number',
+                'status',
+            ]);
     }
 
     public function DataTransactionAction()
     {
-        return $this->belongsTo(DataTransactionAction::class, 'transaction_actions_id','id');
+        return $this->belongsTo(DataTransactionAction::class, 'transaction_actions_id','id')
+            ->select([
+                'id',
+                'name'
+            ]);
     }
 
     public function DataUserGroup()
     {
-        return $this->belongsTo(DataUserGroup::class, 'user_groups_id','id');
+        return $this->belongsTo(DataUserGroup::class, 'user_groups_id','id')
+            ->select([
+                'id',
+                'group_name'
+            ]);
     }
 
     public function Employee()

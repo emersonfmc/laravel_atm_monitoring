@@ -26,5 +26,21 @@
             max-height: 400px; /* Adjust the height as needed */
             overflow-y: auto;
         }
+
+        .table_scrollable::-webkit-scrollbar {
+            width: 9px;
+        }
+
+        .table_scrollable::-webkit-scrollbar-track {
+            border-radius: 8px;
+            background-color: #ffffff;
+            border: 1px solid #ffffff;
+            box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+        }
+
+        .table_scrollable::-webkit-scrollbar-thumb {
+            border-radius: 8px;
+            background-color: #C1C1C1;
+        }
 </style>
 

@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layouts.atm_monitoring_master')
 
 @section('title') @lang('translation.Dashboards') @endsection
 
@@ -709,7 +709,10 @@
                                                         </h5>
                                                     </div>
                                                     <div class="flex-grow-1">
-                                                        <div><span class="fw-bold h6 text-primary">${transactionAction} </span> / ${transactionNumber } / ${branchLocation}</div>
+                                                        <div>
+                                                            <span class="fw-bold h6 text-danger">${transactionAction} </span> /
+                                                            <span class="fw-bold h6">${transactionNumber }</span> /
+                                                            <span class="text-primary">${branchLocation}</span></div>
                                                     </div>
                                                 </div>
                                             </li>`;
