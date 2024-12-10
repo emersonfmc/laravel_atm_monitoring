@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layouts.atm_monitoring_master')
 
 @section('content')
 
