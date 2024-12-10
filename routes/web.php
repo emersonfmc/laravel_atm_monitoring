@@ -32,6 +32,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/elog_monitoring_dashboard', 'elog_monitoring_dashboard')->name('elog_monitoring_dashboard');
         Route::get('/elog_monitoring_dashboard_data', 'elog_monitoring_dashboard_data')->name('elog_monitoring_dashboard_data');
         Route::get('/elog_monitoring_transaction_data', 'elog_monitoring_transaction_data')->name('elog_monitoring_transaction_data');
+
+        Route::get('/main_dashboard', 'main_dashboard')->name('main_dashboard');
         Route::get('/SidebarCount', 'SidebarCount')->name('SidebarCount');
     });
 });

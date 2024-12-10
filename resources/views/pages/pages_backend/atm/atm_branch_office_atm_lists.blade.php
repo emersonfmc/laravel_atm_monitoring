@@ -1,4 +1,4 @@
-@extends('layouts.atm_monitoring_master')
+@extends('layouts.atm_monitoring.atm_monitoring_master')
 
 @section('content')
 
@@ -776,6 +776,155 @@
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
             </div>
           </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addAtmTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="createTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-uppercase">Add ATM Transaction</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('TransactionAddAtm') }}" method="POST" id="TransactionAddAtmValidateForm">
+                        @csrf
+                        <div class="row">
+                            <input type="hidden" name="atm_id" id="add_atm_atm_id">
+                            <input type="hidden" name="reason_for_pull_out" value="23">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <div id="add_atm_fullname" class="fw-bold h4"></div>
+                                    <span id="add_atm_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="add_atm_pension_account_type" class="fw-bold h5"></span>
+                                </div>
+                                <hr>
+                                <div class="row mb-3">
+                                    <div class="form-group col-3">
+                                        <label class="fw-bold h6">Transaction Number</label>
+                                        <input type="text" class="form-control" id="add_atm_transaction_number" readonly>
+                                    </div>
+
+                                    <div class="form-group col-3">
+                                        <label class="fw-bold h6">Birthdate</label>
+                                        <input type="text" class="form-control" id="add_atm_birth_date" readonly>
+                                    </div>
+
+                                    <div class="form-group col-3">
+                                        <label class="fw-bold h6">Bank Account Number</label>
+                                        <input type="text" class="form-control" id="add_atm_bank_account_no" readonly>
+                                    </div>
+                                    <div class="form-group col-3">
+                                        <label class="fw-bold h6">Bank Name</label>
+                                        <input type="text" class="form-control" id="add_atm_bank_name" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="form-group col-3">
+                                        <label class="fw-bold h6">Type</label>
+                                        <input type="text" class="form-control" id="add_atm_atm_type" readonly>
+                                    </div>
+                                    <div class="form-group col-3">
+                                        <label class="fw-bold h6">Expiration Date</label>
+                                        <input type="text" class="form-control" id="add_atm_expiration_date" readonly>
+                                    </div>
+
+                                    <div class="form-group col-3">
+                                        <label class="fw-bold h6">Collection Date</label>
+                                        <select name="collection_date" id="add_atm_collection_date" class="form-select select2">
+                                            @foreach ($DataCollectionDate as $collection)
+                                                <option value="{{ $collection->collection_date }}">{{ $collection->collection_date }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="row mt-2">
+                                    <hr>
+                                    <label class="fw-bold h6 text-center mb-3 text-primary">
+                                    ATM / Passsbook / Simcard Details
+                                    </label>
+
+                                    <hr>
+                                    <div class="col-md-6">
+                                    <div class="form-group mb-2 row align-items-center">
+                                        <label class="col-form-label col-sm-4 fw-bold">Type</label>
+                                        <div class="col-sm-5">
+                                        <select name="atm_type" id="atm_type_add_atm" class="form-select" required>
+                                            <option value="" selected disabled>Type</option>
+                                            <option value="ATM">ATM</option>
+                                            <option value="Passbook">Passbook</option>
+                                            <option value="Sim Card">Sim Card</option>
+                                        </select>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <select name="atm_status" id="atm_status" class="form-select" required>
+                                            <option value="">ATM Status</option>
+                                            <option value="New" selected>New</option>
+                                            <option value="Old">Old</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mb-2 row align-items-center">
+                                        <label class="col-form-label col-4 fw-bold">ATM / Passbook / Sim No.</label>
+                                        <div class="col-8">
+                                        <input type="text" name="atm_number" class="atm_card_input_mask form-control" placeholder="ATM / Passbook / Sim No." required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mb-2 row align-items-center">
+                                        <label class="col-form-label col-4 fw-bold">Balance</label>
+                                        <div class="col-8">
+                                            <input type="text" name="atm_balance" class="balance_input_mask form-control" placeholder="Balance" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mb-2 row align-items-center">
+                                        <label class="font-size col-form-label col-4 fw-bold">Banks</label>
+                                        <div class="col-8">
+                                        <div class="form-group">
+                                            <select name="bank_name" id="add_atm_bank_names" class="form-select select2" required>
+                                                @foreach ($DataBankLists as $bank)
+                                                    <option value="{{ $bank->bank_name }}">{{ $bank->bank_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                    <div class="form-group mb-2 row align-items-center">
+                                        <label class="col-form-label col-4 fw-bold">Pin Code</label>
+                                        <div class="col-8">
+                                        <input type="number" name="pin_code" class="form-control" placeholder="PIN Code">
+                                        </div>
+                                    </div>
+                                    <div class="form-group mb-2 row align-items-center">
+                                        <label class="col-form-label col-4 fw-bold">Expiration Date</label>
+                                        <div class="col-8">
+                                        <input type="month" name="expiration_date" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group mb-2 row align-items-center">
+                                        <label class="col-form-label col-4 fw-bold">Remarks</label>
+                                        <div class="col-8">
+                                        <input type="text" name="remarks" class="form-control" placeholder="Remarks" minlength="0" maxlength="100">
+                                        </div>
+                                    </div>
+                                    </div>
+                                    <hr class="mt-2 mb-2">
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                            <button type="submit" class="btn btn-success">Add ATM</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -2255,6 +2404,195 @@
                     };
                 });
             // Generating of QR Code
+
+            // Add ATM Transaction
+                    $('#addAtmTransactionModal').on('shown.bs.modal', function () {
+                    $('#add_atm_bank_names').select2({ dropdownParent: $('#addAtmTransactionModal'), });
+                    $('#add_atm_collection_date').select2({ dropdownParent: $('#addAtmTransactionModal'), });
+                });
+
+                $('#FetchingDatatable').on('click', '.addAtmTransaction', function(e) {
+                    e.preventDefault();
+                    var new_atm_id = $(this).data('id');
+
+                    $.ajax({
+                        url: "/AtmClientFetch",
+                        type: "GET",
+                        data: { new_atm_id : new_atm_id },
+                        success: function(data) {
+                            let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+
+                            $('#add_atm_fullname').text(data.client_information.last_name +', '
+                                                        + data.client_information.first_name +' '
+                                                        +(data.client_information.middle_name ?? '') +' '
+                                                        + (data.client_information.suffix ?? ''));
+
+                            $('#add_atm_pension_number_display').text(data.client_information.pension_number ?? '');
+                            $('#add_atm_pension_number_display').inputmask("99-9999999-99");
+
+                            $('#add_atm_pension_number').val(data.client_information.pension_number);
+                            $('#add_atm_pension_account_type').text(data.client_information.pension_account_type);
+                            $('#add_atm_pension_type').val(data.client_information.pension_type);
+                            $('#add_atm_birth_date').val(formattedBirthDate);
+                            $('#add_atm_branch_location').val(data.branch.branch_location);
+
+                            $('#add_atm_atm_id').val(data.id);
+                            $('#add_atm_bank_account_no').val(data.bank_account_no ?? '');
+                            $('#add_atm_collection_date').val(data.collection_date ?? '').trigger('change');
+                            $('#add_atm_atm_type').val(data.atm_type ?? '');
+                            $('#add_atm_bank_name').val(data.bank_name ?? '');
+                            $('#add_atm_transaction_number').val(data.transaction_number ?? '');
+
+                            let expirationDate = '';
+                            if (data.expiration_date && data.expiration_date !== '0000-00-00') {
+                                expirationDate = new Date(data.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                            }
+                            $('#add_atm_expiration_date').val((expirationDate || ''));
+
+                            $('#addAtmTransactionModal').modal('show');
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("An error occurred: " + error);
+                        }
+                    });
+                });
+
+                function AddAtmTransactionModal() {
+                    $('#addAtmTransactionModal').modal('hide');
+                    $('#FetchingDatatable tbody').empty();
+                }
+
+                $('#TransactionAddAtmValidateForm').validate({
+                    rules: {
+                        remarks: {
+                            required: true
+                        },
+                        pin_code: {
+                            required: function (element) {
+                                return $('#atm_type_add_atm').val() === 'ATM'; // Pin code required only if ATM type is 'ATM'
+                            }
+                        }
+                    },
+                    errorElement: 'span',
+                    errorPlacement: function(error, element) {
+                        error.addClass('invalid-feedback');
+                        element.closest('.form-group').append(error);
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element, errorClass, validClass) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    submitHandler: function(form) {
+                        var hasRows = FetchingDatatableBody.children('tr').length > 0;
+                        if (hasRows) {
+                            Swal.fire({
+                                title: 'Confirmation',
+                                text: 'Are you sure you want to save this?',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonColor: "#007BFF",
+                                cancelButtonColor: "#6C757D",
+                                confirmButtonText: "Yes, Save it!"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    const currentPage = dataTable.table.page();
+                                    var formData = new FormData(form);
+                                    $.ajax({
+                                        url: form.action,
+                                        type: form.method,
+                                        data: formData,
+                                        contentType: false,
+                                        processData: false,
+                                        success: function(response) {
+
+                                            if (typeof response === 'string') {
+                                                var res = JSON.parse(response);
+                                            } else {
+                                                var res = response; // If it's already an object
+                                            }
+
+                                            if (res.status === 'success')
+                                            {
+                                                AddAtmTransactionModal();
+                                                Swal.fire({
+                                                    title: 'Successfully Created!',
+                                                    text: 'Transaction is successfully Created!',
+                                                    icon: 'success',
+                                                    showCancelButton: false,
+                                                    showConfirmButton: true,
+                                                    confirmButtonText: 'OK',
+                                                    preConfirm: () => {
+                                                        return new Promise(( resolve
+                                                        ) => {
+                                                            Swal.fire({
+                                                                title: 'Please Wait...',
+                                                                allowOutsideClick: false,
+                                                                allowEscapeKey: false,
+                                                                showConfirmButton: false,
+                                                                showCancelButton: false,
+                                                                didOpen: () => {
+                                                                    Swal.showLoading();
+                                                                    // here the reload of datatable
+                                                                    // window.location.href = '{{ route("BranchOfficePage") }}';
+                                                                    dataTable.table.ajax.reload( () =>
+                                                                    {
+                                                                        Swal.close();
+                                                                        $(form)[0].reset();
+                                                                        dataTable.table.page(currentPage).draw( false );
+                                                                    },
+                                                                    false );
+                                                                }
+                                                            })
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                            else if (res.status === 'error')
+                                            {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: res.message,
+                                                    icon: 'error',
+                                                });
+                                            }
+                                            else
+                                            {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: 'Error Occurred Please Try Again',
+                                                    icon: 'error',
+                                                });
+                                            }
+                                        },
+                                        error: function(xhr, status, error) {
+                                            var errorMessage =
+                                                'An error occurred. Please try again later.';
+                                            if (xhr.responseJSON && xhr.responseJSON
+                                                .error) {
+                                                errorMessage = xhr.responseJSON.error;
+                                            }
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: errorMessage,
+                                                icon: 'error',
+                                            });
+                                        }
+                                    })
+                                }
+                            })
+                        } else {
+
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Empty Record!',
+                                text: 'Table is empty, add row to proceed!',
+                            });
+                        }
+                    }
+                });
+            // Add ATM Transaction
         });
 
         $(document).on('click', '.view_pin_code', function(e) {

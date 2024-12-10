@@ -121,8 +121,8 @@ class DefaultController extends Controller
         $mpdf->AddPageByArray([
             'margin-left' => 10,
             'margin-right' => 3,
-            'margin-top' => 0,
-            'margin-bottom' => 0,
+            'margin-top' => 3,
+            'margin-bottom' => 3,
         ]);
 
         // Write HTML to PDF
