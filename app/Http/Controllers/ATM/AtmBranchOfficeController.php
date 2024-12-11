@@ -94,16 +94,14 @@ class AtmBranchOfficeController extends Controller
 
                 // Only show the button for users in specific groups
                 if (in_array($userGroup, ['Developer', 'Admin', 'Branch Head', 'Everfirst Admin'])) {
-                    if ($hasOngoingTransaction)
-                    {
+                    if ($hasOngoingTransaction) {
                         // Display the spinning icon if there is any ongoing transaction
-                        $action = '<i class="fas fa-spinner fa-spin fs-3 text-success"></i>';
+                        $action = '<i class="fas fa-spinner fa-spin fs-3 text-success me-4"></i>';
                     }
-                    else if ($latestTransaction && $latestTransaction->transaction_actions_id)
-                    {
+                    else if ($latestTransaction && $latestTransaction->transaction_actions_id) {
                         // Generate buttons based on `transaction_actions_id`
                         if ($latestTransaction->transaction_actions_id == 3 || $latestTransaction->transaction_actions_id == 9) {
-                            $action = '<button type="button" class="btn btn-success release_transaction"
+                            $action = '<button type="button" class="btn btn-success release_transaction me-2"
                                             data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="right"
@@ -112,7 +110,7 @@ class AtmBranchOfficeController extends Controller
                                         </button>';
                         }
                         else if ($latestTransaction->transaction_actions_id == 1) {
-                            $action = '<button type="button" class="btn btn-warning borrow_transaction"
+                            $action = '<button type="button" class="btn btn-warning borrow_transaction me-2"
                                             data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="right"
@@ -121,7 +119,7 @@ class AtmBranchOfficeController extends Controller
                                         </button>';
                         }
                         else if ($latestTransaction->transaction_actions_id == 11) {
-                            $action = '<button type="button" class="btn btn-primary replacement_atm_transaction"
+                            $action = '<button type="button" class="btn btn-primary replacement_atm_transaction me-2"
                                             data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="right"
@@ -130,7 +128,7 @@ class AtmBranchOfficeController extends Controller
                                         </button>';
                         }
                         else if ($latestTransaction->transaction_actions_id == 13) {
-                            $action = '<button type="button" class="btn btn-danger cancelled_loan_transaction"
+                            $action = '<button type="button" class="btn btn-danger cancelled_loan_transaction me-2"
                                             data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="right"
@@ -139,7 +137,7 @@ class AtmBranchOfficeController extends Controller
                                         </button>';
                         }
                         else if ($latestTransaction->transaction_actions_id == 16) {
-                            $action = '<button type="button" class="btn btn-danger release_balance_transaction"
+                            $action = '<button type="button" class="btn btn-danger release_balance_transaction me-2"
                                             data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="right"
@@ -148,7 +146,7 @@ class AtmBranchOfficeController extends Controller
                                         </button>';
                         }
                         else {
-                            $action = '<button type="button" class="btn btn-warning borrow_transaction"
+                            $action = '<button type="button" class="btn btn-warning borrow_transaction me-2"
                                             data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="right"
@@ -157,9 +155,8 @@ class AtmBranchOfficeController extends Controller
                                         </button>';
                         }
                     }
-                    else
-                    {
-                        $action = '<button type="button" class="btn btn-warning borrow_transaction"
+                    else {
+                        $action = '<button type="button" class="btn btn-warning borrow_transaction me-2 me-2"
                                         data-id="'.$row->id.'"
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="right"
@@ -167,6 +164,14 @@ class AtmBranchOfficeController extends Controller
                                     <i class="fas fa-undo"></i>
                                     </button>';
                     }
+
+                    $action .= '<a href="#" class="btn btn-success addAtmTransaction me-2 me-2"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="Add ATM"
+                                    data-id="' . $row->id . '">
+                                    <i class="fas fa-credit-card"></i>
+                                </a>';
                 }
 
                 return $action; // Return the action content

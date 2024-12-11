@@ -310,6 +310,11 @@ class DashboardController extends Controller
         ]);
     }
 
+    public function main_dashboard()
+    {
+        return view('pages.pages_backend.main_dashboard');
+    }
+
 
 
 
