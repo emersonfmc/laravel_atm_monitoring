@@ -68,7 +68,7 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('settings.area.page') }}" class="waves-effect">
+                    <a href="{{ route('settings.branch.page') }}" class="waves-effect">
                         <i class="fas fa-code-branch fs-5" style="color: #E684FF;"></i>
                         <span key="sub-branches">Branches</span>
                     </a>
