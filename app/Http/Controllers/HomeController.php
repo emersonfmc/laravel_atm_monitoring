@@ -38,11 +38,7 @@ class HomeController extends Controller
 
     public function root()
     {
-        $branch_id = Auth::user()->branch_id;
-        $Branches = Branch::where('status', 'Active')->get();
-        $DataTransactionAction = DataTransactionAction::where('status', 'Active')->get();
-
-        return view('pages.pages_backend.dashboard',compact('branch_id','Branches','DataTransactionAction'));
+        return view('pages.pages_backend.main_dashboard');
     }
 
     /*Language Translation*/
