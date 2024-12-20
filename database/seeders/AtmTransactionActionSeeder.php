@@ -39,6 +39,9 @@ class AtmTransactionActionSeeder extends Seeder
             [21, 'ATM Did not Replaced',             2, 'Going to Head Office','Active'],
             [22, 'Returning / Balik Loob Client',    4, 'Going to Head Office', 'Active'],
             [23, 'Add ATM',                          2, 'Going to Head Office', 'Active'],
+            [24, 'ATM/PB For Collection',            5, 'Outside For Collection', 'Active'],
+            [25, 'Print Out Statement Thru ATM',     5, 'Outside For Collection', 'Active'],
+            [26, 'Update Passbook Details',          5, 'Outside For Collection', 'Active'],
         ];
 
         foreach ($datas as $data) {

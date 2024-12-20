@@ -1,18 +1,16 @@
 <header id="page-topbar">
-    <div class="navbar-header">
+    <div class="navbar-header ms-5 me-5">
         <div class="d-flex">
             <!-- LOGO -->
-            <div class="navbar-brand-box">
-                <a href="index" class="logo logo-dark">
-                    <span class="logo-sm">
-                        <img src="{{ URL::asset('/assets/images/favicon.ico') }}" alt="" height="22">
-                    </span>
-                    <span class="logo-lg">
-                        <img src="{{ URL::asset('/assets/images/favicon.ico') }}" alt="" height="17">
+            <div class="navbar-brand-box text-start">
+                <a href="{{ route('main_dashboard') }}" class="logo logo-dark text-start">
+                    <span>
+                        <img src="{{ URL::asset('/assets/images/favicon.ico') }}" alt="" height="40" class="me-2">
+                        <span class="fw-bold h5 text-dark">EVERFIRST </span>
                     </span>
                 </a>
 
-                <a href="index" class="logo logo-light">
+                <a href="{{ route('main_dashboard') }}" class="logo logo-light">
                     <span class="logo-sm">
                         <img src="{{ URL::asset('/assets/images/favicon.ico') }}" alt="" height="25" width="25">
                     </span>
@@ -24,7 +22,7 @@
             </div>
 
 
-    </div>
+        </div>
 
     <div class="d-flex">
 

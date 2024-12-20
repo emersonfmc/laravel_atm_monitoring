@@ -29,6 +29,12 @@ use Yajra\DataTables\Facades\DataTables;
 
 class SettingsController extends Controller
 {
+    public function settings_dashboard()
+    {
+        return view('pages.pages_backend.settings_dashboard');
+    }
+
+
     public function users_group_page()
     {
         $user = Auth::user();

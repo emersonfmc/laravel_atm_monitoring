@@ -3,44 +3,47 @@
 
 <head>
     <meta charset="utf-8" />
-    <title> @yield('title') RDS | Everfirst</title>
+    <title> RDS | Everfirst </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
+    <meta content="Themesbrand" name="author" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ URL::asset('assets/images/favicon.ico') }}">
-    @include('layouts.head-css')
+    @include('layouts.documents.documents_head-css')
 </head>
 
 @section('body')
-    <body data-topbar="dark" data-layout="horizontal">
+    <body data-sidebar="dark">
 @show
-
     <!-- Begin page -->
     <div id="layout-wrapper">
-        @include('layouts.horizontal')
+        @include('layouts.documents.documents_topbar')
+        @include('layouts.documents.documents_sidebar')
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
         <div class="main-content">
             <div class="page-content">
-                <!-- Start content -->
                 <div class="container-fluid">
-                    @yield('content')
-                </div> <!-- content -->
+
+                    @yield('documents')
+                </div>
+                <!-- container-fluid -->
             </div>
-            @include('layouts.footer')
+            <!-- End Page-content -->
+            @include('layouts.main_footer')
         </div>
-        <!-- ============================================================== -->
-        <!-- End Right content here -->
-        <!-- ============================================================== -->
+        <!-- end main content-->
     </div>
-    <!-- END wrapper -->
+    <!-- END layout-wrapper -->
 
     <!-- Right Sidebar -->
     {{-- @include('layouts.right-sidebar') --}}
-    <!-- END Right Sidebar -->
+    <!-- /Right-bar -->
 
-    @include('layouts.vendor-scripts')
+    <!-- JAVASCRIPT -->
+    @include('layouts.documents.documents_vendor-scripts')
 </body>
 
 </html>

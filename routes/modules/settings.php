@@ -8,6 +8,8 @@ Auth::routes();
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'settings'], function () {
     Route::controller(SettingsController::class)->group(function () {
+        Route::get('/settings_dashboard', 'settings_dashboard')->name('settings.dashboard.page');
+
         Route::get('/districts', 'districts_page')->name('settings.district.page');
         Route::get('/districts/data', 'districts_data')->name('settings.district.data');
         Route::get('/districts/get/{id}', 'districtsGet')->name('settings.districts.get');

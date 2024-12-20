@@ -199,7 +199,7 @@
                 <h4 class="card-title mb-4 mt-2">Top Branch Most Clients</h4>
                 <div class="text-center">
                     <div class="mb-4">
-                        <i class="fas fa-code-branch display-4" style="color: #E684FF;"></i>
+                        <i class="fas fa-star display-4" style="color: #FAF704"></i>
                     </div>
                     <!-- Placeholder for Top 1 Branch -->
                     <h3 id="TopBranchClientCount">0</h3>
@@ -421,7 +421,7 @@
     <!-- end modal -->
 
 <script>
-// Selection Year for ATMs Passbooks and Simcards
+    // Selection Year for ATMs Passbooks and Simcards
     $(document).ready(function () {
         var startYearAtm = 2000; // Starting year
         var endYearAtm = new Date().getFullYear(); // Current year
@@ -501,7 +501,7 @@
                             }
                         },
                         title: {
-                            text: `ATMs, Passbooks, and Sim Cards - ${atm_year}`, // Display the year dynamically
+                            text: `ATMs, Passbooks, and Sim Cards`, // Display the year dynamically
                             align: 'center',
                             style: {
                                 color: '#FFFFFF' // Set the title color to white

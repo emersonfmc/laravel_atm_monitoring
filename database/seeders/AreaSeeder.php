@@ -94,7 +94,7 @@ class AreaSeeder extends Seeder
                         ],
                         [
                             'area_no' => 'A1',
-                            'area_supervisor' => 'Kayneth Joy Vigare',
+                            'area_supervisor' => 'Jocelyn Dela Cruz',
                             // 'email' => 'ksvigare@everfirstloans.com',
                             'district_id' => 5,
                                 'status' => 'Active',
