@@ -1,11 +1,11 @@
-@extends('layouts.atm_monitoring.atm_monitoring_master')
+@extends('layouts.settings.settings_master')
 
 @section('css')
     <!-- DataTables -->
     <link href="{{ URL::asset('assets/libs/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 
-@section('content')
+@section('settings')
 
     @component('components.breadcrumb')
         @slot('li_1') Settings @endslot

@@ -50,7 +50,7 @@ class DistrictSeeder extends Seeder
             ],
             [
                 'district_number' => 'D5',
-                'district_name' => 'Edgardo Rivera',
+                'district_name' => 'Kayneth Joy vigare',
                 'email' => 'ecrivera@everfirstloans.com',
                 'company_id' => 2,
                 'status' => 1,

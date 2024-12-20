@@ -73,6 +73,7 @@ class AtmHeadOfficeController extends Controller
         // Start the query with the necessary relationships
         $query = AtmClientBanks::with('ClientInformation', 'Branch', 'AtmBanksTransaction')
             ->where('location', 'Head Office')
+            ->whereNull('deleted_at')
             ->latest('updated_at');
 
         // Apply branch filter based on user branch_id or request input

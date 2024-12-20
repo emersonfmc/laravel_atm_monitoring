@@ -32,7 +32,7 @@ class DashboardController extends Controller
         $Branches = Branch::where('status', 'Active')->get();
         $DataTransactionAction = DataTransactionAction::where('status', 'Active')->get();
 
-        return view('pages.pages_backend.dashboard',compact('branch_id','Branches','DataTransactionAction'));
+        return view('pages.pages_backend.atm_dashboard',compact('branch_id','Branches','DataTransactionAction'));
     }
 
     public function elog_monitoring_dashboard_data(Request $request)

@@ -23,7 +23,7 @@ class ClientInformationFactory extends Factory
             'pension_type' => $this->faker->randomElement(['SSS','GSIS']), // Select from predefined pension types
             'pension_account_type' => DB::table('data_pension_types_lists')->inRandomOrder()->value('pension_name'), // Randomly select pension_name from atm_pension_types
             'first_name' => $this->faker->firstName, // Generate a random first name
-            'middle_name' => $this->faker->firstName, // Generate a random middle name
+           'middle_name' => strtoupper($this->faker->lexify($this->faker->boolean ? '?' : '??')) . '.',
             'last_name' => $this->faker->lastName, // Generate a random last name
             'suffix' => $this->faker->optional()->randomElement(['Jr.', 'Sr.', 'Ma.', 'I', 'II', 'III', 'IV']), // Random suffix or null
             'birth_date' => $this->faker->dateTimeBetween('1950-01-01', '1960-12-31')->format('Y-m-d'), // Random birth date
@@ -36,7 +36,7 @@ class ClientInformationFactory extends Factory
     {
         return $this->afterCreating(function (ClientInformation $client) {
             // Format today's date as MMDDYY for the transaction number prefix
-            $datePart = now()->format('mdy'); // e.g., "103024" for October 30, 2024
+            $datePart = now()->format('Y'); // e.g., "103024" for October 30, 2024
 
             // Create 2 unique ATMs for each client
             for ($i = 0; $i < 2; $i++) {
@@ -52,7 +52,7 @@ class ClientInformationFactory extends Factory
                 $incrementedPart = str_pad($increment, 5, '0', STR_PAD_LEFT);
 
                 // Form the full transaction number
-                $transactionNumber = "AD-$datePart-$incrementedPart";
+                $transactionNumber = "TS-$datePart-$incrementedPart";
 
                 // Create an ATM record for the client with a unique transaction number
                 AtmClientBanks::factory()->create([

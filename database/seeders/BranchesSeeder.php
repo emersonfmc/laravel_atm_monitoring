@@ -64,7 +64,7 @@ class BranchesSeeder extends Seeder
                         [2, 4, 'LX', 'Litex', 'Rodel Mogol', 2, 'Active', '2023-08-16 22:03:51'],
                         [5, 9, 'MI', 'Guadalupe Makati', 'Mark Anthony Ebora', 2, 'Active', '2023-08-17 22:03:51'],
                         [3, 5, 'ML', 'Malabon', 'Portia May Dela Cerna', 2, 'Active', '2023-08-18 22:03:51'],
-                        [2, 3, 'MC', 'Malaria', 'Marilou Fontanilla', 2, 'Active', '2023-08-19 22:03:51'],
+                        [2, 3, 'MC', 'Malaria', 'Jenny Cahusay', 2, 'Active', '2023-08-19 22:03:51'],
                         [1, 2, 'MS', 'Malolos', 'Jellie Enriquez', 2, 'Active', '2023-08-20 22:03:51'],
                         [5, 9, 'MD', 'Boni Mandaluyong', 'Myra Duran', 2, 'Active', '2023-08-21 22:03:51'],
                         [4, 8, 'MK', 'Marikina', 'Leah Licot', 2, 'Active', '2023-08-22 22:03:51'],
@@ -110,9 +110,9 @@ class BranchesSeeder extends Seeder
                         [NULL,	NULL,	NULL,	'Sucat',	NULL,	2, 'Active', '2022-09-21 22:03:51'],
                         [4,	7,	'TG',	'Taguig',	'Gilian Brin',	2, 'Active', '2022-09-21 22:03:51'],
                         [6,	11,	'TW',	'Tanauan',	'Mariecris Capalos', 2, 'Active', '2022-09-21 22:03:51'],
-                        [2,	4,	'TS',	'Tandang Sora',	'Sharon Miranda', 2, 'Active', '2022-09-21 22:03:51'],
+                        [2,	4,	'TS',	'Tandang Sora',	'Nico Patanao', 2, 'Active', '2022-09-21 22:03:51'],
                         [5,	10,	'TA',	'Tanza',	'Sarah Jane Abricanan',	2, 'Active', '2022-09-21 22:03:51'],
-                        [4,	7,	'TR',	'Taytay',	'Nathalee Manuel',	2, 'Active', '2022-09-21 22:03:51'],
+                        [4,	7,	'TR',	'Taytay',	'John Paul Tenedero',	2, 'Active', '2022-09-21 22:03:51'],
                         [NULL,	NULL,	NULL,	'Timelogs',	NULL,	2, 'Active', '2022-09-21 22:03:51'],
                         [3,	5,	'TN',	'Tinajeros',	'Rachelle Paura',	2, 'Active', '2022-09-21 22:03:51'],
                         [NULL,	NULL,	NULL,	'Training',	NULL,	2, 'Active', '2022-09-21 22:03:51'],
@@ -145,6 +145,12 @@ class BranchesSeeder extends Seeder
                         [6,	12,	'CR',	'Carmona',	'Erica M. Bartolata',2, 'Active','2024-09-27 08:38:03'],
                         [5,	10,	'TC',	'Trece Martires',	'Maryjane M. Ortinez',2, 'Active','2024-09-27 09:47:08'],
                         [4,	7,	'MP',	'Manggahan Pasig',	'John Paul D. Tenedero',2, 'Active','2024-10-08 14:53:34'],
+                        [1,	2,	'SB',	'Pandi',	'Melody O. Buligan',2, 'Active','2024-10-08 14:53:34'],
+                        [1,	1,	'LU',	'Lubao',	'Nerry C. Nadal',2, 'Active','2024-10-08 14:53:34'],
+                        [1,	1,	'PO',	'Poblacion / Tarlac',	'Lorelie DC. Patricio',2, 'Active','2024-10-08 14:53:34'],
+                        [1,	2,	'GU',	'Guiguinto',	'Marjorie O. Peña',2, 'Active','2024-10-08 14:53:34'],
+                        [4,	8,	'TE',	'Teresa',	'Jenny Santos',2, 'Active','2024-10-08 14:53:34'],
+                        [4,	7,	'TY',	'Tanay',	'Recio, Neman C',2, 'Active','2024-10-08 14:53:34'],
                     ];
 
                     // Loop through each branch array and insert into the database

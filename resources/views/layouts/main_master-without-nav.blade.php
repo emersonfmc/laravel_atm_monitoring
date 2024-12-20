@@ -10,13 +10,13 @@
         <meta content="Themesbrand" name="author" />
         <!-- App favicon -->
         <link rel="shortcut icon" href="{{ URL::asset('assets/images/favicon.ico')}}">
-        @include('layouts.atm_monitoring.atm_monitoring_head-css')
+        @include('layouts.main_head-css')
   </head>
 
     @yield('body')
 
     @yield('content')
 
-    @include('layouts.atm_monitoring.atm_monitoring_vendor-scripts')
+    @include('layouts.main_vendor-scripts')
     </body>
 </html>

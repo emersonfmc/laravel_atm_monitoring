@@ -18,7 +18,7 @@
                     </span>
                     <span class="logo-lg">
                         <img src="{{ URL::asset('/assets/images/favicon.ico') }}" alt="" height="35" width="35" class="me-2">
-                        <span class="fw-bold h5 text-white">ATM MONITORING</span>
+                        <span class="fw-bold h5 text-white">DOCUMENTS</span>
                     </span>
                 </a>
             </div>

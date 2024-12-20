@@ -10,23 +10,24 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ URL::asset('assets/images/favicon.ico') }}">
-    @include('layouts.main_head-css')
+    @include('layouts.settings.settings_head-css')
 </head>
 
 @section('body')
-    <body>
+    <body data-sidebar="dark">
 @show
     <!-- Begin page -->
     <div id="layout-wrapper">
-        @include('layouts.main_topbar')
+        @include('layouts.settings.settings_topbar')
+        @include('layouts.settings.settings_sidebar')
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
-        <div class="me-5 ms-5">
+        <div class="main-content">
             <div class="page-content">
                 <div class="container-fluid">
 
-                    @yield('main_dashboard')
+                    @yield('settings')
                 </div>
                 <!-- container-fluid -->
             </div>
@@ -42,7 +43,7 @@
     <!-- /Right-bar -->
 
     <!-- JAVASCRIPT -->
-    @include('layouts.main_vendor-scripts')
+    @include('layouts.settings.settings_vendor-scripts')
 </body>
 
 </html>
