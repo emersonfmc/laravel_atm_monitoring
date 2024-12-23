@@ -95,6 +95,23 @@
                     </a>
                 </li>
 
+                <li>
+                    <a href="{{ route('system.announcement.pages') }}" class="waves-effect">
+                        <i class="fas fa-bullhorn text-primary"></i>
+                        <span key="sub-maintenance">Announcement</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('system.logs.pages') }}" class="waves-effect">
+                        <i class="fa fa-history text-info"></i>
+                        <span key="sub-maintenance">System Logs</span>
+                    </a>
+                </li>
+
+
+
+
 
                 {{-- Icons Used
                 Box Icons

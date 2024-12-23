@@ -19,16 +19,16 @@ return new class extends Migration
             $table->unsignedBigInteger('client_banks_id')->nullable();
             $table->unsignedBigInteger('transaction_actions_id')->nullable();
             $table->string('request_by_employee_id')->nullable();
-
+            $table->string('oc_request_number')->nullable();
+            $table->enum('oc_transaction',['YES','NO'])->default('NO');
+            $table->string('oc_request_type')->nullable();
             $table->string('transaction_number')->nullable();
             $table->string('bank_account_no')->nullable();
-            $table->enum('atm_type',['ATM','Passbook','Sim Card'])->nullable();
             $table->unsignedBigInteger('branch_id')->nullable();
             $table->integer('aprb_no')->nullable();
-
             $table->string('reason')->nullable();
             $table->string('reason_remarks')->nullable();
-
+            // $table->enum('atm_type',['ATM','Passbook','Sim Card'])->nullable();
             $table->enum('status',['ON GOING','CANCELLED','COMPLETED'])->nullable();
 
             $table->integer('yellow_copy')->nullable();
