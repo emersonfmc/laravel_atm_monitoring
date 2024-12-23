@@ -224,6 +224,52 @@
                             </ul>
                         </li>
 
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow"
+                                key="outside_for_collection">
+                                <i class="fas fa-user-cog text-info"></i> Outside For Collection</a>
+                            <ul class="sub-menu" aria-expanded="true">
+                                <li>
+                                    <a href="#" key="pb_setup">
+                                        <i class="fas fa-plus-circle fs-6 text-primary"></i>SETUP
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" key="outside_for_receiving">
+                                        <i class="fas fa-undo fs-6 text-success"></i>
+                                        For Receiving
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" key="outside_for_releasing">
+                                        <i class="fas fa-redo fs-6 text-danger"></i>
+                                        For Releasing
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" key="outside_for_returning">
+                                        <i class="fas fa-sync fs-6 text-warning"></i>
+                                        For Returning
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" key="outside_transaction">
+                                        <i class="fas fa-desktop fs-6 text-success"></i>
+                                        PB Transaction
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" key="outside_all_transaction">
+                                        <i class="fas fa-desktop fs-6 text-info"></i>
+                                        PB All Transaction
+                                    </a>
+                                </li>
+
+
+                            </ul>
+                        </li>
+
                         <li>
                             <a href="#" key="atm_released_atm">
                                 <i class="fas fa-undo-alt fs-6 text-warning"></i>

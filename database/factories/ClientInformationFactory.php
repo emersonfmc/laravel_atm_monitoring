@@ -23,7 +23,7 @@ class ClientInformationFactory extends Factory
             'pension_type' => $this->faker->randomElement(['SSS','GSIS']), // Select from predefined pension types
             'pension_account_type' => DB::table('data_pension_types_lists')->inRandomOrder()->value('pension_name'), // Randomly select pension_name from atm_pension_types
             'first_name' => $this->faker->firstName, // Generate a random first name
-           'middle_name' => strtoupper($this->faker->lexify($this->faker->boolean ? '?' : '??')) . '.',
+            'middle_name' => $this->faker->firstName, // Generate a random middle name
             'last_name' => $this->faker->lastName, // Generate a random last name
             'suffix' => $this->faker->optional()->randomElement(['Jr.', 'Sr.', 'Ma.', 'I', 'II', 'III', 'IV']), // Random suffix or null
             'birth_date' => $this->faker->dateTimeBetween('1950-01-01', '1960-12-31')->format('Y-m-d'), // Random birth date
@@ -41,7 +41,7 @@ class ClientInformationFactory extends Factory
             // Create 2 unique ATMs for each client
             for ($i = 0; $i < 2; $i++) {
                 // Fetch the latest transaction number for today and increment it
-                $latestTransactionNumber = AtmClientBanks::where('transaction_number', 'LIKE', "AD-$datePart-%")
+                $latestTransactionNumber = AtmClientBanks::where('transaction_number', 'LIKE', "TS-$datePart-%")
                     ->orderBy('transaction_number', 'desc')
                     ->value('transaction_number');
 
