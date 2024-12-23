@@ -30,7 +30,7 @@
                     <div class="row"> <!-- Added gx-3 for consistent spacing -->
                         <!-- Card Monitoring -->
                         <div class="col-md-6 d-flex align-items-stretch"> <!-- Ensure equal height for columns -->
-                            <div class="card shadow-lg w-100 h-80"> <!-- Ensure the card takes full height -->
+                            <div class="card shadow-lg w-100 h-80 rounded-3 border border-dark"> <!-- Ensure the card takes full height -->
                                 <div class="card-body d-flex flex-column"> <!-- Flex container -->
                                     <div class="row">
                                         <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-4 text-center">
@@ -59,7 +59,7 @@
 
                         <!-- Documents -->
                         <div class="col-md-6 d-flex align-items-stretch"> <!-- Ensure equal height for columns -->
-                            <div class="card shadow-lg w-100 h-80"> <!-- Ensure the card takes full height -->
+                            <div class="card shadow-lg w-100 h-80 rounded-3 border border-dark"> <!-- Ensure the card takes full height -->
                                 <div class="card-body d-flex flex-column"> <!-- Flex container -->
                                     <div class="row">
                                         <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-4 text-center">
@@ -86,7 +86,7 @@
 
                         <!-- Settings -->
                         <div class="col-md-6 d-flex align-items-stretch"> <!-- Ensure equal height for columns -->
-                            <div class="card shadow-lg w-100 h-80"> <!-- Ensure the card takes full height -->
+                            <div class="card shadow-lg w-100 h-80 rounded-3 border border-dark"> <!-- Ensure the card takes full height -->
                                 <div class="card-body d-flex flex-column"> <!-- Flex container -->
                                     <div class="row">
                                         <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-4 text-center">
