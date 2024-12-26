@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Log;
 use App\Models\SystemLogs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -33,13 +34,55 @@ class SystemController extends Controller
 
     public function system_annoucement_get($id)
     {
-        $SystemAnnouncements = SystemAnnouncements::findOrFail($id);
+        $SystemAnnouncements = SystemAnnouncements::with('Employee')->findOrFail($id);
         return response()->json($SystemAnnouncements);
     }
 
+    public function system_annoucement_specific($id)
+    {
+        $SystemAnnouncements = SystemAnnouncements::with('Employee')->findOrFail($id);
+        return view('pages.pages_backend.settings.annoucements_display', compact('SystemAnnouncements'));
+    }
+
+    public function system_annoucement_fetch()
+    {
+        $user = Auth::user();
+        $user_types = $user->user_types;
+
+        return view('pages.pages_backend.settings.announcements_fetch', compact('user_types'));
+    }
+
+
     public function system_annoucement_create(Request $request)
     {
+        // Determine the prefix based on the type
+        if ($request->type == 'New Features') {
+            $FirstID = 'NF';
+        } elseif ($request->type == 'Notification') {
+            $FirstID = 'NO';
+        } elseif ($request->type == 'Enhancements') {
+            $FirstID = 'EN';
+        } elseif ($request->type == 'Maintenance') {
+            $FirstID = 'MN';
+        } else {
+            $FirstID = 'XX'; // Default or handle this case accordingly
+        }
+
+        // Get the current date components
+        $date = Carbon::now();
+        $month = $date->format('m');
+        $day = $date->format('d');
+        $year = $date->format('y');
+
+        // Retrieve the last created announcement ID for generating the next ID
+        $lastAnnouncement = SystemAnnouncements::orderBy('id', 'desc')->first();
+        $nextId = $lastAnnouncement ? $lastAnnouncement->id + 1 : 1;
+
+        // Combine the components to create the announcement ID
+        $announcementId = $FirstID . '-' . $month . $day . $year . '-' . $nextId;
+
         SystemAnnouncements::create([
+            'announcement_id' => $announcementId,
             'type' => $request->type,
             'title' => $request->title,
             'description' => $request->description,
@@ -99,18 +142,24 @@ class SystemController extends Controller
         ]);
     }
 
-
     public function system_annoucement_display()
     {
-        $systemAnnouncements = SystemAnnouncements::with('Employee')
-            ->orderBy('updated_at', 'desc') // Explicitly set order here
+        $systemAnnouncements = SystemAnnouncements::with('employee')
+            ->orderBy('date_end', 'asc')
             ->limit(5)
             ->get();
 
-        return DataTables::of($systemAnnouncements)
-        ->setRowId('id')
-        ->make(true);
+        return response()->json($systemAnnouncements);
+
     }
+
+    public function system_annoucement_counts()
+    {
+        $today = now()->toDateString();
+        $SystemAnnouncements = SystemAnnouncements::where('date_end', '>=', $today)->count();
+        return response()->json($SystemAnnouncements);
+    }
+
 
     public function system_logs_pages()
     {
@@ -126,17 +175,23 @@ class SystemController extends Controller
             ->orderBy('updated_at', 'desc') // Explicitly set order here
             ->get()
             ->map(function ($log) {
-                // Add custom formatted differForHumans
                 $now = Carbon::now();
                 $diffInMinutes = $log->created_at->diffInMinutes($now);
-                $hours = intdiv($diffInMinutes, 60);
-                $minutes = $diffInMinutes % 60;
+                $days = intdiv($diffInMinutes, 1440); // 1440 minutes in a day
+                $remainingMinutes = $diffInMinutes % 1440;
+                $hours = intdiv($remainingMinutes, 60);
+                $minutes = $remainingMinutes % 60;
 
-                if ($hours > 0) {
-                    $log->differForHumans = $hours . ' hr and ' . $minutes . ' mins ago';
+                if ($days > 0) {
+                    $log->differForHumans = $days . ' day' . ($days > 1 ? 's' : '') .
+                        ' and ' . $hours . ' hr' . ($hours > 1 ? 's' : '') . ' ago';
+                } elseif ($hours > 0) {
+                    $log->differForHumans = $hours . ' hr' . ($hours > 1 ? 's' : '') .
+                        ' and ' . $minutes . ' min' . ($minutes > 1 ? 's' : '') . ' ago';
                 } else {
-                    $log->differForHumans = $minutes . ' mins ago';
+                    $log->differForHumans = $minutes . ' min' . ($minutes > 1 ? 's' : '') . ' ago';
                 }
+
                 return $log;
             });
 
@@ -149,6 +204,8 @@ class SystemController extends Controller
             ->rawColumns(['differForHumans'])
             ->make(true);
     }
+
+
 
 
 

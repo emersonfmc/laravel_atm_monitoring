@@ -28,7 +28,7 @@ return new class extends Migration
             $table->integer('aprb_no')->nullable();
             $table->string('reason')->nullable();
             $table->string('reason_remarks')->nullable();
-            // $table->enum('atm_type',['ATM','Passbook','Sim Card'])->nullable();
+            $table->enum('atm_type',['ATM','Passbook','Sim Card'])->nullable();
             $table->enum('status',['ON GOING','CANCELLED','COMPLETED'])->nullable();
 
             $table->integer('yellow_copy')->nullable();
