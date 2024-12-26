@@ -55,85 +55,26 @@
         <div class="dropdown d-inline-block">
             <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="bx bx-bell bx-tada"></i>
-                <span class="badge bg-danger rounded-pill">3</span>
+                <i class="fas fa-bullhorn"></i>
+                <span class="badge bg-danger rounded-pill" id="annoucementsCounts"></span>
             </button>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
                 aria-labelledby="page-header-notifications-dropdown">
                 <div class="p-3">
                     <div class="row align-items-center">
                         <div class="col">
-                            <h6 class="m-0" key="t-notifications"> @lang('translation.Notifications') </h6>
-                        </div>
-                        <div class="col-auto">
-                            <a href="#!" class="small" key="t-view-all"> @lang('translation.View_All')</a>
+                            <h6 class="m-0" key="t-notifications"> Announcements </h6>
                         </div>
                     </div>
                 </div>
                 <div data-simplebar style="max-height: 230px;">
-                    <a href="" class="text-reset notification-item">
-                        <div class="d-flex">
-                            <div class="avatar-xs me-3">
-                                <span class="avatar-title bg-primary rounded-circle font-size-16">
-                                    <i class="bx bx-cart"></i>
-                                </span>
-                            </div>
-                            <div class="flex-grow-1">
-                                <h6 class="mt-0 mb-1" key="t-your-order">@lang('translation.Your_order_is_placed')</h6>
-                                <div class="font-size-12 text-muted">
-                                    <p class="mb-1" key="t-grammer">@lang('translation.If_several_languages_coalesce_the_grammar')</p>
-                                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i> <span key="t-min-ago">@lang('translation.3_min_ago')</span></p>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                    <a href="" class="text-reset notification-item">
-                        <div class="d-flex">
-                            <img src="{{ URL::asset ('/assets/images/users/avatar-3.jpg') }}"
-                                class="me-3 rounded-circle avatar-xs" alt="user-pic">
-                            <div class="flex-grow-1">
-                                <h6 class="mt-0 mb-1">@lang('translation.James_Lemire')</h6>
-                                <div class="font-size-12 text-muted">
-                                    <p class="mb-1" key="t-simplified">@lang('translation.It_will_seem_like_simplified_English')</p>
-                                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i> <span key="t-hours-ago">@lang('translation.1_hours_ago')</span></p>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                    <a href="" class="text-reset notification-item">
-                        <div class="d-flex">
-                            <div class="avatar-xs me-3">
-                                <span class="avatar-title bg-success rounded-circle font-size-16">
-                                    <i class="bx bx-badge-check"></i>
-                                </span>
-                            </div>
-                            <div class="flex-grow-1">
-                                <h6 class="mt-0 mb-1" key="t-shipped">@lang('translation.Your_item_is_shipped')</h6>
-                                <div class="font-size-12 text-muted">
-                                    <p class="mb-1" key="t-grammer">@lang('translation.If_several_languages_coalesce_the_grammar')</p>
-                                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i> <span key="t-min-ago">@lang('translation.3_min_ago')</span></p>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
+                    <div class="notification-items ms-2">
 
-                    <a href="" class="text-reset notification-item">
-                        <div class="d-flex">
-                            <img src="{{ URL::asset ('/assets/images/users/avatar-4.jpg') }}"
-                                class="me-3 rounded-circle avatar-xs" alt="user-pic">
-                            <div class="flex-grow-1">
-                                <h6 class="mt-0 mb-1">@lang('translation.Salena_Layfield')</h6>
-                                <div class="font-size-12 text-muted">
-                                    <p class="mb-1" key="t-occidental">@lang('translation.As_a_skeptical_Cambridge_friend_of_mine_occidental')</p>
-                                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i> <span key="t-hours-ago">@lang('translation.1_hours_ago')</span></p>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
+                    </div>
                 </div>
                 <div class="p-2 border-top d-grid">
-                    <a class="btn btn-sm btn-link font-size-14 text-center" href="javascript:void(0)">
-                        <i class="mdi mdi-arrow-right-circle me-1"></i> <span key="t-view-more">@lang('translation.View_More')</span>
+                    <a class="btn btn-sm btn-link font-size-14 text-center" href="{{ route('system.announcement.fetch') }}">
+                        <i class="mdi mdi-arrow-right-circle me-1"></i> <span key="t-view-more">View_More</span>
                     </a>
                 </div>
             </div>
@@ -164,6 +105,134 @@
     </div>
 </div>
 </header>
+
+    {{-- Announcements --}}
+    <script>
+        $(document).ready(function () {
+            function fetchAnnouncementDisplay() {
+                $.ajax({
+                    url: "/system/announcement/display",  // Append a unique timestamp to the URL
+                    type: "GET",
+                    cache: false,  // Disable caching to avoid stale data
+                    success: function(response) {
+                        $('.notification-items').empty();
+
+                        // Example response handling for multiple rows:
+                        response.forEach(function(row) {
+                            // Check if row and its properties exist
+                            if (!row || !row.description) {
+                                console.error("Error: Missing expected data in the response.");
+                                return;
+                            }
+
+                            var iconClass;
+                            switch(row.type) {
+                                case 'New Features':
+                                    iconClass = 'fas fa-plus-square text-success';
+                                    break;
+                                case 'Notification':
+                                    iconClass = 'far fa-bell text-info';
+                                    break;
+                                case 'Enhancements':
+                                    iconClass = 'fas fa-edit text-warning';
+                                    break;
+                                case 'Maintenance':
+                                    iconClass = 'fas fa-tools text-danger';
+                                    break;
+                                default:
+                                    iconClass = 'fas fa-info-circle'; // Default icon
+                            }
+
+                            // Truncate description to max length
+                            const maxLength = 30; // Example: limit to 30 characters
+                            const truncatedDescription = row.description.length > maxLength ? row.description.substring(0, maxLength) + '...' : row.description;
+
+                            // Format the dates
+                            const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+                            const formattedStartDate = row.date_start ? new Date(row.date_start).toLocaleDateString('en-US', dateOptions) : 'N/A';
+                            const formattedEndDate = row.date_end ? new Date(row.date_end).toLocaleDateString('en-US', dateOptions) : 'N/A';
+
+                            // Use the differForHumans value
+                            const timeAgo = row.differForHumans;
+                            const annoucementURL = `/system/announcement/specific/${row.id}`
+
+                            // Create new notification item with conditional display of date_end
+                            var notificationItem;
+                            if (row.date_start === row.date_end) {
+                                notificationItem = `
+                                    <a href="${annoucementURL}" class="notification-item">
+                                        <div class="d-flex">
+                                            <div class="avatar-xs me-3 d-flex align-items-center justify-content-center">
+                                                <i class="${iconClass} fs-1"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mt-0 mb-1">${row.title}</h6>
+                                                <div class="font-size-12 text-muted">
+                                                    <p class="mb-1">${truncatedDescription}</p>
+                                                    <i class="mdi mdi-clock-outline text-danger"></i> <span>${formattedStartDate}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                `;
+                            } else {
+                                notificationItem = `
+                                    <a href="${annoucementURL}" class="notification-item">
+                                        <div class="d-flex">
+                                            <div class="avatar-xs me-3 d-flex align-items-center justify-content-center">
+                                                <i class="${iconClass} fs-1"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mt-0 mb-1">${row.title}</h6>
+                                                <div class="font-size-12 text-muted">
+                                                    <p class="mb-1">${truncatedDescription}</p>
+                                                    <i class="mdi mdi-clock-outline"></i> <span>${formattedStartDate}</span> -
+                                                    <i class="mdi mdi-clock-outline text-danger"></i> <span>${formattedEndDate}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                `;
+                            }
+
+                            // Append the new notification item to the list
+                            $('.notification-items').append(notificationItem);
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error fetching counts:", error);
+                    }
+                });
+            }
+
+            fetchAnnouncementDisplay();
+            // Reload the count every 5 seconds (5000 milliseconds)
+            setInterval(fetchAnnouncementDisplay, 5000);
+        });
+
+        $(document).ready(function () {
+            // Function to fetch the announcement count
+            function fetchAnnouncementCount() {
+                $.ajax({
+                    url: "/system/announcement/counts",  // Your route to get the counts
+                    type: "GET",
+                    cache: false,  // Disable caching to avoid stale data
+                    success: function(response) {
+                        $('#annoucementsCounts').text(response ?? '');  // Display the count directly
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error fetching counts:", error);
+                    }
+                });
+            }
+
+            // Initial count fetch
+            fetchAnnouncementCount();
+
+            // Reload the count every 5 seconds (5000 milliseconds)
+            setInterval(fetchAnnouncementCount, 5000);
+        });
+    </script>
 
 
     {{-- Full Screen and Minimize Full Screen size --}}

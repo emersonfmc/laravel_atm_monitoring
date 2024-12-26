@@ -6,58 +6,60 @@
 @endsection
 
 
-    @component('components.breadcrumb')
-        @slot('li_1') Settings @endslot
-        @slot('title') System Announcements @endslot
-    @endcomponent
+    <div class="container">
+        @component('components.breadcrumb')
+            @slot('li_1') Settings @endslot
+            @slot('title') System Announcements @endslot
+        @endcomponent
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
 
-                    <div class="row">
-                        <div class="col-md-8 text-start">
-                            <h4 class="card-title">System Announcements</h4>
-                            <p class="card-title-desc">
-                                A district head is responsible for managing and overseeing the operations,
-                                administration, and development activities within a district
-                            </p>
+                        <div class="row">
+                            <div class="col-md-8 text-start">
+                                <h4 class="card-title">System Announcements</h4>
+                                <p class="card-title-desc">
+                                    A district head is responsible for managing and overseeing the operations,
+                                    administration, and development activities within a district
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAnnouncementsModal"><i
+                                    class="fas fa-plus-circle me-1"></i> Create Announcement</button>
+                            </div>
                         </div>
-                        <div class="col-md-4 text-end">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAnnouncementsModal"><i
-                                class="fas fa-plus-circle me-1"></i> Create Announcement</button>
+                        <hr>
+
+
+                        <div class="table-responsive">
+                            <table id="FetchingDatatable" class="table table-border dt-responsive wrap table-design" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Type</th>
+                                        <th>Title & Description</th>
+                                        <th>Announce By</th>
+                                        <th>Date From</th>
+                                        <th>Date To</th>
+                                        <th>Created Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Table body content goes here -->
+                                </tbody>
+                            </table>
                         </div>
+
+
+
                     </div>
-                    <hr>
-
-
-                    <div class="table-responsive">
-                        <table id="FetchingDatatable" class="table table-border dt-responsive wrap table-design" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Type</th>
-                                    <th>Title & Description</th>
-                                    <th>Announce By</th>
-                                    <th>Date From</th>
-                                    <th>Date To</th>
-                                    <th>Created Date</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Table body content goes here -->
-                            </tbody>
-                        </table>
-                    </div>
-
-
-
                 </div>
-            </div>
-        </div> <!-- end col -->
-    </div> <!-- end row -->
+            </div> <!-- end col -->
+        </div> <!-- end row -->
+    </div>
 
     <div class="modal fade" id="createAnnouncementsModal" data-bs-backdrop="static" tabindex="-1" role="dialog"district_id
         aria-labelledby="createAnnouncementsModalLabel" aria-hidden="true">
