@@ -58,25 +58,14 @@
 
     <script>
         $(document).ready(function () {
-            var FetchingDatatableBody = $('#FetchingDatatable tbody');
-
             const dataTable = new ServerSideDataTable('#FetchingDatatable');
             var url = '{!! route('system.logs.data') !!}';
-            const buttons = [{
-                text: 'Delete',
-                action: function(e, dt, node, config) {
-                    // Add your custom button action here
-                    alert('Custom button clicked!');
-                }
-            }];
             const columns = [
                 {
                     data: 'action',
                     name: 'action',
                     render: function(data, type, row, meta) {
                         let spanClass = '';
-
-                        // Determine the text color based on atm_type
                         switch (row.action) {
                             case 'Create':
                                 spanClass = 'bg-primary';
@@ -88,9 +77,8 @@
                                 spanClass = 'bg-danger';
                                 break;
                             default:
-                                spanClass = 'bg-secondary'; // Default color if none match
+                                spanClass = 'bg-secondary';
                         }
-
                         return `<span class="badge ${spanClass}">${row.action}</span>`;
                     },
                     orderable: true,
@@ -99,8 +87,17 @@
                 {
                     data: null,
                     render: function(data, type, row, meta) {
+                        // Set the maximum length for the description
+                        const maxLength = 50; // Example: limit to 50 characters
+
+                        // Truncate the description if it exceeds the maximum length
+                        let truncatedDescription = row.description;
+                        if (row.description.length > maxLength) {
+                            truncatedDescription = row.description.substring(0, maxLength) + '...';
+                        }
+
                         return `<span class="fw-bold text-primary h6">${row.title}</span><br>
-                                <span class="text-muted">${row.description}</span>`; // Check if company exists
+                                <span class="text-muted">${truncatedDescription}</span>`;
                     },
                     orderable: true,
                     searchable: true,
@@ -109,7 +106,7 @@
                     data: 'employee_id',
                     name: 'employee.name',
                     render: function(data, type, row, meta) {
-                        return row.employee ? '<span>' + row.employee.name + '</span>' : ''; // Check if company exists
+                        return row.employee ? '<span>' + row.employee.name + '</span>' : '';
                     },
                     orderable: true,
                     searchable: true,
@@ -133,7 +130,6 @@
                             year: 'numeric'
                         });
                     }
-
                 },
                 {
                     data: null,
@@ -147,8 +143,6 @@
                     orderable: true,
                     searchable: true
                 },
-
-
                 {
                     data: 'ip_address',
                     name: 'ip_address',
@@ -159,7 +153,27 @@
                     searchable: true,
                 },
             ];
+
+            // Initialize DataTable
             dataTable.initialize(url, columns);
+
+            // // Initialize DataTable with explicit cache control in the AJAX request
+            // const dt = $('#FetchingDatatable').DataTable({
+            //     processing: true,
+            //     serverSide: true,
+            //     ajax: {
+            //         url: url,
+            //         type: 'GET',
+            //         cache: false, // Prevent browser from caching the response
+            //     },
+            //     columns: columns,
+            // });
+
+
+            // Add polling to reload data every 10 seconds
+            setInterval(function () {
+                $('#FetchingDatatable').DataTable().ajax.reload(null, false); // Reload data without resetting pagination
+            }, 5000); // 10000 milliseconds = 10 seconds
         });
     </script>
 
