@@ -130,10 +130,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="#" method="POST" id="cancelledTransactionForm">
+                    <form action="{{ route('TransactionCancelled') }}" method="POST" id="cancelledTransactionForm">
                         @csrf
                         <div class="row">
                             <input type="hidden" name="atm_id" id="cancelled_atm_id">
+                            <input type="hidden" name="transaction_id" id="cancelled_transaction_id">
+
                             <div class="col-12">
                                 <div class="form-group">
                                     <div id="cancelled_fullname" class="fw-bold h4"></div>

@@ -59,6 +59,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/system/announcement/specific/{id}', 'system_annoucement_specific')->name('system.announcement.specific');
 
         Route::get('/system/announcement/fetch', 'system_annoucement_fetch')->name('system.announcement.fetch');
+        Route::get('/system/announcement/fetch/data', 'system_annoucement_fetch_data')->name('system.announcement.fetch.data');
 
         Route::get('/system/announcement/counts', 'system_annoucement_counts')->name('system.announcement.counts');
         Route::post('/system/announcement/create', 'system_annoucement_create')->name('system.announcement.create');
@@ -68,10 +69,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/system/logs/data', 'system_logs_data')->name('system.logs.data');
     });
 });
-
-
-
-
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(UserController::class)->group(function () {
@@ -129,6 +126,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/TransactionReleaseCreate', 'TransactionReleaseCreate')->name('TransactionReleaseCreate');
         Route::post('/TransactionEditClient', 'TransactionEditClient')->name('TransactionEditClient');
         Route::post('/TransactionUpdate', 'TransactionUpdate')->name('TransactionUpdate');
+        Route::post('/TransactionCancelled', 'TransactionCancelled')->name('TransactionCancelled');
 
         Route::get('/TransactionReceivingPage', 'TransactionReceivingPage')->name('TransactionReceivingPage');
         Route::get('/TransactionReceivingData', 'TransactionReceivingData')->name('TransactionReceivingData');
@@ -151,7 +149,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/PassbookCollectionTransactionGet', 'PassbookCollectionTransactionGet')->name('PassbookCollectionTransactionGet');
         Route::post('/PassbookCollectionTransactionUpdate', 'PassbookCollectionTransactionUpdate')->name('PassbookCollectionTransactionUpdate');
         Route::post('/PassbookCollectionTransactionCancelled', 'PassbookCollectionTransactionCancelled')->name('PassbookCollectionTransactionCancelled');
-
         Route::get('/PassbookCollectionReceivingPage', 'PassbookCollectionReceivingPage')->name('PassbookCollectionReceivingPage');
         Route::get('/PassbookCollectionReleasingPage', 'PassbookCollectionReleasingPage')->name('PassbookCollectionReleasingPage');
         Route::get('/PassbookCollectionReturningPage', 'PassbookCollectionReturningPage')->name('PassbookCollectionReturningPage');

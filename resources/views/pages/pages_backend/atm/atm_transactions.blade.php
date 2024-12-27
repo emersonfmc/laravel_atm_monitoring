@@ -335,17 +335,19 @@
 
     <div class="modal fade" id="cancelledTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="createTransactionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 34%;" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold text-uppercase">Cancelled Transaction</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="#" method="POST" id="cancelledTransactionForm">
+                    <form action="{{ route('TransactionCancelled') }}" method="POST" id="cancelledTransactionForm">
                         @csrf
                         <div class="row">
                             <input type="hidden" name="atm_id" id="cancelled_atm_id">
+                            <input type="hidden" name="transaction_id" id="cancelled_transaction_id">
+
                             <div class="col-12">
                                 <div class="form-group">
                                     <div id="cancelled_fullname" class="fw-bold h4"></div>
@@ -1024,51 +1026,185 @@
                 });
             // Edit Information
 
-            $('#FetchingDatatable').on('click', '.cancelledTransaction', function(e) {
-                e.preventDefault();
-                var transaction_id = $(this).data('id');
+            // Cancelled Information
+                $('#FetchingDatatable').on('click', '.cancelledTransaction', function(e) {
+                    e.preventDefault();
+                    var transaction_id = $(this).data('id');
 
-                $.ajax({
-                    url: "/TransactionGet",
-                    type: "GET",
-                    data: { transaction_id : transaction_id },
-                    success: function(data) {
-                        let formattedBirthDate = data.atm_client_banks.client_information.birth_date ? new Date(data.atm_client_banks.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+                    $('#cancelled_transaction_id').val(transaction_id);
 
-                        $('#cancelled_fullname').text(data.atm_client_banks.client_information.last_name +', '
-                                                    + data.atm_client_banks.client_information.first_name +' '
-                                                    +(data.atm_client_banks.client_information.middle_name ?? '') +' '
-                                                    + (data.atm_client_banks.client_information.suffix ?? ''));
+                    $.ajax({
+                        url: "/TransactionGet",
+                        type: "GET",
+                        data: { transaction_id : transaction_id },
+                        success: function(data) {
+                            let formattedBirthDate = data.atm_client_banks.client_information.birth_date ? new Date(data.atm_client_banks.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
 
-                        $('#cancelled_branch_id').val(data.branch_id ?? '').trigger('change');
+                            $('#cancelled_fullname').text(data.atm_client_banks.client_information.last_name +', '
+                                                        + data.atm_client_banks.client_information.first_name +' '
+                                                        +(data.atm_client_banks.client_information.middle_name ?? '') +' '
+                                                        + (data.atm_client_banks.client_information.suffix ?? ''));
 
-                        $('#cancelled_pension_number_display').text(data.atm_client_banks.client_information.pension_number ?? '');
-                        $('#cancelled_pension_number_display').inputmask("99-9999999-99");
+                            $('#cancelled_branch_id').val(data.branch_id ?? '').trigger('change');
 
-                        $('#cancelled_pension_number').val(data.atm_client_banks.client_information.pension_number);
-                        $('#cancelled_pension_account_type').text(data.atm_client_banks.client_information.pension_account_type);
-                        $('#cancelled_pension_type').val(data.atm_client_banks.client_information.pension_type);
-                        $('#cancelled_birth_date').val(formattedBirthDate);
-                        $('#cancelled_atm_id').val(data.atm_client_banks.id);
-                        $('#cancelled_bank_account_no').val(data.atm_client_banks.bank_account_no ?? '');
-                        $('#cancelled_collection_date').val(data.atm_client_banks.collection_date ?? '').trigger('change');
-                        $('#cancelled_atm_type').val(data.atm_client_banks.atm_type ?? '');
-                        $('#cancelled_bank_name').val(data.atm_client_banks.bank_name ?? '');
-                        $('#cancelled_transaction_number').val(data.atm_client_banks.transaction_number ?? '');
+                            $('#cancelled_pension_number_display').text(data.atm_client_banks.client_information.pension_number ?? '');
+                            $('#cancelled_pension_number_display').inputmask("99-9999999-99");
 
-                        let expirationDate = '';
-                        if (data.atm_client_banks.expiration_date && data.atm_client_banks.expiration_date !== '0000-00-00') {
-                            expirationDate = new Date(data.atm_client_banks.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                            $('#cancelled_pension_number').val(data.atm_client_banks.client_information.pension_number);
+                            $('#cancelled_pension_account_type').text(data.atm_client_banks.client_information.pension_account_type);
+                            $('#cancelled_pension_type').val(data.atm_client_banks.client_information.pension_type);
+                            $('#cancelled_birth_date').val(formattedBirthDate);
+                            $('#cancelled_atm_id').val(data.atm_client_banks.id);
+                            $('#cancelled_bank_account_no').val(data.atm_client_banks.bank_account_no ?? '');
+                            $('#cancelled_collection_date').val(data.atm_client_banks.collection_date ?? '').trigger('change');
+                            $('#cancelled_atm_type').val(data.atm_client_banks.atm_type ?? '');
+                            $('#cancelled_bank_name').val(data.atm_client_banks.bank_name ?? '');
+                            $('#cancelled_transaction_number').val(data.atm_client_banks.transaction_number ?? '');
+
+                            let expirationDate = '';
+                            if (data.atm_client_banks.expiration_date && data.atm_client_banks.expiration_date !== '0000-00-00') {
+                                expirationDate = new Date(data.atm_client_banks.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                            }
+                            $('#cancelled_expiration_date').val((expirationDate || ''));
+
+                            $('#cancelledTransactionModal').modal('show');
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("An error occurred: " + error);
                         }
-                        $('#cancelled_expiration_date').val((expirationDate || ''));
+                    });
+                });
 
-                        $('#cancelledTransactionModal').modal('show');
+                function CancelledTransactionModal() {
+                    $('#cancelledTransactionModal').modal('hide');
+                    $('#FetchingDatatable tbody').empty();
+                }
+
+                $('#cancelledTransactionForm').validate({
+                    rules: {
+                        remarks: {
+                            required: true
+                        }
                     },
-                    error: function(xhr, status, error) {
-                        console.error("An error occurred: " + error);
+                    errorElement: 'span',
+                    errorPlacement: function(error, element) {
+                        error.addClass('invalid-feedback');
+                        element.closest('.form-group').append(error);
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element, errorClass, validClass) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    submitHandler: function(form) {
+                        var hasRows = FetchingDatatableBody.children('tr').length > 0;
+                        if (hasRows) {
+                            Swal.fire({
+                                title: 'Confirmation',
+                                text: 'Are you sure you want to Cancelled this?',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonColor: "#EB6666",
+                                cancelButtonColor: "#6C757D",
+                                confirmButtonText: "Yes, Cancelled it!"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    const currentPage = dataTable.table.page();
+                                    var formData = new FormData(form);
+                                    $.ajax({
+                                        url: form.action,
+                                        type: form.method,
+                                        data: formData,
+                                        contentType: false,
+                                        processData: false,
+                                        success: function(response) {
+
+                                            if (typeof response === 'string') {
+                                                var res = JSON.parse(response);
+                                            } else {
+                                                var res = response; // If it's already an object
+                                            }
+
+                                            if (res.status === 'success')
+                                            {
+                                                CancelledTransactionModal();
+                                                Swal.fire({
+                                                    title: 'Successfully Cancelled!',
+                                                    text: 'Transaction is successfully Cancelled!',
+                                                    icon: 'success',
+                                                    showCancelButton: false,
+                                                    showConfirmButton: true,
+                                                    confirmButtonText: 'OK',
+                                                    preConfirm: () => {
+                                                        return new Promise(( resolve
+                                                        ) => {
+                                                            Swal.fire({
+                                                                title: 'Please Wait...',
+                                                                allowOutsideClick: false,
+                                                                allowEscapeKey: false,
+                                                                showConfirmButton: false,
+                                                                showCancelButton: false,
+                                                                didOpen: () => {
+                                                                    Swal.showLoading();
+                                                                    // here the reload of datatable
+                                                                    dataTable.table.ajax.reload( () =>
+                                                                    {
+                                                                        Swal.close();
+                                                                        $(form)[0].reset();
+                                                                        dataTable.table.page(currentPage).draw( false );
+                                                                    },
+                                                                    false );
+                                                                }
+                                                            })
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                            else if (res.status === 'error')
+                                            {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: res.message,
+                                                    icon: 'error',
+                                                });
+                                            }
+                                            else
+                                            {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: 'Error Occurred Please Try Again',
+                                                    icon: 'error',
+                                                });
+                                            }
+                                        },
+                                        error: function(xhr, status, error) {
+                                            var errorMessage =
+                                                'An error occurred. Please try again later.';
+                                            if (xhr.responseJSON && xhr.responseJSON
+                                                .error) {
+                                                errorMessage = xhr.responseJSON.error;
+                                            }
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: errorMessage,
+                                                icon: 'error',
+                                            });
+                                        }
+                                    })
+                                }
+                            })
+                        } else {
+
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Empty Record!',
+                                text: 'Table is empty, add row to proceed!',
+                            });
+                        }
                     }
                 });
-            });
+            // Cancelled Information
 
             // Edit Transaction
                 $('#FetchingDatatable').on('click', '.editAdminTransaction', function(e) {
