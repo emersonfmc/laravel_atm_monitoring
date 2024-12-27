@@ -1067,15 +1067,12 @@
                     orderable: true,
                     searchable: true,
                 },
-                {
-                    data: 'pin_no',
-                    name: 'pin_no',
-                    render: function(data, type, row) {
-                        return `<a href="#" class="text-info fs-4 view_pin_code"
-                                    data-pin="${row.pin_no}"
-                                    data-bank_account_no="${row.bank_account_no}"><i class="fas fa-eye"></i>
-                                </a><br>`;
 
+                {
+                    data: 'pin_code_details',
+                    name: 'pin_code_details',
+                    render: function(data, type, row, meta) {
+                        return data ? `<span>${data}</span>` : '';
                     },
                     orderable: true,
                     searchable: true,

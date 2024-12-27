@@ -1,5 +1,5 @@
-@extends('layouts.main_dashboard_master')
-@section('main_dashboard')
+@extends('layouts.settings.settings_master')
+@section('settings')
 
 @section('css')
     <link href="{{ URL::asset('assets/libs/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
