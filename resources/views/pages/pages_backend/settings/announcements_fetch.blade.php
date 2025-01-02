@@ -21,37 +21,83 @@
                             <div class="col-md-8 text-start">
                                 <h4 class="card-title">System Announcements</h4>
                                 <p class="card-title-desc">
-                                    A district head is responsible for managing and overseeing the operations,
-                                    administration, and development activities within a district
+                                    System announcements serve as important notifications that inform users about updates,
+                                    changes, or critical information related to the system's functionality and operations.
                                 </p>
                             </div>
-                            <div class="col-md-4 text-end">
+                            {{-- <div class="col-md-4 text-end">
                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAnnouncementsModal"><i
                                     class="fas fa-plus-circle me-1"></i> Create Announcement</button>
-                            </div>
+                            </div> --}}
                         </div>
                         <hr>
 
 
-                        <div class="table-responsive">
-                            <table id="FetchingDatatable" class="table table-border dt-responsive wrap table-design" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Type</th>
-                                        <th>Title & Description</th>
-                                        <th>Announce By</th>
-                                        <th>Date From</th>
-                                        <th>Date To</th>
-                                        <th>Created Date</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Table body content goes here -->
-                                </tbody>
-                            </table>
+                        <div id="displayAllAnnouncements">
                         </div>
+
+                        <script>
+                            var url = "/system/announcement/fetch/data";
+
+                            $.get(url, function(response) {
+                                // Assuming response is an array of announcements
+                                var container = $('#displayAllAnnouncements');
+                                container.empty(); // Clear any existing content
+
+                                response.forEach(function(announcement) {
+                                    var iconClass;
+                                    switch(announcement.type) {
+                                        case 'New Features':
+                                            iconClass = 'fas fa-plus-square text-success';
+                                            break;
+                                        case 'Notification':
+                                            iconClass = 'far fa-bell text-info';
+                                            break;
+                                        case 'Enhancements':
+                                            iconClass = 'fas fa-edit text-warning';
+                                            break;
+                                        case 'Maintenance':
+                                            iconClass = 'fas fa-tools text-danger';
+                                            break;
+                                        default:
+                                            iconClass = 'fas fa-info-circle';
+                                    }
+
+                                    var dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+                                    var formattedStartDate = announcement.date_start ? new Date(announcement.date_start).toLocaleDateString('en-US', dateOptions) : 'N/A';
+                                    var formattedEndDate = announcement.date_end ? new Date(announcement.date_end).toLocaleDateString('en-US', dateOptions) : 'N/A';
+
+                                    var dateDisplay = (announcement.date_start === announcement.date_end) ?
+                                        `<i class="mdi mdi-clock-outline text-danger"></i> <span>${formattedStartDate}</span>` :
+                                        `<i class="mdi mdi-clock-outline"></i> <span>${formattedStartDate}</span> - <i class="mdi mdi-clock-outline text-danger"></i> <span>${formattedEndDate}</span>`;
+
+                                    var announcementHTML = `
+                                        <div class="announcement-item mb-3">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-3 text-center d-flex flex-column align-items-center justify-content-center">
+                                                    <div class="me-2 mb-2">
+                                                        <i class="${iconClass}" style="font-size:100px;"></i>
+                                                    </div>
+                                                    <div class="h5 fw-bold text-uppercase">${announcement.type}</div>
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <div class="fw-bold h6 mb-2">${announcement.announcement_id}</div>
+                                                    <h6 class="fw-bold text-primary mb-2">${announcement.title}</h6>
+                                                    <div class="ms-2 mb-2">${announcement.description}</div>
+                                                    <div class="text-muted">
+                                                        - ${announcement.employee.name}
+                                                    </div>
+                                                    <div class="mt-2">
+                                                        <div class="text-muted">${dateDisplay}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><hr>`;
+
+                                    container.append(announcementHTML);
+                                });
+                            });
+                        </script>
 
 
 
@@ -255,403 +301,6 @@
                     $(this).val(''); // Clear the end date input if invalid
                 }
             });
-        });
-
-        $(document).ready(function () {
-            var FetchingDatatableBody = $('#FetchingDatatable tbody');
-
-            const dataTable = new ServerSideDataTable('#FetchingDatatable');
-            var url = '{!! route('system.announcement.data') !!}';
-            const buttons = [{
-                text: 'Delete',
-                action: function(e, dt, node, config) {
-                    // Add your custom button action here
-                    alert('Custom button clicked!');
-                }
-            }];
-            const columns = [
-                {
-                    data: 'announcement_id',
-                    name: 'announcement_id',
-                    render: function(data, type, row, meta) {
-                        return '<span">' + data + '</span>'; // Display user's ID
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'type',
-                    name: 'type',
-                    render: function(data, type, row, meta) {
-                        return '<span">' + data + '</span>'; // Display user's ID
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: null,
-                    render: function(data, type, row, meta) {
-                        // Set the maximum length for the description
-                        const maxLength = 50; // Example: limit to 50 characters
-
-                        // Truncate the description if it exceeds the maximum length
-                        let truncatedDescription = row.description;
-                        if (row.description.length > maxLength) {
-                            truncatedDescription = row.description.substring(0, maxLength) + '...';
-                        }
-
-                        return `<span class="fw-bold text-primary h6">${row.title}</span><br>
-                                <span class="text-muted">${truncatedDescription}</span>`;
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'employee_id',
-                    name: 'employee_id',
-                    render: function(data, type, row, meta) {
-                        return '<span>' + data + '</span>';
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'date_start',
-                    name: 'date_start',
-                    render: function(data, type, row) {
-                        return new Date(data).toLocaleDateString('en-US', {
-                            month: 'long',
-                            day: 'numeric',
-                            year: 'numeric'
-                        });
-                    }
-
-                },
-                {
-                    data: 'date_end',
-                    name: 'date_end',
-                    render: function(data, type, row) {
-                        return new Date(data).toLocaleDateString('en-US', {
-                            month: 'long',
-                            day: 'numeric',
-                            year: 'numeric'
-                        });
-                    }
-                },
-                {
-                    data: 'created_at',
-                    name: 'created_at',
-                    render: function(data, type, row) {
-                        return new Date(data).toLocaleDateString('en-US', {
-                            month: 'long',
-                            day: 'numeric',
-                            year: 'numeric'
-                        });
-                    }
-
-                },
-                {
-                    data: null,
-                    name: 'action',
-                    render: function(data, type, row) {
-                        return `
-                            <a href="#" class="text-info viewBtn me-2" data-id="${row.id}"
-                                data-bs-toggle="tooltip" data-bs-placement="top" title="View">
-                                <i class="fas fa-eye me-2"></i>
-                            </a>
-
-                            <a href="#" class="text-warning editBtn me-2" data-id="${row.id}"
-                                data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                                <i class="fas fa-pencil-alt me-2"></i>
-                            </a>
-
-                            <a href="#" class="text-danger deleteBtn me-2" data-id="${row.id}"
-                                data-bs-toggle="tooltip" data-bs-placement="top" title="Delete ">
-                                <i class="fas fa-trash-alt me-2"></i>
-                            </a>`;
-                    },
-                    orderable: false,
-                    searchable: false,
-                }
-            ];
-            dataTable.initialize(url, columns);
-
-            // View Function
-                $('#FetchingDatatable').on('click', '.viewBtn', function(e) {
-                    e.preventDefault();
-                    var itemID = $(this).data('id');
-
-                    var url = "/system/announcement/get/" + itemID;
-
-                    $.get(url, function(data) {
-                        // Parse and format the dates, with null handling
-                        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-                        const formattedStartDate = data.date_start ? new Date(data.date_start).toLocaleDateString('en-US', dateOptions) : 'N/A'; // Fallback for null or undefined
-                        const formattedEndDate = data.date_end ? new Date(data.date_end).toLocaleDateString('en-US', dateOptions) : 'N/A'; // Fallback for null or undefined
-
-                        // Populate the modal fields
-                        $('#view_item_id').val(data.id || ''); // Fallback for null ID
-                        $('#view_type').val(data.type || '').trigger('change'); // Fallback for null type
-                        $('#view_title').val(data.title || ''); // Fallback for null title
-                        $('#view_description').text(data.description || ''); // Fallback for null description
-                        $('#view_date_start').val(formattedStartDate); // Display formatted start date
-                        $('#view_date_end').val(formattedEndDate);     // Display formatted end date
-
-                        $('#viewAnnouncementsModal').modal('show');
-                    });
-                });
-            // View Function
-
-            // Create Function
-                function closeCreateModal() {
-                    $('#createAnnouncementsModal').modal('hide');
-                    $('#FetchingDatatable tbody').empty();
-                    // $('#FetchingDatatable').addClass('d-none');
-                }
-
-                $('#createValidateForm').validate({
-                    rules: {
-                        area: { required: true, },
-                        area_supervisor: { required: true, },
-                        district_id: { required: true, },
-                    },
-                    errorElement: 'span',
-                    errorPlacement: function(error, element) {
-                        error.addClass('invalid-feedback');
-                        element.closest('.form-group').append(error);
-                    },
-                    highlight: function(element, errorClass, validClass) {
-                        $(element).addClass('is-invalid');
-                    },
-                    unhighlight: function(element, errorClass, validClass) {
-                        $(element).removeClass('is-invalid');
-                    },
-                    submitHandler: function(form) {
-                        var hasRows = FetchingDatatableBody.children('tr').length > 0;
-                        if (hasRows) {
-                            Swal.fire({
-                                title: 'Confirmation',
-                                text: 'Are you sure you want to save this?',
-                                icon: 'question',
-                                showCancelButton: true,
-                                confirmButtonColor: "#007BFF",
-                                cancelButtonColor: "#6C757D",
-                                confirmButtonText: "Yes, Save it!"
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    const currentPage = dataTable.table.page();
-                                    $.ajax({
-                                        url: form.action,
-                                        type: form.method,
-                                        data: $(form).serialize(),
-                                        success: function(response) {
-                                            closeCreateModal();
-                                            Swal.fire({
-                                                title: 'Successfully Added!',
-                                                text: 'Announcement is successfully added!',
-                                                icon: 'success',
-                                                showCancelButton: false,
-                                                showConfirmButton: true,
-                                                confirmButtonText: 'OK',
-                                                preConfirm: () => {
-                                                    return new Promise(( resolve
-                                                    ) => {
-                                                        Swal.fire({
-                                                            title: 'Please Wait...',
-                                                            allowOutsideClick: false,
-                                                            allowEscapeKey: false,
-                                                            showConfirmButton: false,
-                                                            showCancelButton: false,
-                                                            didOpen: () => {
-                                                                Swal.showLoading();
-                                                                // here the reload of datatable
-                                                                dataTable.table.ajax.reload( () =>
-                                                                {
-                                                                    Swal.close();
-                                                                    $(form)[0].reset();
-                                                                    dataTable.table.page(currentPage).draw( false );
-                                                                },
-                                                                false );
-                                                            }
-                                                        })
-                                                    });
-                                                }
-                                            });
-                                        },
-                                        error: function(xhr, status, error) {
-                                            var errorMessage =
-                                                'An error occurred. Please try again later.';
-                                            if (xhr.responseJSON && xhr.responseJSON
-                                                .error) {
-                                                errorMessage = xhr.responseJSON.error;
-                                            }
-                                            Swal.fire({
-                                                title: 'Error!',
-                                                text: errorMessage,
-                                                icon: 'error',
-                                            });
-                                        }
-                                    })
-                                }
-                            })
-                        } else {
-
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Empty Record!',
-                                text: 'Table is empty, add row to proceed!',
-                            });
-                        }
-                    }
-                });
-            // Create Function
-
-            // Update Function
-                $('#updateValidateForm').validate({
-                    rules: {
-                        area: { required: true, },
-                        area_supervisor: { required: true, },
-                        district_id: { required: true, },
-                    },
-                    errorElement: 'span',
-                    errorPlacement: function(error, element) {
-                        error.addClass('invalid-feedback');
-                        element.closest('.form-group').append(error);
-                    },
-                    highlight: function(element, errorClass, validClass) {
-                        $(element).addClass('is-invalid');
-                    },
-                    unhighlight: function(element, errorClass, validClass) {
-                        $(element).removeClass('is-invalid');
-                    },
-                    submitHandler: function(form) {
-                        var hasRows = FetchingDatatableBody.children('tr').length > 0;
-                        if (hasRows) {
-                            Swal.fire({
-                                title: 'Confirmation',
-                                text: 'Are you sure you want to save this?',
-                                icon: 'question',
-                                showCancelButton: true,
-                                confirmButtonColor: "#28A745",
-                                cancelButtonColor: "#6C757D",
-                                confirmButtonText: "Yes, Save it!"
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    const currentPage = dataTable.table.page();
-                                    $.ajax({
-                                        url: form.action,
-                                        type: form.method,
-                                        data: $(form).serialize(),
-                                        success: function(response) {
-                                            closeUpdateModal();
-                                            Swal.fire({
-                                                title: 'Successfully Updated!',
-                                                text: 'Announcement is successfully Updated!',
-                                                icon: 'success',
-                                                showCancelButton: false,
-                                                showConfirmButton: true,
-                                                confirmButtonText: 'OK',
-                                                preConfirm: () => {
-                                                    return new Promise(( resolve
-                                                    ) => {
-                                                        Swal.fire({
-                                                            title: 'Please Wait...',
-                                                            allowOutsideClick: false,
-                                                            allowEscapeKey: false,
-                                                            showConfirmButton: false,
-                                                            showCancelButton: false,
-                                                            didOpen: () => {
-                                                                Swal.showLoading();
-                                                                // here the reload of datatable
-                                                                dataTable.table.ajax.reload( () =>
-                                                                {
-                                                                    Swal.close();
-                                                                    $(form)[0].reset();
-                                                                    dataTable.table.page(currentPage).draw( false );
-                                                                },
-                                                                false );
-                                                            }
-                                                        })
-                                                    });
-                                                }
-                                            });
-                                        },
-                                        error: function(xhr, status, error) {
-                                            var errorMessage =
-                                                'An error occurred. Please try again later.';
-                                            if (xhr.responseJSON && xhr.responseJSON
-                                                .error) {
-                                                errorMessage = xhr.responseJSON.error;
-                                            }
-                                            Swal.fire({
-                                                title: 'Error!',
-                                                text: errorMessage,
-                                                icon: 'error',
-                                            });
-                                        }
-                                    })
-                                }
-                            })
-                        } else {
-
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Empty Record!',
-                                text: 'Table is empty, add row to proceed!',
-                            });
-                        }
-                    }
-                });
-
-                $('#FetchingDatatable').on('click', '.editBtn', function(e) {
-                    e.preventDefault();
-                    var itemID = $(this).data('id');
-
-                    var url = "/system/announcement/get/" + itemID;
-
-                    $.get(url, function(data) {
-                        console.log(data);
-                        $('#update_item_id').val(data.id);
-                        $('#update_type').val(data.type).trigger('change');
-                        $('#update_title').val(data.title);
-                        $('#update_description').val(data.description);
-                        $('#update_date_start').val(data.date_start);
-                        $('#update_date_end').val(data.date_end);
-
-                        $('#updateAnnouncementsModal').modal('show');
-                    });
-                });
-
-                function closeUpdateModal() {
-                    $('#updateAnnouncementsModal').modal('hide');
-                    $('#FetchingDatatable tbody').empty();
-                    // $('#usersGroupPageTable').addClass('d-none');
-                }
-
-                var today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-                $('#update_date_start').attr('min', today); // Set the minimum date to today for date_start
-                $('#update_date_end').attr('min', today); // Set the minimum date to today for date_end
-
-                $('#update_date_start').on('change', function() {
-                    var startDate = $(this).val();
-                    $('#update_date_end').attr('min', startDate).val(''); // Set min date for date_end and clear its value
-                });
-
-                $('#update_date_end').on('change', function() {
-                    var endDate = $(this).val();
-                    var startDate = $('#update_date_start').val();
-                    if (startDate && endDate < startDate) {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Oops...",
-                            text: "End date must be the same or after the start date!"
-                        });
-                        $(this).val(''); // Clear the end date input if invalid
-                    }
-                });
-            // Update Function
-
-
         });
     </script>
 

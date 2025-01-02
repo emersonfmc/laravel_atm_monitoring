@@ -52,6 +52,12 @@ class SystemController extends Controller
         return view('pages.pages_backend.settings.announcements_fetch', compact('user_types'));
     }
 
+    public function system_annoucement_fetch_data()
+    {
+        $SystemAnnouncements = SystemAnnouncements::with('Employee')->get();
+        return response()->json($SystemAnnouncements);
+    }
+
 
     public function system_annoucement_create(Request $request)
     {
@@ -172,7 +178,7 @@ class SystemController extends Controller
     public function system_logs_data()
     {
         $systemLogs = SystemLogs::with('Employee')
-            ->orderBy('updated_at', 'desc') // Explicitly set order here
+            ->orderBy('created_at', 'desc') // Explicitly set order here
             ->get()
             ->map(function ($log) {
                 $now = Carbon::now();

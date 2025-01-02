@@ -240,8 +240,8 @@ class AtmHeadOfficeController extends Controller
                 if ($clientInfo) {
                     $lastName = $clientInfo->last_name ?? '';
                     $firstName = $clientInfo->first_name ?? '';
-                    $middleName = $clientInfo->middle_name ? ' ' . $clientInfo->middle_name : ''; // Add space if middle_name exists
-                    $suffix = $clientInfo->suffix ? ', ' . $clientInfo->suffix : ''; // Add comma if suffix exists
+                    $middleName = $clientInfo->middle_name ? ' ' . $clientInfo->middle_name . '.' : ' '; // Add period if middle_name exists
+                    $suffix = $clientInfo->suffix ? ' ' . $clientInfo->suffix . '.' : ' '; // Add period if suffix exists
 
                     // Combine the parts into the full name
                     $fullName = "{$lastName}, {$firstName}{$middleName}{$suffix}";
@@ -272,7 +272,32 @@ class AtmHeadOfficeController extends Controller
 
                 return $pension_details;
             })
-            ->rawColumns(['action', 'pending_to','passbook_for_collection','full_name','qr_code','pension_details']) // Render HTML in both the action and pending_to columns
+            ->addColumn('pin_code_details', function ($row) {
+                if ($row->atm_type == 'ATM') {
+                    if ($row->pin_no != NULL) {
+                        $pin_code_details =
+                            '<a href="#" class="text-info fs-4 view_pin_code"
+                                data-pin="' . $row->pin_no . '"
+                                data-transaction_number="' . $row->transaction_number . '"
+                                data-bank_account_no="' . $row->bank_account_no . '">
+                                <i class="fas fa-eye"></i>
+                            </a>';
+                    } else {
+                        $pin_code_details = 'No Pin Code';
+                    }
+                } else {
+                    $pin_code_details = 'No Pin Code';
+                }
+
+                return $pin_code_details;
+            })
+            ->rawColumns(['action',
+                          'pending_to',
+                          'passbook_for_collection',
+                          'full_name',
+                          'qr_code',
+                          'pension_details',
+                          'pin_code_details']) // Render HTML in both the action and pending_to columns
             ->make(true);
     }
 

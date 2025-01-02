@@ -1606,7 +1606,7 @@ class AtmTransactionController extends Controller
                 'AtmBanksTransaction.Branch',
                 'AtmBanksTransaction.AtmClientBanks',
                 'AtmBanksTransaction.AtmClientBanks.ClientInformation')
-            ->whereIn('status', ['Pending','Completed','Cancelled']) // Use whereIn for multiple values
+            ->whereIn('status', ['Pending','Completed']) // Use whereIn for multiple values
             ->where('type', 'Received')
             ->orderBy('id', 'asc'); // Corrected syntax for descending order
 
@@ -1737,7 +1737,7 @@ class AtmTransactionController extends Controller
                 'AtmBanksTransaction.Branch',
                 'AtmBanksTransaction.AtmClientBanks',
                 'AtmBanksTransaction.AtmClientBanks.ClientInformation')
-            ->whereIn('status', ['Pending','Completed','Cancelled']) // Use whereIn for multiple values
+            ->whereIn('status', ['Pending','Completed']) // Use whereIn for multiple values
             ->where('type', 'Released')
             ->orderBy('id', 'desc'); // Corrected syntax for descending order
 
@@ -2059,6 +2059,53 @@ class AtmTransactionController extends Controller
             'message' => 'Transaction updated successfully!'
         ]);
     }
+
+    public function TransactionCancelled(Request $request)
+    {
+        $transaction_id = $request->transaction_id ?? NULL;
+        $remarks = $request->remarks ?? NULL;
+
+        // Retrieve the parent transaction record
+        $AtmBanksTransaction = AtmBanksTransaction::findOrFail($transaction_id);
+        $TransactionNumber = $AtmBanksTransaction->transaction_number;
+        $TransactionAction = $AtmBanksTransaction->transaction_actions_id;
+
+        // Update the status of the parent transaction
+        $AtmBanksTransaction->update([
+            'status' => 'CANCELLED',
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // Retrieve and update the child transaction approvals
+        AtmBanksTransactionApproval::where('banks_transactions_id', $transaction_id)
+            ->whereIn('status', ['Pending', 'Stand By'])
+            ->update([
+                'status' => 'Cancelled',
+            ]);
+
+        // Retrieve the transaction action data for logging purposes
+        $DataTransactionAction = DataTransactionAction::findOrFail($TransactionAction);
+
+        // Log the transaction update in the system logs
+        SystemLogs::create([
+            'system' => 'ATM Monitoring',
+            'action' => 'Update',
+            'title' => 'Cancelled Transaction',
+            'description' => $TransactionNumber . ' | ' . $DataTransactionAction->name . ' | ' . $remarks,
+            'employee_id' => Auth::user()->employee_id,
+            'ip_address' => $request->ip(),
+            'created_at' => Carbon::now(),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        // Return a successful response
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Transaction Cancelled successfully!'
+        ]);
+    }
+
+
 
 
 

@@ -521,21 +521,21 @@
                             <hr>
 
                             <div class="col-3 form-group mb-3">
+                                <label class="fw-bold h6">Lastname</label>
+                                <input type="text" name="last_name" id="edit_last_name" class="form-control"
+                                       minlength="0" maxlength="50" placeholder="Lastname" required>
+                            </div>
+
+                            <div class="col-3 form-group mb-3">
                                 <label class="fw-bold h6">Firstname</label>
                                 <input type="text" name="first_name" id="edit_first_name" class="form-control"
                                        minlength="0" maxlength="50" placeholder="Firstname" required>
                             </div>
 
                             <div class="col-3 form-group mb-3">
-                                <label class="fw-bold h6">Middlename</label>
+                                <label class="fw-bold h6">Middle Initial</label>
                                 <input type="text" name="middle_name" id="edit_middle_name" class="form-control"
-                                       minlength="0" maxlength="50" placeholder="Middlename" required>
-                            </div>
-
-                            <div class="col-3 form-group mb-3">
-                                <label class="fw-bold h6">Lastname</label>
-                                <input type="text" name="last_name" id="edit_last_name" class="form-control"
-                                       minlength="0" maxlength="50" placeholder="Lastname" required>
+                                       minlength="0" maxlength="3" placeholder="Middlename" required>
                             </div>
 
                             <div class="col-3 form-group mb-3">
@@ -843,18 +843,15 @@
                     searchable: true,
                 },
                 {
-                    data: 'pin_no',
-                    name: 'pin_no',
-                    render: function(data, type, row) {
-                        return `<a href="#" class="text-info fs-4 view_pin_code"
-                                    data-pin="${row.pin_no}"
-                                    data-bank_account_no="${row.bank_account_no}"><i class="fas fa-eye"></i>
-                                </a><br>`;
-
+                    data: 'pin_code_details',
+                    name: 'pin_code_details',
+                    render: function(data, type, row, meta) {
+                        return data ? `<span>${data}</span>` : '';
                     },
                     orderable: true,
                     searchable: true,
                 },
+
                 {
                     data: 'atm_status',
                     name: 'atm_status',

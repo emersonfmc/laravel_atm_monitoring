@@ -173,6 +173,14 @@
                         <div class="row">
                             <div class="col-3">
                                 <div class="form-group mb-3">
+                                    <label class="fw-bold h6">Lastname</label>
+                                    <input type="text" name="last_name" id="last_name" class="form-control"
+                                            placeholder="Enter Lastname" minlength="0" maxlength="50" required>
+                                </div>
+                            </div>
+
+                            <div class="col-3">
+                                <div class="form-group mb-3">
                                     <label class="fw-bold h6">Firstname</label>
                                     <input type="text" name="first_name" id="first_name"
                                             class="form-control" placeholder="Enter Firstname" minlength="0" maxlength="50" required>
@@ -180,16 +188,9 @@
                             </div>
                             <div class="col-3">
                                 <div class="form-group mb-3">
-                                    <label class="fw-bold h6">Middlename</label>
+                                    <label class="fw-bold h6">Middle Initial</label>
                                     <input type="text" name="middle_name" id="middle_name"
-                                            class="form-control" placeholder="Enter Middlename" minlength="0" maxlength="50">
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="form-group mb-3">
-                                    <label class="fw-bold h6">Lastname</label>
-                                    <input type="text" name="last_name" id="last_name" class="form-control"
-                                            placeholder="Enter Lastname" minlength="0" maxlength="50" required>
+                                            class="form-control" placeholder="Enter Middle Initial" minlength="0" maxlength="3">
                                 </div>
                             </div>
                         </div>
