@@ -55,8 +55,8 @@ class DashboardController extends Controller
 
 
         // Count By Client Monthly
-            $yearClient = $request->yearClient ?? ''; // Requested year or empty for all
-            // $yearClient = $request->yearClient ?? now()->year; // Use this if want to display all current year data
+            // $yearClient = $request->yearClient ?? ''; // Requested year or empty for all
+            $yearClient = $request->yearClient ?? now()->year; // Use this if want to display all current year data
 
             // Count By Client Monthly
             $ClientCounts = ClientInformation::selectRaw('
@@ -78,8 +78,8 @@ class DashboardController extends Controller
         // Count By Client Monthly
 
         // Count By ATM Passbook Simcard Monthly
-            $yearAtm = $request->yearAtm ?? '';
-            // $yearAtm = $request->yearAtm ?? now()->year; // Use this if want to display all current year data
+            // $yearAtm = $request->yearAtm ?? '';
+            $yearAtm = $request->yearAtm ?? now()->year; // Use this if want to display all current year data
 
             $AtmClientBanksCounts = AtmClientBanks::selectRaw('
                 YEAR(created_at) as year,
