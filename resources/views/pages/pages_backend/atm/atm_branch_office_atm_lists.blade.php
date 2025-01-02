@@ -2620,9 +2620,6 @@
                 }
             });
         });
-
-
-
     </script>
 
 @endsection

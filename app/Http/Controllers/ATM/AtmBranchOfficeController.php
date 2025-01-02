@@ -237,8 +237,8 @@ class AtmBranchOfficeController extends Controller
                 if ($clientInfo) {
                     $lastName = $clientInfo->last_name ?? '';
                     $firstName = $clientInfo->first_name ?? '';
-                    $middleName = $clientInfo->middle_name ? ' ' . $clientInfo->middle_name : ''; // Add space if middle_name exists
-                    $suffix = $clientInfo->suffix ? ', ' . $clientInfo->suffix : ''; // Add comma if suffix exists
+                    $middleName = $clientInfo->middle_name ? ' ' . $clientInfo->middle_name . '.' : ' '; // Add period if middle_name exists
+                    $suffix = $clientInfo->suffix ? ' ' . $clientInfo->suffix . '.' : ' '; // Add period if suffix exists
 
                     // Combine the parts into the full name
                     $fullName = "{$lastName}, {$firstName}{$middleName}{$suffix}";
