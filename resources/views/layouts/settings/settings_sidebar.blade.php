@@ -53,6 +53,14 @@
                     </ul>
                 </li>
 
+
+                <li>
+                    <a href="{{ route('settings.departments.page') }}" class="waves-effect">
+                        <i class="fas fa-building text-primary"></i>
+                        <span key="sub-districts">Departments</span>
+                    </a>
+                </li>
+
                 <li>
                     <a href="{{ route('settings.district.page') }}" class="waves-effect">
                         <i class="fas fa-map-marked fs-5" style="color: #68FFFF;"></i>

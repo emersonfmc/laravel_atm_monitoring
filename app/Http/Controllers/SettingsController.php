@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\DataPensionTypesLists;
 use App\Models\DataTransactionAction;
 use App\Models\AtmTransactionSequence;
+use App\Models\DataDepartments;
 use App\Models\DataTransactionSequence;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -908,11 +909,89 @@ class SettingsController extends Controller
         ]);
     }
 
+    public function departmentsPage()
+    {
+        return view('pages.pages_backend.settings.departments_page');
+    }
+
+    public function departmentsData()
+    {
+       $DataDepartments = DataDepartments::latest('updated_at')
+            ->whereNull('deleted_at')
+            ->get();
+
+        return DataTables::of($DataDepartments)
+            ->setRowId('id')
+            ->make(true);
+    }
+
+    public function departmentsGet($id)
+    {
+        $DataDepartments = DataDepartments::findOrFail($id);
+        return response()->json($DataDepartments);
+    }
+
+    public function departmentsCreate(Request $request)
+    {
+        DataDepartments::create([
+            'name' => $request->name,
+            'status' => 'active',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // Create System Logs used for Auditing of Logs
+        SystemLogs::create([
+            'system' => 'ATM Monitoring',
+            'action' => 'Create',
+            'title' => 'Create Departments Page',
+            'description' => 'Creation of Departments Page' .  $request->name,
+            'employee_id' => Auth::user()->employee_id,
+            'ip_address' => $request->ip(),
+            'created_at' => Carbon::now(),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Departments Page Created successfully!'
+        ]);
+    }
+
+    public function departmentsUpdate(Request $request)
+    {
+        $DataDepartments = DataDepartments::findOrFail($request->item_id);
+        $DataDepartments->update([  // Update the instance instead of using the class method
+            'name' => $request->name,
+            'status' => $request->status,
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // Create System Logs used for Auditing of Logs
+        SystemLogs::create([
+            'system' => 'ATM Monitoring',
+            'action' => 'Update',
+            'title' => 'Update Departments Page',
+            'description' => 'Updating of Departments Page' .  $DataDepartments->name .' into '. $request->name,
+            'employee_id' => Auth::user()->employee_id,
+            'ip_address' => $request->ip(),
+            'created_at' => Carbon::now(),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Departments Page Updated Successfully!'  // Changed message to reflect update action
+        ]);
+    }
 
     public function login_page()
     {
         return view('auth.login_page');
     }
+
+
+
 
 
 

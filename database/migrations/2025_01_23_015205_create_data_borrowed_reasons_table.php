@@ -13,8 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tbl_departments', function (Blueprint $table) {
+        Schema::create('data_borrowed_reasons', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->nullable();
+            $table->enum('status', ['active','inactive'])->default('active');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -27,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tbl_departments');
+        Schema::dropIfExists('data_borrowed_reasons');
     }
 };

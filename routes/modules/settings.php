@@ -73,6 +73,12 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'settings'], functio
         Route::post('/maintenance/create', 'maintenance_create')->name('settings.maintenance.create');
         Route::post('/maintenance/update', 'maintenance_update')->name('settings.maintenance.update');
 
+        Route::get('/departments_page', 'departmentsPage')->name('settings.departments.page');
+        Route::get('/departments_data', 'departmentsData')->name('settings.departments.data');
+        Route::get('/departments/get/{id}', 'departmentsGet')->name('settings.departments.get');
+        Route::post('/departments/create', 'departmentsCreate')->name('settings.departments.create');
+        Route::post('/departments/update', 'departmentsUpdate')->name('settings.departments.update');
+
 
         Route::get('/login_get_test', 'login_page')->name('login.page.test');
     });

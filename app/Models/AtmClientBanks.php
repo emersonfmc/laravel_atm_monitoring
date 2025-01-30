@@ -30,7 +30,6 @@ class AtmClientBanks extends Model
             'suffix',
             'created_at'
         ]);
-
     }
 
     public function Branch()
