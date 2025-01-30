@@ -307,28 +307,44 @@
 
 <script>
     $(document).ready(function () {
-        $.ajax({
-            url: "/SidebarCount",  // Your route to get the counts
-            type: "GET",
-            success: function(response) {
-                // Format the numbers with comma as thousand separator
-                const formatNumber = (number) => {
-                    return number.toLocaleString(); // Formats the number with commas (e.g., 1,000)
-                };
-                $('#ClientInformationCount').text(formatNumber(response.ClientInformationCount));
-                $('#HeadOfficeCount').text(formatNumber(response.HeadOfficeCounts));
-                $('#BranchOfficeCount').text(formatNumber(response.BranchOfficeCounts));
-                $('#ReleasedCount').text(formatNumber(response.ReleasedCounts));
-                $('#SafekeepCount').text(formatNumber(response.SafekeepCounts));
-                $('#OnGoingTransactionCount').text(formatNumber(response.OnGoingTransaction));
-                $('#PendingReceivingTransactionCount').text(formatNumber(response.PendingReceivingTransaction));
-                $('#PendingReleasingTransactionCount').text(formatNumber(response.PendingReleasingTransaction));
-            },
-            error: function(xhr, status, error) {
-                console.error("Error fetching counts:", error);
-            }
-        });
+        const fetchCounts = () => {
+            $.ajax({
+                url: "/SidebarCount",  // Your route to get the counts
+                type: "GET",
+                cache: false,  // Disable AJAX caching
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',  // Prevent caching
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                },
+                success: function(response) {
+                    // Format the numbers with comma as thousand separator
+                    const formatNumber = (number) => {
+                        return number.toLocaleString(); // Formats the number with commas (e.g., 1,000)
+                    };
+                    $('#ClientInformationCount').text(formatNumber(response.ClientInformationCount));
+                    $('#HeadOfficeCount').text(formatNumber(response.HeadOfficeCounts));
+                    $('#BranchOfficeCount').text(formatNumber(response.BranchOfficeCounts));
+                    $('#ReleasedCount').text(formatNumber(response.ReleasedCounts));
+                    $('#SafekeepCount').text(formatNumber(response.SafekeepCounts));
+                    $('#OnGoingTransactionCount').text(formatNumber(response.OnGoingTransaction));
+                    $('#PendingReceivingTransactionCount').text(formatNumber(response.PendingReceivingTransaction));
+                    $('#PendingReleasingTransactionCount').text(formatNumber(response.PendingReleasingTransaction));
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching counts:", error);
+                }
+            });
+        };
+
+        // Initial fetch
+        fetchCounts();
+
+        // Set interval to refresh every 5 seconds
+        setInterval(fetchCounts, 5000); // 5000 milliseconds = 5 seconds
     });
+
+
 
 </script>
 <!-- Left Sidebar End -->

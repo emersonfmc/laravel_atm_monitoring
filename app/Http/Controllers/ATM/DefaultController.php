@@ -27,9 +27,17 @@ class DefaultController extends Controller
     public function AtmClientFetch(Request $request)
     {
         $new_atm_id = $request->new_atm_id;
-        $AtmClientBanks = AtmClientBanks::with('ClientInformation','ClientInformation.AtmClientBanks','Branch')->findOrFail($new_atm_id);
+        $AtmClientBanks = AtmClientBanks::with('ClientInformation', 'ClientInformation.AtmClientBanks', 'Branch')->findOrFail($new_atm_id);
+
+        // $Lastname = $AtmClientBanks->ClientInformation->last_name ?? '';
+        // $FirstName = $AtmClientBanks->ClientInformation->first_name ?? '';
+        // $MiddleName = $AtmClientBanks->ClientInformation->middle_name ?? '';
+        // $Suffix = $AtmClientBanks->ClientInformation->suffix ?? '';
+        // $Fullname = $Lastname . ', ' . $FirstName . ' ' . $MiddleName . ' ' . $Suffix;
+
         return response()->json($AtmClientBanks);
     }
+
 
     public function AtmClientBanksFetch(Request $request)
     {
@@ -44,7 +52,8 @@ class DefaultController extends Controller
             ->where('id', $client_id)
             ->firstOrFail();
 
-        return response()->json($ClientInfo);
+        // Return the ClientInformation including the fullname attribute
+        return response()->json($ClientInfo->toArray());
     }
 
     public function UserSelect()
