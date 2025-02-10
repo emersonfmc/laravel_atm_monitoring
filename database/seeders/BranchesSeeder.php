@@ -151,6 +151,9 @@ class BranchesSeeder extends Seeder
                         [1,	2,	'GU',	'Guiguinto',	'Marjorie O. Peña',2, 'Active','2024-10-08 14:53:34'],
                         [4,	8,	'TE',	'Teresa',	'Jenny Santos',2, 'Active','2024-10-08 14:53:34'],
                         [4,	7,	'TY',	'Tanay',	'Recio, Neman C',2, 'Active','2024-10-08 14:53:34'],
+                        [2,	3,	'FV',	'Fairview',	'Jennilyn Salomeo',2, 'Active','2025-01-27 14:53:34'],
+                        [2,	4,	'',	'Batasan',	'Alyssa B. Dacumos',2, 'Active','2025-01-30 14:53:34'],
+                        [2,	4,	'',	'Malanday',	'BERNARD MATTHEW A. JUSON',2, 'Active','2025-02-03 14:53:34'],
                     ];
 
                     // Loop through each branch array and insert into the database

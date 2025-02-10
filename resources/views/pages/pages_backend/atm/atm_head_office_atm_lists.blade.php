@@ -67,8 +67,7 @@
                                     <th>Created Date</th>
                                     <th>Birthdate</th>
                                     <th>Box</th>
-                                    <th>Card No. & Bank</th>
-                                    {{-- <th>ATM / Passbook / Simcard No & Bank</th> --}}
+                                    <th>Card No. / Bank / Coll Date</th>
                                     <th>PIN Code</th>
                                     <th>Status</th>
                                     <th>QR</th>
@@ -836,7 +835,8 @@
 
                         return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span>
                                 ${replacementCountDisplay}<br>
-                                <span>${row.bank_name}</span>`;
+                                <span>${row.bank_name}</span><br>
+                                <span class="text-primary">${row.collection_date}</span>`;
 
                     },
                     orderable: true,
