@@ -1,4 +1,4 @@
-@extends('layouts.settings.settings_master')
+@extends('layouts.settings_monitoring.settings_master')
 @section('settings')
 
 @section('css')

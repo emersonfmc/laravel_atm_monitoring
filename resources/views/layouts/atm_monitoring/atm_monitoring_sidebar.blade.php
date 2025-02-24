@@ -11,13 +11,20 @@
                 <li class="menu-title" key="t-menu">Menu</li>
 
                 <li>
+                    <a href="#" class="waves-effect">
+                        <i class="far fa-question-circle text-warning"></i>
+                        <span key="how_it_works">How it Works ?</span>
+                    </a>
+                </li>
+
+                <li>
                     <a href="{{ route('elog_monitoring_dashboard') }}" class="waves-effect">
                         <i class="fas fa-desktop text-info"></i>
                         <span key="t-dashboard">Dashboard</span>
                     </a>
                 </li>
 
-                <li>
+                {{-- <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="fas fa-print text-success" aria-hidden="true"></i>
                         <span key="document">Document Transaction</span>
@@ -54,7 +61,7 @@
                                 <i class="fas fa-print fs-6 text-success fs-6"></i>Return Document <br> From HO</a>
                         </li>
                     </ul>
-                </li>
+                </li> --}}
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -64,35 +71,52 @@
                     <ul class="sub-menu" aria-expanded="true">
                         <li>
                             <a href="#" key="atm_reports_daily_report">
-                                <i class="fas fa-print fs-6 text-success"></i>Daily Report
+                                <i class="fas fa-print fs-6 text-success"></i>
+                                    Daily Transaction
                             </a>
                         </li>
                         <li>
-                            <a href="#" key="atm_reports_released_report">
-                                <i class="fas fa-print fs-6 text-success"></i>Released Report
+                            <a href="#" key="atm_reports_released_transaction_logs">
+                                <i class="fas fa-print fs-6 text-success"></i>
+                                    Release Transaction Logs
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" key="atm_reports_released_to_rider">
+                                <i class="fas fa-print fs-6 text-success"></i>
+                                    Release to Rider
                             </a>
                         </li>
                         <li>
                             <a href="#" key="atm_reports_cancelled_transaction_logs">
-                                <i class="fas fa-print fs-6 text-success"></i>Cancelled <br> Transaction Logs</a>
+                                <i class="fas fa-print fs-6 text-success"></i>
+                                    Cancelled <br> Transaction Logs
+                            </a>
                         </li>
                         <li>
                             <a href="#" key="atm_reports_unreturn_yellow_paper">
-                                <i class="fas fa-print fs-6 text-success"></i>Unreturn Yellow <br> Paper</a>
+                                <i class="fas fa-print fs-6 text-success"></i>
+                                    Unreturn Yellow <br> Paper
+                            </a>
                         </li>
                         <li>
                             <a href="#" key="atm_reports_aprb_report">
-                                <i class="fas fa-print fs-6 text-success"></i>APRB Report</a>
-                        </li>
-
-                        <li>
-                            <a href="#" key="atm_reports_cash_box_report">
-                                <i class="fas fa-box fs-6 text-warning"></i>Cash Box No. Report
+                                <i class="fas fa-print fs-6 text-success"></i>
+                                    APRB Report
                             </a>
                         </li>
-
-
-
+                        <li>
+                            <a href="#" key="atm_reports_not_return_by_bank">
+                                <i class="fas fa-print fs-6 text-success"></i>
+                                    Not Returned By Bank
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" key="atm_reports_cash_box_report">
+                                <i class="fas fa-box fs-6 text-warning"></i>
+                                    Cash Box No. Report
+                            </a>
+                        </li>
                     </ul>
                 </li>
 
@@ -159,7 +183,7 @@
                             </a>
                         </li>
 
-                        <li>
+                        {{-- <li>
                             <a href="javascript: void(0);" class="has-arrow"
                                 key="t-sub-dropdown1"><i class="fas fa-chalkboard-teacher text-info fs-6"></i> Users Transaction</a>
                             <ul class="sub-menu" aria-expanded="true">
@@ -178,7 +202,7 @@
                                         <i class="fas fa-check text-success fs-6"></i> All Users Completed Transaction</a>
                                 </li>
                             </ul>
-                        </li>
+                        </li> --}}
 
                         <li class="mm-active">
                             <a href="javascript: void(0);" class="has-arrow"
@@ -224,43 +248,100 @@
                             </ul>
                         </li>
 
-
-                        <li>
+                        <li class="mm-active">
                             <a href="javascript: void(0);" class="has-arrow"
                                 key="outside_for_collection">
-                                <i class="fas fa-user-cog text-info"></i> Outside For Collection</a>
+                                    <i class="fas fa-user-cog text-info me-1"></i>Outside For Collection</a>
+                                <ul class="sub-menu" aria-expanded="true">
+                                    <li>
+                                        <a href="#" key="outside_setup">
+                                            <i class="far fa-dot-circle"></i>SETUP
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" key="outside_for_receiving">
+                                            <i class="far fa-dot-circle"></i>
+                                            For Receiving Transaction Filtered
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" key="outside_for_cancellation">
+                                            <i class="far fa-dot-circle"></i>
+                                            For Request of Cancellation
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" key="outside_scan_qr">
+                                            <i class="far fa-dot-circle"></i>
+                                            Scan QR Check Client Details w/ PIN Number
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" key="outside_by_request_number_with_cancel">
+                                            <i class="far fa-dot-circle"></i>
+                                            By Request Number with Cancel
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" key="outside_scan_qr">
+                                            <i class="far fa-dot-circle"></i>
+                                            All Request Number
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a href="#" key="outside_scan_qr">
+                                            <i class="far fa-dot-circle"></i>
+                                            All Transaction Detailed
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a href="#" key="outside_scan_qr">
+                                            <i class="far fa-dot-circle"></i>
+                                            Received Transaction w/ Lapsing
+                                        </a>
+                                    </li>
+
+
+                                </ul>
+                        </li>
+
+                        {{-- <li class="mm-active">
+                            <a href="javascript: void(0);" class="has-arrow"
+                                key="pb_for_collection"><i class="fas fa-book" style="color: #cc2424;"></i>Outside For Collection</a>
                             <ul class="sub-menu" aria-expanded="true">
                                 <li>
-                                    <a href="#" key="pb_setup">
+                                    <a href="{{ route('PassbookCollectionSetUpPage') }}" key="pb_setup">
                                         <i class="fas fa-plus-circle fs-6 text-primary"></i>SETUP
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" key="outside_for_receiving">
+                                    <a href="{{ route('PassbookCollectionReceivingPage') }}" key="pb_for_receiving">
                                         <i class="fas fa-undo fs-6 text-success"></i>
                                         For Receiving
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" key="outside_for_releasing">
+                                    <a href="{{ route('PassbookCollectionReleasingPage') }}" key="pb_for_releasing">
                                         <i class="fas fa-redo fs-6 text-danger"></i>
                                         For Releasing
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" key="outside_for_returning">
+                                    <a href="{{ route('PassbookCollectionReturningPage') }}" key="pb_for_returning">
                                         <i class="fas fa-sync fs-6 text-warning"></i>
                                         For Returning
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" key="outside_transaction">
+                                    <a href="{{ route('PassbookCollectionTransactionPage') }}" key="pb_transaction">
                                         <i class="fas fa-desktop fs-6 text-success"></i>
                                         PB Transaction
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" key="outside_all_transaction">
+                                    <a href="{{ route('PassbookCollectionAllTransactionPage') }}" key="pb_all_transaction">
                                         <i class="fas fa-desktop fs-6 text-info"></i>
                                         PB All Transaction
                                     </a>
@@ -268,9 +349,12 @@
 
 
                             </ul>
-                        </li>
+                        </li> --}}
 
-                        <li>
+
+
+
+                        {{-- <li>
                             <a href="#" key="atm_released_atm">
                                 <i class="fas fa-undo-alt fs-6 text-warning"></i>
                                 Going to Head <br>Office ( ELOG )
@@ -282,16 +366,10 @@
                                 <i class="fas fa-redo fs-6 text-info"></i>
                                 Going Back to <br>Branch ( ELOG )
                             </a>
-                        </li>
+                        </li> --}}
                     </ul>
                 </li>
 
-                <li>
-                    <a href="{{ route('elog_monitoring_dashboard') }}" class="waves-effect">
-                        <i class="far fa-question-circle text-warning"></i>
-                        <span key="how_it_works">How it Works ?</span>
-                    </a>
-                </li>
 
                 {{-- Icons Used
                 Box Icons

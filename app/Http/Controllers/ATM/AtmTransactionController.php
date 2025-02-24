@@ -48,6 +48,7 @@ class AtmTransactionController extends Controller
     {
         $userGroup = Auth::user()->UserGroup->group_name;
         $branch_id = Auth::user()->branch_id;
+        $userDepartment = Auth::user()->department;
 
         // Start building the query with conditional branch, transaction, and status filters
         $query = AtmBanksTransaction::with([
@@ -183,7 +184,36 @@ class AtmTransactionController extends Controller
 
                 return $pension_details;
             })
-            ->rawColumns(['action','pending_to','full_name','pension_details']) // Render HTML in the pending_to column
+            ->addColumn('pin_code_details', function ($row) use ($userGroup, $userDepartment){
+                // Define the user groups that need access
+                $authorizedUserGroups = ['Developer', 'Admin', 'Everfirst Admin',
+                    'Collection Receiving Clerk', 'Collection Head',
+                    'Collection Staff', 'Collection Staff / Releasing',
+                    'Collection Custodian', 'Collection Supervisor', 'Checker'];
+
+                if (in_array($userGroup, $authorizedUserGroups) || $userDepartment == 'Collection') {
+                    if ($row->atm_type == 'ATM') {
+                        if ($row->pin_no != NULL) {
+                            $pin_code_details =
+                                '<a href="#" class="text-info fs-4 view_pin_code"
+                                    data-pin="' . $row->pin_no . '"
+                                    data-transaction_number="' . $row->transaction_number . '"
+                                    data-bank_account_no="' . $row->bank_account_no . '">
+                                    <i class="fas fa-eye"></i>
+                                </a>';
+                        } else {
+                            $pin_code_details = 'No Pin Code';
+                        }
+                    } else {
+                        $pin_code_details = 'No Pin Code';
+                    }
+                } else {
+                    $pin_code_details = '********';
+                }
+
+                return $pin_code_details;
+            })
+            ->rawColumns(['action','pending_to','full_name','pension_details','pin_code_details']) // Render HTML in the pending_to column
             ->make(true);
     }
 

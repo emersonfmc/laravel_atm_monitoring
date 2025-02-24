@@ -51,6 +51,7 @@ class ClientContoller extends Controller
     public function client_data()
     {
         $userBranchId = Auth::user()->branch_id;
+        $userGroup = Auth::user()->UserGroup->group_name;
 
         // Start the query with the necessary relationships
         $query = ClientInformation::with('Branch', 'AtmClientBanks')->latest('updated_at');
@@ -67,6 +68,24 @@ class ClientContoller extends Controller
         // Return the data as DataTables response
         return DataTables::of($branchData)
             ->setRowId('id')
+            ->addColumn('action', function($row) use ($userGroup) {
+                $action = '';
+                // Add buttons for users in Collection Staff and others
+                if (in_array($userGroup, ['Collection Staff', 'Developer', 'Admin', 'Everfirst Admin'])) {
+                    // Show the button to transfer branch transaction and edit information
+                    $action .= '<a href="#" class="text-success fw-bold add_more_atm me-2 mb-2"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Add More ATM / PB"
+                                    data-id="' . $row->id . '">
+                                    <i class="far fa-credit-card fs-5"></i>
+                                 </a>';
+                } else {
+                     $action .= '';
+                }
+                return $action; // Return all the accumulated buttons
+            })
+            ->rawColumns(['action'])
             ->make(true);
     }
 

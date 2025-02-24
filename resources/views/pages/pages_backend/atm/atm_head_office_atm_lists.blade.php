@@ -607,7 +607,7 @@
                                         {{-- <div class="row" id="replaceBankAccountNo" style="display:block;"> --}}
 
                                         <div class="row mb-3 replaceBankAccountNo">
-                                            <label class="col-4 fw-bold">ATM / Passbook / Sim No.</label>
+                                            <label class="col-4 fw-bold">Card No.</label>
                                             <div class="form-group col-8">
                                                 <input type="text" name="atm_number" class="atm_card_input_mask form-control" id="edit_bank_account_no" placeholder="ATM / Passbook / Sim No." required>
                                             </div>

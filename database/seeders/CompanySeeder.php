@@ -16,11 +16,13 @@ class CompanySeeder extends Seeder
             $data = [
                         [
                             'company_name' => 'Filipinas Multi-Line Corp',
+                            'status' => 'Active',
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ],
                         [
                             'company_name' => 'Everfirst',
+                            'status' => 'Active',
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ],

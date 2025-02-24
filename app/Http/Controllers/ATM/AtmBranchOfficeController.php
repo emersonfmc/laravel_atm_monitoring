@@ -38,6 +38,7 @@ class AtmBranchOfficeController extends Controller
     {
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
+        $userDepartment = Auth::user()->department;
 
         // Start the query with the necessary relationships
         $query = AtmClientBanks::with('ClientInformation', 'Branch', 'AtmBanksTransaction')
@@ -269,16 +270,31 @@ class AtmBranchOfficeController extends Controller
 
                 return $pension_details;
             })
-            ->addColumn('pin_code_details', function ($row) {
-                if ($row->atm_type == 'ATM') {
-                    if ($row->pin_no != NULL) {
-                        $pin_code_details = '<a href="#" class="text-info fs-4 view_pin_code" data-pin="' . $row->pin_no . '"
-                        data-bank_account_no="' . $row->bank_account_no . '"><i class="fas fa-eye"></i></a>';
+            ->addColumn('pin_code_details', function ($row) use ($userGroup, $userDepartment){
+                // Define the user groups that need access
+                $authorizedUserGroups = ['Developer', 'Admin', 'Everfirst Admin',
+                    'Collection Receiving Clerk', 'Collection Head',
+                    'Collection Staff', 'Collection Staff / Releasing',
+                    'Collection Custodian', 'Collection Supervisor', 'Checker'];
+
+                if (in_array($userGroup, $authorizedUserGroups) || $userDepartment == 'Collection') {
+                    if ($row->atm_type == 'ATM') {
+                        if ($row->pin_no != NULL) {
+                            $pin_code_details =
+                                '<a href="#" class="text-info fs-4 view_pin_code"
+                                    data-pin="' . $row->pin_no . '"
+                                    data-transaction_number="' . $row->transaction_number . '"
+                                    data-bank_account_no="' . $row->bank_account_no . '">
+                                    <i class="fas fa-eye"></i>
+                                </a>';
+                        } else {
+                            $pin_code_details = 'No Pin Code';
+                        }
                     } else {
                         $pin_code_details = 'No Pin Code';
                     }
                 } else {
-                    $pin_code_details = 'No Pin Code';
+                    $pin_code_details = '********';
                 }
 
                 return $pin_code_details;
@@ -307,6 +323,7 @@ class AtmBranchOfficeController extends Controller
     {
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
+        $userDepartment = Auth::user()->department;
 
         // Start the query with the necessary relationships
         $query = AtmClientBanks::with('ClientInformation', 'Branch', 'AtmBanksTransaction')
@@ -454,7 +471,36 @@ class AtmBranchOfficeController extends Controller
                 // Prepare the output
                 return $atmTransactionActionName . ' <div class="text-dark"> ' . $groupName .'</div>'; // Combine the group name and action name
             })
-            ->rawColumns(['action','pending_to']) // Render the HTML in the 'action' column
+            ->addColumn('pin_code_details', function ($row) use ($userGroup, $userDepartment){
+                // Define the user groups that need access
+                $authorizedUserGroups = ['Developer', 'Admin', 'Everfirst Admin',
+                    'Collection Receiving Clerk', 'Collection Head',
+                    'Collection Staff', 'Collection Staff / Releasing',
+                    'Collection Custodian', 'Collection Supervisor', 'Checker'];
+
+                if (in_array($userGroup, $authorizedUserGroups) || $userDepartment == 'Collection') {
+                    if ($row->atm_type == 'ATM') {
+                        if ($row->pin_no != NULL) {
+                            $pin_code_details =
+                                '<a href="#" class="text-info fs-4 view_pin_code"
+                                    data-pin="' . $row->pin_no . '"
+                                    data-transaction_number="' . $row->transaction_number . '"
+                                    data-bank_account_no="' . $row->bank_account_no . '">
+                                    <i class="fas fa-eye"></i>
+                                </a>';
+                        } else {
+                            $pin_code_details = 'No Pin Code';
+                        }
+                    } else {
+                        $pin_code_details = 'No Pin Code';
+                    }
+                } else {
+                    $pin_code_details = '********';
+                }
+
+                return $pin_code_details;
+            })
+            ->rawColumns(['action','pending_to','pin_code_details']) // Render the HTML in the 'action' column
             ->make(true);
     }
 

@@ -1,4 +1,4 @@
-@extends('layouts.settings.settings_master')
+@extends('layouts.settings_monitoring.settings_master')
 
 @section('css')
     <!-- DataTables -->
@@ -9,7 +9,7 @@
 
     @component('components.breadcrumb')
         @slot('li_1') Settings @endslot
-        @slot('title') Release Reason @endslot
+        @slot('title') Maintenance @endslot
     @endcomponent
 
     <div class="row">
@@ -19,14 +19,14 @@
 
                     <div class="row">
                         <div class="col-md-8 text-start">
-                            <h4 class="card-title">Release Reason</h4>
+                            <h4 class="card-title">Maintenance</h4>
                             <p class="card-title-desc">
-                                A list of Release Reason
+                                Page Where you can set a maintenance for Specific Page
                             </p>
                         </div>
                         <div class="col-md-4 text-end">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createReleaseReasonModal"><i
-                                class="fas fa-plus-circle me-1"></i> Create Release Reason</button>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createMaintenanceModal"><i
+                                class="fas fa-plus-circle me-1"></i> Create Maintenance</button>
                         </div>
                     </div>
                     <hr>
@@ -37,8 +37,7 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>Sl</th>
-                                    <th>Reason</th>
-                                    <th>Description</th>
+                                    <th>Page</th>
                                     <th>Status</th>
                                     <th>Created Date</th>
                                     <th>Action</th>
@@ -56,32 +55,26 @@
         </div> <!-- end col -->
     </div> <!-- end row -->
 
-    <div class="modal fade" id="createReleaseReasonModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
-        aria-labelledby="createReleaseReasonModalLabel" aria-hidden="true">
+    <div class="modal fade" id="createMaintenanceModal" data-bs-backdrop="static" tabindex="-1" role="dialog"district_id
+        aria-labelledby="createMaintenanceModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-uppercase">Create Release Reason</h5>
-                    <button type="button" class="btn-close closeCreateModal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title fw-bold text-uppercase">Create Maintenance Page</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" action="{{ route('settings.release.reason.create') }}" id="createValidateForm">
+                    <form method="post" action="{{ route('settings.maintenance.create') }}" id="createValidateForm">
                         @csrf
 
                         <div class="form-group mb-3">
-                            <label class="fw-bold h6">Reason</label>
-                            <input type="text" name="reason" class="form-control" id="reason"
-                                placeholder="Enter Release Reason" minlength="0" maxlength="50" required>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label class="fw-bold h6">Description</label>
-                            <input type="text" name="description" class="form-control" id="description"
-                                placeholder="Enter Release Description" minlength="0" maxlength="50">
+                            <label class="fw-bold h6">Page name</label>
+                            <input type="text" name="pages_name" class="form-control" id="pages_name"
+                                placeholder="Enter Pages Name" minlength="0" maxlength="50" required>
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary closeCreateModal" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </form>
@@ -90,38 +83,31 @@
         </div>
     </div>
 
-    <div class="modal fade" id="updateReleaseReasonModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
-        aria-labelledby="uupdateReleaseReasonModalLabel" aria-hidden="true">
+    <div class="modal fade" id="updateMaintenanceModal" data-bs-backdrop="static" tabindex="-1" role="dialog"update_district_id
+        aria-labelledby="updateMaintenanceModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-uppercase">Update Release Reason</h5>
+                    <h5 class="modal-title fw-bold text-uppercase">Update Maintenance Page</h5>
                     <button type="button" class="btn-close closeUpdateModal" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" action="{{ route('settings.release.reason.update') }}" id="updateValidateForm">
+                    <form method="post" action="{{ route('settings.maintenance.update') }}" id="updateValidateForm">
                         @csrf
-                        <input type="hidden" name="item_id" id="item_id">
+                        <input type="hidden" id="item_id" name="item_id">
 
                         <div class="form-group mb-3">
-                            <label class="fw-bold h6">Reason</label>
-                            <input type="text" name="reason" class="form-control" id="update_reason"
-                                placeholder="Enter Reason" minlength="0" maxlength="50" required>
+                            <label class="fw-bold h6">Page name</label>
+                            <input type="text" name="pages_name" class="form-control" id="update_pages_name"
+                                placeholder="Enter Page Name" minlength="0" maxlength="50" required>
                         </div>
-
-                        <div class="form-group mb-3">
-                            <label class="fw-bold h6">Description</label>
-                            <input type="text" name="description" class="form-control" id="update_description"
-                                placeholder="Enter Description" minlength="0" maxlength="50">
-                        </div>
-
 
                         <div class="form-group mb-3">
                             <label class="fw-bold h6">Status</label>
                             <select name="status" id="update_status" class="form-select" required>
-                                <option value="" selected disabled>Pension Number Types</option>
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
+                                <option value="yes">yes</option>
+                                <option value="no">no</option>
+
                             </select>
                         </div>
 
@@ -140,7 +126,7 @@
             var FetchingDatatableBody = $('#FetchingDatatable tbody');
 
             const dataTable = new ServerSideDataTable('#FetchingDatatable');
-            var url = '{!! route('settings.release.reason.data') !!}';
+            var url = '{!! route('settings.maintenance.data') !!}';
             const buttons = [{
                 text: 'Delete',
                 action: function(e, dt, node, config) {
@@ -159,19 +145,10 @@
                     searchable: true,
                 },
                 {
-                    data: 'reason',
-                    name: 'reason',
+                    data: 'pages_name',
+                    name: 'pages_name',
                     render: function(data, type, row, meta) {
                         return '<span class="fw-bold h6 text-primary">' + data + '</span>';
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'description',
-                    name: 'description',
-                    render: function(data, type, row, meta) {
-                        return '<span class="">' + data + '</span>';
                     },
                     orderable: true,
                     searchable: true,
@@ -180,13 +157,7 @@
                     data: 'status',
                     name: 'status',
                     render: function(data, type, row, meta) {
-                        if (data === 'Active') {
-                            return '<span class="badge bg-primary">Active</span>';
-                        } else if (data === 'Inactive') {
-                            return '<span class="badge bg-danger">Inactive</span>';
-                        } else {
-                            return '<span>No Status</span>';
-                        }
+                        return row.status ? '<span>' + row.status + '</span>' : ''; // Check if company exists
                     },
                     orderable: true,
                     searchable: true,
@@ -226,7 +197,9 @@
 
             $('#createValidateForm').validate({
                 rules: {
-                    reason: { required: true, }
+                    area: { required: true, },
+                    area_supervisor: { required: true, },
+                    district_id: { required: true, },
                 },
                 errorElement: 'span',
                 errorPlacement: function(error, element) {
@@ -260,8 +233,8 @@
                                     success: function(response) {
                                         closeCreateModal();
                                         Swal.fire({
-                                            title: 'Successfully Created!',
-                                            text: 'Release Reason is successfully Created!',
+                                            title: 'Successfully Added!',
+                                            text: 'Maintenance Page is successfully added!',
                                             icon: 'success',
                                             showCancelButton: false,
                                             showConfirmButton: true,
@@ -320,7 +293,9 @@
 
             $('#updateValidateForm').validate({
                 rules: {
-                    reason: { required: true, }
+                    area: { required: true, },
+                    area_supervisor: { required: true, },
+                    district_id: { required: true, },
                 },
                 errorElement: 'span',
                 errorPlacement: function(error, element) {
@@ -355,7 +330,7 @@
                                         closeUpdateModal();
                                         Swal.fire({
                                             title: 'Successfully Updated!',
-                                            text: 'Release Reason is successfully Updated!',
+                                            text: 'Maintenance Page is successfully Updated!',
                                             icon: 'success',
                                             showCancelButton: false,
                                             showConfirmButton: true,
@@ -416,29 +391,30 @@
                 e.preventDefault();
                 var itemID = $(this).data('id');
 
-                var url = "/settings/release/reason/get/" + itemID;
+                var url = "/settings/maintenance/get/" + itemID;
 
                 $.get(url, function(data) {
                     $('#item_id').val(data.id);
-                    $('#update_reason').val(data.reason);
-                    $('#update_description').val(data.description);
-                    $('#update_status').val(data.status);
+                    $('#update_pages_name').val(data.pages_name);
+                    $('#update_status').val(data.status).trigger('change');
 
-                    $('#updateReleaseReasonModal').modal('show');
+                    $('#updateMaintenanceModal').modal('show');
                 });
             });
 
+
             function closeCreateModal() {
-                $('#createReleaseReasonModal').modal('hide');
+                $('#createMaintenanceModal').modal('hide');
                 $('#FetchingDatatable tbody').empty();
-                // $('#FetchingDatatable').addClass('d-none');
             }
 
             function closeUpdateModal() {
-                $('#updateReleaseReasonModal').modal('hide');
+                $('#updateMaintenanceModal').modal('hide');
                 $('#FetchingDatatable tbody').empty();
-                // $('#usersGroupPageTable').addClass('d-none');
             }
+
+
+
         });
     </script>
 
