@@ -8,7 +8,7 @@
 
             <!-- Left Menu Start -->
             <ul class="metismenu list-unstyled" id="side-menu">
-                {{-- <li class="menu-title" key="t-menu">Menu</li>
+                <li class="menu-title" key="t-menu">Menu</li>
 
                 <li>
                     <a href="{{ route('settings.dashboard.page') }}" class="waves-effect">
@@ -16,6 +16,22 @@
                         <span key="settings-dashboard">Dashboard</span>
                     </a>
                 </li>
+
+                <li>
+                    <a href="{{ route('settings.company.page') }}" class="waves-effect">
+                        <i class="fas fa-globe-americas text-success"></i>
+                        <span key="settings-company">Company</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('users.page') }}" class="waves-effect">
+                        <i class="fas fa-users text-info"></i>
+                        <span key="settings-user">Users</span>
+                    </a>
+                </li>
+
+
 
                 <li class="mm-active">
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -53,6 +69,14 @@
                     </ul>
                 </li>
 
+
+                <li>
+                    <a href="{{ route('settings.departments.page') }}" class="waves-effect">
+                        <i class="fas fa-building text-primary"></i>
+                        <span key="sub-districts">Departments</span>
+                    </a>
+                </li>
+
                 <li>
                     <a href="{{ route('settings.district.page') }}" class="waves-effect">
                         <i class="fas fa-map-marked fs-5" style="color: #68FFFF;"></i>
@@ -68,7 +92,7 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('settings.area.page') }}" class="waves-effect">
+                    <a href="{{ route('settings.branch.page') }}" class="waves-effect">
                         <i class="fas fa-code-branch fs-5" style="color: #E684FF;"></i>
                         <span key="sub-branches">Branches</span>
                     </a>
@@ -90,10 +114,35 @@
 
                 <li>
                     <a href="{{ route('settings.maintenance.page') }}" class="waves-effect">
-                        <i class="fas fa-tools fs-5 text-info "></i>
+                        <i class="fas fa-tools fs-5 text-danger "></i>
                         <span key="sub-maintenance">Maintenance</span>
                     </a>
-                </li> --}}
+                </li>
+
+                <li>
+                    <a href="{{ route('system.announcement.pages') }}" class="waves-effect">
+                        <i class="fas fa-bullhorn text-primary"></i>
+                        <span key="sub-maintenance">Announcement</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('system.logs.pages') }}" class="waves-effect">
+                        <i class="fa fa-history text-info"></i>
+                        <span key="sub-maintenance">System Logs</span>
+                    </a>
+                </li>
+
+
+
+
+
+                {{-- Icons Used
+                Box Icons
+                Materail Icons
+                Drip Icons
+                Font Awesome --}}
+
             </ul>
         </div>
         <!-- Sidebar -->

@@ -2,13 +2,16 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\Settings\SettingsController;
 
 Auth::routes();
 
 Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'settings'], function () {
     Route::controller(SettingsController::class)->group(function () {
         Route::get('/settings_dashboard', 'settings_dashboard')->name('settings.dashboard.page');
+        Route::get('/settings/monitoring/dashboard/data', 'settings_monitoring_dashboard_data')->name('settings.monitoring.dashboard.data');
+        Route::get('/settings/system/logs/data', 'settings_system_logs_data')->name('settings.system.logs.data');
+
 
         Route::get('/districts', 'districts_page')->name('settings.district.page');
         Route::get('/districts/data', 'districts_data')->name('settings.district.data');
@@ -72,6 +75,18 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'settings'], functio
         Route::get('/maintenance/get/{id}', 'maintenance_get')->name('settings.maintenance.get');
         Route::post('/maintenance/create', 'maintenance_create')->name('settings.maintenance.create');
         Route::post('/maintenance/update', 'maintenance_update')->name('settings.maintenance.update');
+
+        Route::get('/departments_page', 'departmentsPage')->name('settings.departments.page');
+        Route::get('/departments_data', 'departmentsData')->name('settings.departments.data');
+        Route::get('/departments/get/{id}', 'departmentsGet')->name('settings.departments.get');
+        Route::post('/departments/create', 'departmentsCreate')->name('settings.departments.create');
+        Route::post('/departments/update', 'departmentsUpdate')->name('settings.departments.update');
+
+        Route::get('/company/page', 'companyPage')->name('settings.company.page');
+        Route::get('/company/data', 'companyData')->name('settings.company.data');
+        Route::get('/company/get/{id}', 'companyGet')->name('settings.company.get');
+        Route::post('/company/create', 'companyCreate')->name('settings.company.create');
+        Route::post('/company/update', 'companyUpdate')->name('settings.company.update');
 
 
         Route::get('/login_get_test', 'login_page')->name('login.page.test');

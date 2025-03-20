@@ -21,7 +21,7 @@ class AtmClientBanks extends Model
             'branch_id',
             'pension_number',
             'pension_type',
-            'pension_account_type',
+            'account_type',
             'birth_date',
             'passbook_for_collection',
             'last_name',
@@ -30,7 +30,6 @@ class AtmClientBanks extends Model
             'suffix',
             'created_at'
         ]);
-
     }
 
     public function Branch()

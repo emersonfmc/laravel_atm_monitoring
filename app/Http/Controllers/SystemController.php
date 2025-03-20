@@ -172,7 +172,7 @@ class SystemController extends Controller
         $user = Auth::user();
         $user_types = $user->user_types;
 
-        return view('pages.pages_backend.settings.system_logs', compact('user_types'));
+        return view('pages.pages_backend.settings.settings_system_logs', compact('user_types'));
     }
 
     public function system_logs_data()

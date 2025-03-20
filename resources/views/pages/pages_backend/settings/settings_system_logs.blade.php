@@ -1,4 +1,4 @@
-@extends('layouts.settings.settings_master')
+@extends('layouts.settings_monitoring.settings_master')
 
 @section('css')
     <!-- DataTables -->
@@ -171,9 +171,9 @@
 
 
             // Add polling to reload data every 10 seconds
-            setInterval(function () {
-                $('#FetchingDatatable').DataTable().ajax.reload(null, false); // Reload data without resetting pagination
-            }, 5000); // 10000 milliseconds = 10 seconds
+            // setInterval(function () {
+            //     $('#FetchingDatatable').DataTable().ajax.reload(null, false); // Reload data without resetting pagination
+            // }, 5000); // 10000 milliseconds = 10 seconds
         });
     </script>
 

@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
                         'status' => 'Active',
-                        'user_group_id' => 56,
+                        'user_group_id' => 22,
                         'company_id' => 1,
                         'branch_id' => NULL,
                         'district_code_id' => NULL,

@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers\ATM;
 
+use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use App\Models\SystemLogs;
-use Illuminate\Http\Request;
 use App\Models\AtmClientBanks;
-use Illuminate\Support\Carbon;
 use App\Models\MaintenancePage;
-use App\Http\Controllers\Controller;
-use App\Models\AtmTransactionAction;
-use Illuminate\Support\Facades\Auth;
 use App\Models\DataTransactionAction;
 use App\Models\DataTransactionSequence;
-use Yajra\DataTables\Facades\DataTables;
 use App\Models\PassbookForCollectionTransaction;
 use App\Models\PassbookForCollectionTransactionApproval;
 
@@ -186,7 +185,7 @@ class PassbookCollectionController extends Controller
             $branchAbbreviation = $branch->branch_abbreviation;
 
             // Generate Request Number
-                $request_number_initial = $branchAbbreviation . '-PB' . date('mdy');
+                $request_number_initial = $branchAbbreviation . '-PB' . date('y');
 
                 // Fetch the last `request_number` with the matching prefix
                 $fetch_validate = PassbookForCollectionTransaction::select('request_number')

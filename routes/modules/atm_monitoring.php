@@ -24,6 +24,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/clients/create', 'clientCreate')->name('clients.create');
         Route::post('/clients/update', 'clientUpdate')->name('clients.update');
         Route::post('/pension_number/validate', 'PensionNumberValidate')->name('pension.number.validate');
+
+        Route::post('/add/more/atm', 'addMoreAtm')->name('add.more.atm');
     });
 });
 

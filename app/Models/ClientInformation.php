@@ -25,4 +25,12 @@ class ClientInformation extends Model
                       'pin_no','atm_status','expiration_date',
                       'collection_date','cash_box_no','replacement_count','location','status','created_at']);
     }
+
+    protected $appends = ['fullname']; // This will include fullname in your JSON automatically
+
+    public function getFullnameAttribute() {
+        $names = array_filter([$this->first_name, $this->middle_name, $this->last_name, $this->suffix]);
+        return implode(' ', $names);
+    }
+
 }

@@ -1,4 +1,4 @@
-@extends('layouts.documents.documents_master')
+@extends('layouts.documents_monitoring.documents_master')
 
 @section('css')
     <!-- DataTables -->

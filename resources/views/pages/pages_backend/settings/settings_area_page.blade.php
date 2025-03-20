@@ -1,4 +1,4 @@
-@extends('layouts.settings.settings_master')
+@extends('layouts.settings_monitoring.settings_master')
 
 @section('css')
     <!-- DataTables -->
@@ -9,7 +9,7 @@
 
     @component('components.breadcrumb')
         @slot('li_1') Settings @endslot
-        @slot('title') Collection Date @endslot
+        @slot('title') Area @endslot
     @endcomponent
 
     <div class="row">
@@ -19,16 +19,15 @@
 
                     <div class="row">
                         <div class="col-md-8 text-start">
-                            <h4 class="card-title">Collection</h4>
+                            <h4 class="card-title">Area</h4>
                             <p class="card-title-desc">
-                                The Collection Date refers to the scheduled date when funds or payments are collected.
-                                This date is essential for ensuring timely transactions, It allows recipients and institutions to
-                                manage finances accurately and maintain records efficiently.
+                                A district head is responsible for managing and overseeing the operations,
+                                administration, and development activities within a district
                             </p>
                         </div>
                         <div class="col-md-4 text-end">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCollectionDateModal"><i
-                                class="fas fa-plus-circle me-1"></i> Create Collection Date</button>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAreaModal"><i
+                                class="fas fa-plus-circle me-1"></i> Create Area</button>
                         </div>
                     </div>
                     <hr>
@@ -39,8 +38,10 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>Sl</th>
-                                    <th>Bank Name</th>
-                                    <th>Status</th>
+                                    <th>Area No.</th>
+                                    <th>Area Supervisor</th>
+                                    <th>District Manager</th>
+                                    {{-- <th>Email</th> --}}
                                     <th>Created Date</th>
                                     <th>Action</th>
                                 </tr>
@@ -57,27 +58,42 @@
         </div> <!-- end col -->
     </div> <!-- end row -->
 
-
-    <div class="modal fade" id="createCollectionDateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="createBankLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+    <div class="modal fade" id="createAreaModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="createAreaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-uppercase" id="createBankLabel">Create Collection Date</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                    <h5 class="modal-title fw-bold text-uppercase">Create Area</h5>
+                    <button type="button" class="btn-close closeCreateModal" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" action="{{ route('settings.collection.date.create') }}" id="createCollectionDateForm">
+                    <form method="post" action="{{ route('settings.area.create') }}" id="createValidateForm">
                         @csrf
 
-                        <div class="form-group mb-2">
-                            <label class="fw-bold h6">Collection Date</label>
-                            <input type="text" name="collection_date" id="collection_date" class="form-control" placeholder="Collection Date" minlength="0" maxlength="50" required>
+                        <div class="form-group mb-3">
+                            <label class="fw-bold h6">Area</label>
+                            <input type="text" name="area_no" class="form-control" id="area_no"
+                                placeholder="Enter Area No" minlength="0" maxlength="50" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="fw-bold h6">Area Supervisor</label>
+                            <input type="text" name="area_supervisor" class="form-control" id="area_supervisor"
+                                placeholder="Enter Area Supervisor" minlength="0" maxlength="50" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="fw-bold h6">District Manager</label>
+                            <select name="district_id" id="district_id" class="form-select select2" required>
+                                <option value="" selected disabled>Select District Manager</option>
+                                @foreach ($districts as $district)
+                                    <option value="{{ $district->id }}">{{  $district->district_number .' / '. $district->district_name }}</option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-secondary closeCreateModal" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </form>
@@ -86,35 +102,51 @@
         </div>
     </div>
 
-    <div class="modal fade" id="updateCollectionDateModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="createBankLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+    <div class="modal fade" id="updateAreaModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="updateAreaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-uppercase">Update Collection Date</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                    <h5 class="modal-title fw-bold text-uppercase">Update Area</h5>
+                    <button type="button" class="btn-close closeUpdateModal" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" action="{{ route('settings.collection.date.update')  }}" id="updateCollectionDateForm">
+                    <form method="post" action="{{ route('settings.area.update') }}" id="updateValidateForm">
                         @csrf
                         <input type="hidden" id="item_id" name="item_id">
 
-                        <div class="form-group mb-2">
-                            <label class="fw-bold h6">Collection Date</label>
-                            <input type="text" name="collection_date" id="collection_date_update" class="form-control" placeholder="Collection Date" minlength="0" maxlength="50" required>
+                        <div class="form-group mb-3">
+                            <label class="fw-bold h6">Area</label>
+                            <input type="text" name="area_no" class="form-control" id="update_area_no"
+                                placeholder="Enter Area" minlength="0" maxlength="50" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="fw-bold h6">Area Supervisor</label>
+                            <input type="text" name="area_supervisor" class="form-control" id="update_area_supervisor"
+                                placeholder="Enter Area Supervisor" minlength="0" maxlength="50" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="fw-bold h6">District Manager</label>
+                            <select name="district_id" id="update_district_id" class="form-select select2" required>
+                                @foreach ($districts as $district)
+                                    <option value="{{ $district->id }}">{{  $district->district_number .' / '. $district->district_name }}</option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="form-group mb-3">
                             <label class="fw-bold h6">Status</label>
-                            <select name="status" id="status_update" class="form-select" required>
+                            <select name="status" id="update_status" class="form-select" required>
                                 <option value="Active">Active</option>
                                 <option value="Inactive">Inactive</option>
+
                             </select>
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-secondary closeUpdateModal" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-success">Update</button>
                         </div>
                     </form>
@@ -125,10 +157,13 @@
 
     <script>
         $(document).ready(function () {
-            var SettingsBanksTableBody = $('#FetchingDatatable tbody');
+            $('#district_id').select2({ dropdownParent: $('#createAreaModal') });
+            $('#update_district_id').select2({ dropdownParent: $('#updateAreaModal') });
+
+            var FetchingDatatableBody = $('#FetchingDatatable tbody');
 
             const dataTable = new ServerSideDataTable('#FetchingDatatable');
-            var url = '{!! route('settings.collection.date.data') !!}';
+            var url = '{!! route('settings.area.data') !!}';
             const buttons = [{
                 text: 'Delete',
                 action: function(e, dt, node, config) {
@@ -147,8 +182,8 @@
                     searchable: true,
                 },
                 {
-                    data: 'collection_date',
-                    name: 'collection_date',
+                    data: 'area_no',
+                    name: 'area_no',
                     render: function(data, type, row, meta) {
                         return '<span class="fw-bold h6 text-primary">' + data + '</span>';
                     },
@@ -156,20 +191,32 @@
                     searchable: true,
                 },
                 {
-                    data: 'status',
-                    name: 'status',
+                    data: null,
                     render: function(data, type, row, meta) {
-                        if (data.toLowerCase() === 'active') {
-                            return '<span class="badge bg-primary">Active</span>';
-                        } else if (data.toLowerCase() === 'inactive') {
-                            return '<span class="badge bg-danger">Inactive</span>';
-                        } else {
-                            return '<span>No Status</span>';
-                        }
+                        return `<span class="fw-bold h6">${row.area_supervisor}</span><br>
+                                <span class="text-primary">${row.email}</span>`;
                     },
                     orderable: true,
                     searchable: true,
                 },
+
+                {
+                    data: null,
+                    render: function(data, type, row, meta) {
+                        return `<span class="fw-bold h6">${row.district_details}</span>`;
+                    },
+                    orderable: true,
+                    searchable: true,
+                },
+                // {
+                //     data: 'email',
+                //     name: 'email',
+                //     render: function(data, type, row, meta) {
+                //         return '<span">' + data + '</span>';
+                //     },
+                //     orderable: true,
+                //     searchable: true,
+                // },
                 {
                     data: 'created_at',
                     name: 'created_at',
@@ -203,22 +250,11 @@
             ];
             dataTable.initialize(url, columns);
 
-            function closeCreateModal() {
-                $('#createCollectionDateModal').modal('hide');
-                $('#FetchingDatatable tbody').empty();
-            }
-
-            function closeUpdateModal() {
-                $('#updateCollectionDateModal').modal('hide');
-                $('#FetchingDatatable tbody').empty();
-            }
-
-            $('#createCollectionDateForm').validate({
+            $('#createValidateForm').validate({
                 rules: {
-                    collection_data: { required: true },
-                },
-                messages: {
-                    collection_data: { required: 'Please Enter Collection Date' },
+                    area: { required: true, },
+                    area_supervisor: { required: true, },
+                    district_id: { required: true, },
                 },
                 errorElement: 'span',
                 errorPlacement: function(error, element) {
@@ -232,7 +268,7 @@
                     $(element).removeClass('is-invalid');
                 },
                 submitHandler: function(form) {
-                    var hasRows = SettingsBanksTableBody.children('tr').length > 0;
+                    var hasRows = FetchingDatatableBody.children('tr').length > 0;
                     if (hasRows) {
                         Swal.fire({
                             title: 'Confirmation',
@@ -253,7 +289,103 @@
                                         closeCreateModal();
                                         Swal.fire({
                                             title: 'Successfully Added!',
-                                            text: 'Collection Date is successfully Updated!',
+                                            text: 'Area is successfully added!',
+                                            icon: 'success',
+                                            showCancelButton: false,
+                                            showConfirmButton: true,
+                                            confirmButtonText: 'OK',
+                                            preConfirm: () => {
+                                                return new Promise(( resolve
+                                                ) => {
+                                                    Swal.fire({
+                                                        title: 'Please Wait...',
+                                                        allowOutsideClick: false,
+                                                        allowEscapeKey: false,
+                                                        showConfirmButton: false,
+                                                        showCancelButton: false,
+                                                        didOpen: () => {
+                                                            Swal.showLoading();
+                                                            // here the reload of datatable
+                                                            dataTable.table.ajax.reload( () =>
+                                                            {
+                                                                Swal.close();
+                                                                $(form)[0].reset();
+                                                                dataTable.table.page(currentPage).draw( false );
+                                                            },
+                                                            false );
+                                                        }
+                                                    })
+                                                });
+                                            }
+                                        });
+                                    },
+                                    error: function(xhr, status, error) {
+                                        var errorMessage =
+                                            'An error occurred. Please try again later.';
+                                        if (xhr.responseJSON && xhr.responseJSON
+                                            .error) {
+                                            errorMessage = xhr.responseJSON.error;
+                                        }
+                                        Swal.fire({
+                                            title: 'Error!',
+                                            text: errorMessage,
+                                            icon: 'error',
+                                        });
+                                    }
+                                })
+                            }
+                        })
+                    } else {
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Empty Record!',
+                            text: 'Table is empty, add row to proceed!',
+                        });
+                    }
+                }
+            });
+
+            $('#updateValidateForm').validate({
+                rules: {
+                    area: { required: true, },
+                    area_supervisor: { required: true, },
+                    district_id: { required: true, },
+                },
+                errorElement: 'span',
+                errorPlacement: function(error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                },
+                submitHandler: function(form) {
+                    var hasRows = FetchingDatatableBody.children('tr').length > 0;
+                    if (hasRows) {
+                        Swal.fire({
+                            title: 'Confirmation',
+                            text: 'Are you sure you want to save this?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: "#28A745",
+                            cancelButtonColor: "#6C757D",
+                            confirmButtonText: "Yes, Save it!"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                const currentPage = dataTable.table.page();
+                                $.ajax({
+                                    url: form.action,
+                                    type: form.method,
+                                    data: $(form).serialize(),
+                                    success: function(response) {
+                                        closeUpdateModal();
+                                        Swal.fire({
+                                            title: 'Successfully Updated!',
+                                            text: 'Area is successfully Updated!',
                                             icon: 'success',
                                             showCancelButton: false,
                                             showConfirmButton: true,
@@ -314,113 +446,31 @@
                 e.preventDefault();
                 var itemID = $(this).data('id');
 
-                var url = "/settings/collection/date/get/" + itemID;
+                var url = "/settings/area/get/" + itemID;
 
                 $.get(url, function(data) {
                     $('#item_id').val(data.id);
-                    $('#status_update').val(data.status).trigger('change');
-                    $('#collection_date_update').val(data.collection_date);
-
-                    $('#updateCollectionDateModal').modal('show');
+                    $('#update_area_no').val(data.area_no);
+                    $('#update_area_supervisor').val(data.area_supervisor);
+                    $('#update_district_id').val(data.district_id);
+                    $('#update_status').val(data.status);
+                    $('#updateAreaModal').modal('show');
                 });
             });
 
-            $('#updateCollectionDateForm').validate({
-                rules: {
-                    collection_date: { required: true },
-                },
-                messages: {
-                    collection_date: { required: 'Please Enter Collection Date' },
-                },
-                errorElement: 'span',
-                errorPlacement: function(error, element) {
-                    error.addClass('invalid-feedback');
-                    element.closest('.form-group').append(error);
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).removeClass('is-invalid');
-                },
-                submitHandler: function(form) {
-                    var hasRows = SettingsBanksTableBody.children('tr').length > 0;
-                    if (hasRows) {
-                        Swal.fire({
-                            title: 'Confirmation',
-                            text: 'Are you sure you want to save this?',
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonColor: "#28A745",
-                            cancelButtonColor: "#6C757D",
-                            confirmButtonText: "Yes, Update it!"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                const currentPage = dataTable.table.page();
-                                $.ajax({
-                                    url: form.action,
-                                    type: form.method,
-                                    data: $(form).serialize(),
-                                    success: function(response) {
-                                        closeUpdateModal();
-                                        Swal.fire({
-                                            title: 'Successfully Updated!',
-                                            text: 'Collection Date is successfully Updated!',
-                                            icon: 'success',
-                                            showCancelButton: false,
-                                            showConfirmButton: true,
-                                            confirmButtonText: 'OK',
-                                            preConfirm: () => {
-                                                return new Promise(( resolve
-                                                ) => {
-                                                    Swal.fire({
-                                                        title: 'Please Wait...',
-                                                        allowOutsideClick: false,
-                                                        allowEscapeKey: false,
-                                                        showConfirmButton: false,
-                                                        showCancelButton: false,
-                                                        didOpen: () => {
-                                                            Swal.showLoading();
-                                                            // here the reload of datatable
-                                                            dataTable.table.ajax.reload( () =>
-                                                            {
-                                                                Swal.close();
-                                                                $(form)[0].reset();
-                                                                dataTable.table.page(currentPage).draw( false );
-                                                            },
-                                                            false );
-                                                        }
-                                                    })
-                                                });
-                                            }
-                                        });
-                                    },
-                                    error: function(xhr, status, error) {
-                                        var errorMessage =
-                                            'An error occurred. Please try again later.';
-                                        if (xhr.responseJSON && xhr.responseJSON
-                                            .error) {
-                                            errorMessage = xhr.responseJSON.error;
-                                        }
-                                        Swal.fire({
-                                            title: 'Error!',
-                                            text: errorMessage,
-                                            icon: 'error',
-                                        });
-                                    }
-                                })
-                            }
-                        })
-                    } else {
+            function closeCreateModal() {
+                $('#createAreaModal').modal('hide');
+                $('#FetchingDatatable tbody').empty();
+                // $('#FetchingDatatable').addClass('d-none');
+            }
 
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Empty Record!',
-                            text: 'Table is empty, add row to proceed!',
-                        });
-                    }
-                }
-            });
+            function closeUpdateModal() {
+                $('#updateAreaModal').modal('hide');
+                $('#FetchingDatatable tbody').empty();
+                // $('#usersGroupPageTable').addClass('d-none');
+            }
+
+
 
         });
     </script>

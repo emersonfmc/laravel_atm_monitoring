@@ -13,12 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('companies', function (Blueprint $table) {
+        Schema::create('data_departments', function (Blueprint $table) {
             $table->id();
-            $table->string('company_name');
-            $table->string('company_logo')->nullable();
-            $table->string('company_image')->nullable();
-            $table->enum('status',['Active','Inactive'])->default('Active');
+            $table->string('name')->nullable();
+            $table->enum('status', ['active','inactive'])->default('active');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -31,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('companies');
+        Schema::dropIfExists('data_departments');
     }
 };

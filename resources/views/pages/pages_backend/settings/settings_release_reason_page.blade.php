@@ -1,4 +1,4 @@
-@extends('layouts.settings.settings_master')
+@extends('layouts.settings_monitoring.settings_master')
 
 @section('css')
     <!-- DataTables -->
@@ -9,7 +9,7 @@
 
     @component('components.breadcrumb')
         @slot('li_1') Settings @endslot
-        @slot('title') User Group @endslot
+        @slot('title') Release Reason @endslot
     @endcomponent
 
     <div class="row">
@@ -19,58 +19,69 @@
 
                     <div class="row">
                         <div class="col-md-8 text-start">
-                            <h4 class="card-title">User Group</h4>
+                            <h4 class="card-title">Release Reason</h4>
                             <p class="card-title-desc">
-                                A classification of users based on shared characteristics or roles,
-                                often used to assign specific permissions or access levels within a system.
+                                A list of Release Reason
                             </p>
                         </div>
                         <div class="col-md-4 text-end">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserGroupModal"><i
-                                class="fas fa-plus-circle me-1"></i> Create User Group</button>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createReleaseReasonModal"><i
+                                class="fas fa-plus-circle me-1"></i> Create Release Reason</button>
                         </div>
                     </div>
                     <hr>
 
-                    <table id="usersGroupPageTable" class="table table-border dt-responsive wrap table-design" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Sl</th>
-                                <th>Name</th>
-                                <th>Company</th>
-                                <th>Created Date</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
 
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table id="FetchingDatatable" class="table table-border dt-responsive wrap table-design" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Sl</th>
+                                    <th>Reason</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Created Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+
+                    </div>
 
                 </div>
             </div>
         </div> <!-- end col -->
     </div> <!-- end row -->
 
-    <div class="modal fade" id="createUserGroupModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
-        aria-labelledby="createUserModalLabel" aria-hidden="true">
+    <div class="modal fade" id="createReleaseReasonModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="createReleaseReasonModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-uppercase" id="createUserModalLabel">Create User Group</h5>
-                    <button type="button" class="btn-close closeCreateUserGroupModal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title fw-bold text-uppercase">Create Release Reason</h5>
+                    <button type="button" class="btn-close closeCreateModal" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" action="{{ route('settings.users.group.create')  }}" id="createValidateForm">
+                    <form method="post" action="{{ route('settings.release.reason.create') }}" id="createValidateForm">
                         @csrf
 
                         <div class="form-group mb-3">
-                            <label class="fw-bold h6">User Group</label>
-                            <input type="text" name="user_group" class="form-control" id="user_group" placeholder="Enter User Group" minlength="0" maxlength="50" required>
+                            <label class="fw-bold h6">Reason</label>
+                            <input type="text" name="reason" class="form-control" id="reason"
+                                placeholder="Enter Release Reason" minlength="0" maxlength="50" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="fw-bold h6">Description</label>
+                            <input type="text" name="description" class="form-control" id="description"
+                                placeholder="Enter Release Description" minlength="0" maxlength="50">
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary closeCreateUserGroupModal" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary closeCreateModal" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </form>
@@ -79,27 +90,43 @@
         </div>
     </div>
 
-    <div class="modal fade" id="updateUserGroupModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
-        aria-labelledby="updateUserModalLabel" aria-hidden="true">
+    <div class="modal fade" id="updateReleaseReasonModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="uupdateReleaseReasonModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-uppercase">Update User Group</h5>
-                    <button type="button" class="btn-close closeUpdateUserGroupModal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title fw-bold text-uppercase">Update Release Reason</h5>
+                    <button type="button" class="btn-close closeUpdateModal" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" action="{{ route('settings.users.group.update')  }}" id="UpdateValidateForm">
+                    <form method="post" action="{{ route('settings.release.reason.update') }}" id="updateValidateForm">
                         @csrf
-                        <input type="hidden" id="item_id" name="item_id">
+                        <input type="hidden" name="item_id" id="item_id">
 
                         <div class="form-group mb-3">
-                            <label class="fw-bold h6">User Group</label>
-                            <input type="text" name="user_group" class="form-control" id="update_group_name"
-                                   placeholder="Enter User Group" minlength="0" maxlength="50" required>
+                            <label class="fw-bold h6">Reason</label>
+                            <input type="text" name="reason" class="form-control" id="update_reason"
+                                placeholder="Enter Reason" minlength="0" maxlength="50" required>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="fw-bold h6">Description</label>
+                            <input type="text" name="description" class="form-control" id="update_description"
+                                placeholder="Enter Description" minlength="0" maxlength="50">
+                        </div>
+
+
+                        <div class="form-group mb-3">
+                            <label class="fw-bold h6">Status</label>
+                            <select name="status" id="update_status" class="form-select" required>
+                                <option value="" selected disabled>Pension Number Types</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary closeUpdateUserGroupModal" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary closeUpdateModal" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-success">Update</button>
                         </div>
                     </form>
@@ -109,11 +136,11 @@
     </div>
 
     <script>
-         var usersGroupPageTableBody = $('#usersGroupPageTable tbody');
-
         $(document).ready(function () {
-            const dataTable = new ServerSideDataTable('#usersGroupPageTable');
-            var url = '{!! route('settings.users.group.data') !!}';
+            var FetchingDatatableBody = $('#FetchingDatatable tbody');
+
+            const dataTable = new ServerSideDataTable('#FetchingDatatable');
+            var url = '{!! route('settings.release.reason.data') !!}';
             const buttons = [{
                 text: 'Delete',
                 action: function(e, dt, node, config) {
@@ -132,19 +159,34 @@
                     searchable: true,
                 },
                 {
-                    data: 'group_name',
-                    name: 'group_name',
+                    data: 'reason',
+                    name: 'reason',
                     render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6">' + data + '</span>'; // Display user's name
+                        return '<span class="fw-bold h6 text-primary">' + data + '</span>';
                     },
                     orderable: true,
                     searchable: true,
                 },
                 {
-                    data: 'company_id',
-                    name: 'company.company_name',
+                    data: 'description',
+                    name: 'description',
                     render: function(data, type, row, meta) {
-                        return row.company ? '<span>' + row.company.company_name + '</span>' : ''; // Check if company exists
+                        return '<span class="">' + data + '</span>';
+                    },
+                    orderable: true,
+                    searchable: true,
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    render: function(data, type, row, meta) {
+                        if (data === 'Active') {
+                            return '<span class="badge bg-primary">Active</span>';
+                        } else if (data === 'Inactive') {
+                            return '<span class="badge bg-danger">Inactive</span>';
+                        } else {
+                            return '<span>No Status</span>';
+                        }
                     },
                     orderable: true,
                     searchable: true,
@@ -179,16 +221,12 @@
                     orderable: false,
                     searchable: false,
                 }
-                // <a href="" data-bs-toggle="tooltip" data-bs-placement="top" title="test">Test</a>
-
             ];
             dataTable.initialize(url, columns);
 
             $('#createValidateForm').validate({
                 rules: {
-                    user_group: {
-                        required: true,
-                    },
+                    reason: { required: true, }
                 },
                 errorElement: 'span',
                 errorPlacement: function(error, element) {
@@ -202,7 +240,7 @@
                     $(element).removeClass('is-invalid');
                 },
                 submitHandler: function(form) {
-                    var hasRows = usersGroupPageTableBody.children('tr').length > 0;
+                    var hasRows = FetchingDatatableBody.children('tr').length > 0;
                     if (hasRows) {
                         Swal.fire({
                             title: 'Confirmation',
@@ -220,10 +258,10 @@
                                     type: form.method,
                                     data: $(form).serialize(),
                                     success: function(response) {
-                                        closeUserGroupModal();
+                                        closeCreateModal();
                                         Swal.fire({
-                                            title: 'Successfully Added!',
-                                            text: 'User Group is successfully added!',
+                                            title: 'Successfully Created!',
+                                            text: 'Release Reason is successfully Created!',
                                             icon: 'success',
                                             showCancelButton: false,
                                             showConfirmButton: true,
@@ -280,11 +318,9 @@
                 }
             });
 
-            $('#UpdateValidateForm').validate({
+            $('#updateValidateForm').validate({
                 rules: {
-                    user_group: {
-                        required: true,
-                    },
+                    reason: { required: true, }
                 },
                 errorElement: 'span',
                 errorPlacement: function(error, element) {
@@ -298,16 +334,16 @@
                     $(element).removeClass('is-invalid');
                 },
                 submitHandler: function(form) {
-                    var hasRows = usersGroupPageTableBody.children('tr').length > 0;
+                    var hasRows = FetchingDatatableBody.children('tr').length > 0;
                     if (hasRows) {
                         Swal.fire({
                             title: 'Confirmation',
-                            text: 'Are you sure you want to Update this?',
+                            text: 'Are you sure you want to save this?',
                             icon: 'question',
                             showCancelButton: true,
                             confirmButtonColor: "#28A745",
                             cancelButtonColor: "#6C757D",
-                            confirmButtonText: "Yes, Update it!"
+                            confirmButtonText: "Yes, Save it!"
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 const currentPage = dataTable.table.page();
@@ -316,16 +352,17 @@
                                     type: form.method,
                                     data: $(form).serialize(),
                                     success: function(response) {
-                                        closeUpdateUserGroupModal();
+                                        closeUpdateModal();
                                         Swal.fire({
                                             title: 'Successfully Updated!',
-                                            text: 'User Group successfully Updated!',
+                                            text: 'Release Reason is successfully Updated!',
                                             icon: 'success',
                                             showCancelButton: false,
                                             showConfirmButton: true,
                                             confirmButtonText: 'OK',
                                             preConfirm: () => {
-                                                return new Promise((resolve) => {
+                                                return new Promise(( resolve
+                                                ) => {
                                                     Swal.fire({
                                                         title: 'Please Wait...',
                                                         allowOutsideClick: false,
@@ -333,19 +370,17 @@
                                                         showConfirmButton: false,
                                                         showCancelButton: false,
                                                         didOpen: () => {
-                                                            // Show custom loader (assuming it's already styled correctly)
                                                             Swal.showLoading();
-
-                                                            // Reload DataTable
-                                                            dataTable.table.ajax.reload(() => {
-                                                                // Hide custom loader and reset form after DataTable reload
-                                                                $('span.loader-icon').hide(); // Hide your loader
-                                                                $(form)[0].reset(); // Reset form
-                                                                dataTable.table.page(currentPage).draw(false); // Maintain current page
-                                                                Swal.close(); // Close SweetAlert
-                                                            }, false);
+                                                            // here the reload of datatable
+                                                            dataTable.table.ajax.reload( () =>
+                                                            {
+                                                                Swal.close();
+                                                                $(form)[0].reset();
+                                                                dataTable.table.page(currentPage).draw( false );
+                                                            },
+                                                            false );
                                                         }
-                                                    });
+                                                    })
                                                 });
                                             }
                                         });
@@ -377,47 +412,39 @@
                 }
             });
 
-            $('#usersGroupPageTable').on('click', '.editBtn', function(e) {
+            $('#FetchingDatatable').on('click', '.editBtn', function(e) {
                 e.preventDefault();
                 var itemID = $(this).data('id');
-                console.log(itemID);
 
-                var url = "/settings/users/group/get/" + itemID;
+                var url = "/settings/release/reason/get/" + itemID;
 
                 $.get(url, function(data) {
-                    console.log(data);
                     $('#item_id').val(data.id);
-                    $('#update_group_name').val(data.group_name);
+                    $('#update_reason').val(data.reason);
+                    $('#update_description').val(data.description);
+                    $('#update_status').val(data.status);
 
-                    $('#updateUserGroupModal').modal('show');
+                    $('#updateReleaseReasonModal').modal('show');
                 });
             });
 
-            function closeUserGroupModal() {
-                $('#createUserGroupModal').modal('hide');
-                $('#user_group').empty();
-                $('#usersGroupPageTable tbody').empty();
-                // $('#usersGroupPageTable').addClass('d-none');
+            function closeCreateModal() {
+                $('#createReleaseReasonModal').modal('hide');
+                $('#FetchingDatatable tbody').empty();
+                // $('#FetchingDatatable').addClass('d-none');
             }
 
-            function closeUpdateUserGroupModal() {
-                $('#updateUserGroupModal').modal('hide');
-                $('#user_group').empty();
-                $('#usersGroupPageTable tbody').empty();
+            function closeUpdateModal() {
+                $('#updateReleaseReasonModal').modal('hide');
+                $('#FetchingDatatable tbody').empty();
                 // $('#usersGroupPageTable').addClass('d-none');
             }
-
-            // $('.closeUserGroupModal').on('click', function(e) {
-            //     e.preventDefault();
-            //     closeUserGroupModal();
-            // });
-
-            // $('.closeUpdateUserGroupModal').on('click', function(e) {
-            //     e.preventDefault();
-            //     closeUpdateUserGroupModal();
-            // });
         });
     </script>
+
+
+
+
 
 
 @endsection

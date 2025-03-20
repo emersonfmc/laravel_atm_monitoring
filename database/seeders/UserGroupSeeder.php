@@ -33,9 +33,9 @@ class UserGroupSeeder extends Seeder
                     ['id' => 19, 'group_name' => 'Accounting Staff', 'company_id' => 2, 'created_at' => Carbon::now(),  'updated_at' => Carbon::now(), 'status' => 'Active'],
                     ['id' => 20, 'group_name' => 'Edit For new', 'company_id' => 2, 'created_at' => Carbon::now(),  'updated_at' => Carbon::now(), 'status' => 'Inactive'],
                     ['id' => 21, 'group_name' => 'Collection Head', 'company_id' => 2, 'created_at' => Carbon::now(),  'updated_at' => Carbon::now(), 'status' => 'Active'],
-                    ['id' => 22, 'group_name' => 'Test', 'company_id' => 2, 'created_at' => Carbon::now(),  'updated_at' => Carbon::now(), 'status' => 'Inactive'],
-                    ['id' => 23, 'group_name' => 'Test2', 'company_id' => 2, 'created_at' => Carbon::now(),  'updated_at' => Carbon::now(), 'status' => 'Inactive'],
-                    ['id' => 24, 'group_name' => 'Test3', 'company_id' => 2, 'created_at' => Carbon::now(),  'updated_at' => Carbon::now(),'status' => 'Active'],
+                    ['id' => 22, 'group_name' => 'Developer', 'company_id' => 1, 'created_at' => Carbon::now(),  'updated_at' => Carbon::now(), 'status' => 'Inactive'],
+                    ['id' => 23, 'group_name' => 'IT Manager', 'company_id' => 2, 'created_at' => Carbon::now(),  'updated_at' => Carbon::now(), 'status' => 'Inactive'],
+                    ['id' => 24, 'group_name' => 'IT Supervisor', 'company_id' => 2, 'created_at' => Carbon::now(),  'updated_at' => Carbon::now(),'status' => 'Active'],
                     ['id' => 25, 'group_name' => 'AP/AR Staff', 'company_id' => 2, 'created_at' => Carbon::now(),  'updated_at' => Carbon::now(), 'status' => 'Active'],
                     ['id' => 26, 'group_name' => 'Payroll Clerk', 'company_id' => 2, 'created_at' => Carbon::now(),  'updated_at' => Carbon::now(), 'status' => 'Active'],
                     ['id' => 27, 'group_name' => 'Collection Department', 'company_id' => 2, 'created_at' => Carbon::now(),  'updated_at' => Carbon::now(), 'status' => 'Active'],
@@ -67,7 +67,9 @@ class UserGroupSeeder extends Seeder
                     ['id' => 53, 'group_name' => 'Collection Supervisor', 'company_id' => 2, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now(), 'status' => 'Active'],
                     ['id' => 54, 'group_name' => 'Checker', 'company_id' => 2, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now(), 'status' => 'Active'],
                     ['id' => 55, 'group_name' => 'Passbook Custodian', 'company_id' => 2, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now(), 'status' => 'Active'],
-                    ['id' => 56, 'group_name' => 'Developer', 'company_id' => 2, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now(), 'status' => 'Active'],
+                    ['id' => 56, 'group_name' => 'Inventory Staff (Checker)', 'company_id' => 2, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now(), 'status' => 'Active'],
+                    ['id' => 57, 'group_name' => 'Inventory Staff(Validator)', 'company_id' => 2, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now(), 'status' => 'Active'],
+                    ['id' => 58, 'group_name' => 'Outside Collector', 'company_id' => 2, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now(), 'status' => 'Active'],
                 ];
 
             DB::table('data_user_groups')->insert($data);

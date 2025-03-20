@@ -1,4 +1,4 @@
-@extends('layouts.settings.settings_master')
+@extends('layouts.settings_monitoring.settings_master')
 
 @section('css')
     <!-- DataTables -->
@@ -465,7 +465,8 @@
                     name: 'name',
                     render: function(data, type, row, meta) {
                         return `<div class="fw-bold h6">${row.name}</div>
-                                <div class="fw-bold text-primary fs-6">${row.email}</div>`; // Display user's name
+                                <div class="fw-bold text-primary fs-6">${row.email}</div>
+                                <div class="fw-bold text-danger">${row.employee_id}</div>`; // Display user's name
                     },
                     orderable: true,
                     searchable: true,

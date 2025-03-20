@@ -103,6 +103,7 @@
                                 <th>Branch</th>
                                 <th>Client</th>
                                 <th>Passbook No & Bank</th>
+                                <th>Collection Date</th>
                                 <th>Type</th>
                                 <th>Status</th>
                                 <th>Remarks</th>
@@ -390,6 +391,15 @@
                                                 row.atm_client_banks.atm_status
                                             );
                                         },
+                                    },
+                                    {
+                                        data: null,
+                                        render: function(data, type, row, meta) {
+                                            return `<span>${row.atm_client_banks.collection_date}</span>`;
+
+                                        },
+                                        orderable: true,
+                                        searchable: true,
                                     },
                                     {
                                         data: 'status', // Status with badge

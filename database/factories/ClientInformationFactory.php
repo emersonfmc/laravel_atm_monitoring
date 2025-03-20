@@ -20,8 +20,8 @@ class ClientInformationFactory extends Factory
         return [
             'branch_id' => $this->faker->randomElement([4, 5, 6, 8]), // Select branch_id from 4, 5, 6, or 8
             'pension_number' => $this->faker->unique()->numerify('###########'), // Generate 11-digit pension number
-            'pension_type' => $this->faker->randomElement(['SSS', 'GSIS']), // Select from predefined pension types
-            'pension_account_type' => DB::table('data_pension_types_lists')->inRandomOrder()->value('pension_name'), // Randomly select pension_name from atm_pension_types
+            'pension_type' => DB::table('data_pension_types_lists')->inRandomOrder()->value('pension_name'), // Randomly select pension_name from atm_pension_types
+            'account_type' => $this->faker->randomElement(['SSS', 'GSIS']), // Select from predefined pension types
             'first_name' => $this->faker->firstName, // Generate a random first name
             'middle_name' => strtoupper($this->faker->randomLetter), // Generate a random capital letter and add a dot
             'last_name' => $this->faker->lastName, // Generate a random last name
