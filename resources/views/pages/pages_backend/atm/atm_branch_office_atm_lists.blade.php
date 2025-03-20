@@ -39,8 +39,8 @@
                                     <th>Pension No</th>
                                     <th>Created Date</th>
                                     <th>Birthdate</th>
-                                    <th>Box</th>
-                                    <th>Card No. & Bank</th>
+                                    {{-- <th>Box</th> --}}
+                                    <th>Card No. / Bank / Coll Date</th>
                                     <th>PIN Code</th>
                                     <th>Status</th>
                                     <th>QR</th>
@@ -1038,15 +1038,15 @@
                     orderable: true,
                     searchable: true,
                 },
-                {
-                    data: 'cash_box_no',
-                    name: 'cash_box_no',
-                    render: function(data, type, row, meta) {
-                        return data ? `<span>${data}</span>` : '';
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
+                // {
+                //     data: 'cash_box_no',
+                //     name: 'cash_box_no',
+                //     render: function(data, type, row, meta) {
+                //         return data ? `<span>${data}</span>` : '';
+                //     },
+                //     orderable: true,
+                //     searchable: true,
+                // },
                 {
                     data: 'bank_account_no',
                     name: 'bank_account_no',
@@ -1061,7 +1061,8 @@
 
                         return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span>
                                 ${replacementCountDisplay}<br>
-                                <span>${row.bank_name}</span>`;
+                                <span>${row.bank_name ?? ''}</span><br>
+                                <span class="fw-bold text-primary">${row.collection_date ?? ''}</span>`;
 
                     },
                     orderable: true,

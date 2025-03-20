@@ -25,31 +25,40 @@ class ServerSideDataTable {
                 },
                 processing: function () {
                     Swal.fire({
-                        title: "Please Wait...",
-                        text: "Please wait for a moment",
+                        title: 'Loading Please Wait',
+                        html: "<div class='d-flex justify-content-center align-items-center mt-2 mb-2' style='height:60px;'><div class='loader'></div></div>",
                         allowEscapeKey: false,
                         allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        },
+                        showConfirmButton: false,
+                        width: "350px" // Adjust width as needed
                     });
                     return "Please wait for a moment ....";
                 },
             },
+
+
         });
 
         $(this.tableSelector)
             .on("length.dt", function (e, settings, len) {
                 // Show a custom processing message when changing the number of entries
                 Swal.fire({
-                    title: "Please Wait...",
-                    text: "Please wait for a moment",
+                    title: 'Loading Please Wait',
+                    html: "<div class='d-flex justify-content-center align-items-center' style='height:60px;'><div class='loader'></div></div>",
                     allowEscapeKey: false,
                     allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    },
+                    showConfirmButton: false,
+                    width: "350px" // Adjust width as needed
                 });
+                // Swal.fire({
+                //     title: "Please Wait...",
+                //     text: "Please wait for a moment",
+                //     allowEscapeKey: false,
+                //     allowOutsideClick: false,
+                //     didOpen: () => {
+                //         Swal.showLoading();
+                //     },
+                // });
             })
             .on("draw.dt", function () {
                 Swal.close();

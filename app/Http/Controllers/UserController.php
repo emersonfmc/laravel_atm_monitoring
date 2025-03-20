@@ -26,7 +26,7 @@ class UserController extends Controller
         $DataDistrict = DataDistrict::whereNull('deleted_at')
             ->get();
 
-        return view('pages.pages_backend.settings.users_page',compact('user_groups','DataDistrict'));
+        return view('pages.pages_backend.settings.settings_users_page',compact('user_groups','DataDistrict'));
     }
 
     public function users_data()
@@ -111,7 +111,7 @@ class UserController extends Controller
             }
             else if($request->user_type === 'Developer')
             {
-                $user_group_id = 56;
+                $user_group_id = 22;
                 $branch_id = NULL;
                 $district_id = NULL;
                 $area_id = NULL;

@@ -8,10 +8,17 @@
 
             <!-- Left Menu Start -->
             <ul class="metismenu list-unstyled" id="side-menu">
-                {{-- <li class="menu-title" key="t-menu">Menu</li>
+                <li class="menu-title" key="t-menu">Menu</li>
 
                 <li>
-                    <a href="{{ route('settings.dashboard.page') }}" class="waves-effect">
+                    <a href="#" class="waves-effect">
+                        <i class="far fa-question-circle text-warning"></i>
+                        <span key="settings-dashboard">How It Works</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#" class="waves-effect">
                         <i class="fas fa-desktop text-info"></i>
                         <span key="settings-dashboard">Dashboard</span>
                     </a>
@@ -19,81 +26,39 @@
 
                 <li class="mm-active">
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="fa fa-cog text-primary" aria-hidden="true"></i>
-                        <span key="settings">ATM Settings</span>
+                        <i class="far fa-folder-open text-success" aria-hidden="true"></i>
+                        <span key="documents">Documents Monitoring</span>
                     </a>
                     <ul class="sub-menu" aria-expanded="true">
                         <li>
-                            <a href="{{ route('settings.bank.page') }}" key="settings_atm_bank_lists">
-                                <i class="fas fa-university fs-6 text-primary"></i> Banks
+                            <a href="#" key="documents_transaction">
+                                <i class="fas fa-file-invoice text-primary"></i> My Transaction
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('settings.pension.types.page') }}" key="settings_atm_pension_types">
-                                <i class="fas fa-stream fs-6 text-success"></i> Pension Types</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('settings.release.reason.page') }}" key="settings_atm_release_reason">
-                                <i class="fas fa-stream fs-6 text-success"></i>
-                                Release Reason
+                            <a href="#" key="documents_for_receiving">
+                                <i class="fas fa-file-upload text-warning"></i> For Receiving
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('settings.transaction.action.page') }}" key="settings_atm_transaction_action">
-                                <i class="fas fa-location-arrow fs-6 text-primary"></i>
-                                Transaction Action
+                            <a href="#" key="documents_already_received">
+                                <i class="fas fa-file-signature text-success"></i> My Received
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('settings.collection.date.page') }}" key="settings_atm_collection_date">
-                                <i class="fas fa-hands fs-6 text-info"></i>
-                                Collection Date
+                            <a href="#" key="documents_already_received">
+                                <i class="far fa-file-alt text-info"></i> All Transaction
                             </a>
                         </li>
                     </ul>
                 </li>
 
                 <li>
-                    <a href="{{ route('settings.district.page') }}" class="waves-effect">
-                        <i class="fas fa-map-marked fs-5" style="color: #68FFFF;"></i>
-                        <span key="sub-districts">Districts</span>
+                    <a href="#" class="waves-effect">
+                        <i class="fas fa-file-alt"></i>
+                        <span key="sub-districts">List of All Documents</span>
                     </a>
                 </li>
-
-                <li>
-                    <a href="{{ route('settings.area.page') }}" class="waves-effect">
-                        <i class="fas fa-map-marker-alt fs-5 text-info"></i>
-                        <span key="sub-area">Areas</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('settings.area.page') }}" class="waves-effect">
-                        <i class="fas fa-code-branch fs-5" style="color: #E684FF;"></i>
-                        <span key="sub-branches">Branches</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('settings.users.group.page') }}" class="waves-effect">
-                        <i class="fas fa-users fs-5" style="color: #808000;"></i>
-                        <span key="sub-user-group">User Group</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#}" class="waves-effect">
-                        <i class="fas fa-print fs-5 text-success"></i>
-                        <span key="sub-documents">Documents</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ route('settings.maintenance.page') }}" class="waves-effect">
-                        <i class="fas fa-tools fs-5 text-info "></i>
-                        <span key="sub-maintenance">Maintenance</span>
-                    </a>
-                </li> --}}
             </ul>
         </div>
         <!-- Sidebar -->

@@ -1,121 +1,28 @@
-/* .loader {
-    animation: rotate 1s infinite;
-    height: 50px;
+/* HTML: <div class="loader"></div> */
+.loader {
     width: 50px;
-  }
-
-  .loader:before,
-  .loader:after {
+    aspect-ratio: 1;
+    display: grid;
     border-radius: 50%;
-    content: "";
-    display: block;
-    height: 20px;
-    width: 20px;
+    background:
+      linear-gradient(0deg ,rgb(0 0 0/50%) 30%,#0000 0 70%,rgb(0 0 0/100%) 0) 50%/8% 100%,
+      linear-gradient(90deg,rgb(0 0 0/25%) 30%,#0000 0 70%,rgb(0 0 0/75% ) 0) 50%/100% 8%;
+    background-repeat: no-repeat;
+    animation: l23 1s infinite steps(12);
   }
-  .loader:before {
-    animation: ball1 1s infinite;
-    background-color: #fff;
-    box-shadow: 30px 0 0 #ff3d00;
-    margin-bottom: 10px;
+  .loader::before,
+  .loader::after {
+     content: "";
+     grid-area: 1/1;
+     border-radius: 50%;
+     background: inherit;
+     opacity: 0.915;
+     transform: rotate(30deg);
   }
-  .loader:after {
-    animation: ball2 1s infinite;
-    background-color: #ff3d00;
-    box-shadow: 30px 0 0 #fff;
+  .loader::after {
+     opacity: 0.83;
+     transform: rotate(60deg);
   }
-
-  @keyframes rotate {
-    0% { transform: rotate(0deg) scale(0.8) }
-    50% { transform: rotate(360deg) scale(1.2) }
-    100% { transform: rotate(720deg) scale(0.8) }
+  @keyframes l23 {
+    100% {transform: rotate(1turn)}
   }
-
-  @keyframes ball1 {
-    0% {
-      box-shadow: 30px 0 0 #ff3d00;
-    }
-    50% {
-      box-shadow: 0 0 0 #ff3d00;
-      margin-bottom: 0;
-      transform: translate(15px, 15px);
-    }
-    100% {
-      box-shadow: 30px 0 0 #ff3d00;
-      margin-bottom: 10px;
-    }
-  }
-
-  @keyframes ball2 {
-    0% {
-      box-shadow: 30px 0 0 #fff;
-    }
-    50% {
-      box-shadow: 0 0 0 #fff;
-      margin-top: -20px;
-      transform: translate(15px, 15px);
-    }
-    100% {
-      box-shadow: 30px 0 0 #fff;
-      margin-top: 0;
-    }
-  } */
-
-  /* HTML: <div class="loader"></div> */
-
-
-  .loading-overlay {
-    position: fixed; /* Cover the entire screen */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.8); /* Optional: semi-transparent background */
-    display: flex;
-    justify-content: center;
-    align-items: center; /* Center vertically */
-    z-index: 9999; /* Ensure it's on top of other content */
-}
-
-.loading-wave {
-    width: 300px;
-    height: 100px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-}
-
-.loading-bar {
-    width: 20px;
-    height: 10px;
-    margin: 0 5px;
-    background-color: #3498db;
-    border-radius: 5px;
-    animation: loading-wave-animation 1s ease-in-out infinite;
-}
-
-.loading-bar:nth-child(2) {
-    animation-delay: 0.1s;
-}
-
-.loading-bar:nth-child(3) {
-    animation-delay: 0.2s;
-}
-
-.loading-bar:nth-child(4) {
-    animation-delay: 0.3s;
-}
-
-@keyframes loading-wave-animation {
-    0% {
-        height: 10px;
-    }
-
-    50% {
-        height: 50px;
-    }
-
-    100% {
-        height: 10px;
-    }
-}
-

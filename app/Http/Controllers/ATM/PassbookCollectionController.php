@@ -185,7 +185,7 @@ class PassbookCollectionController extends Controller
             $branchAbbreviation = $branch->branch_abbreviation;
 
             // Generate Request Number
-                $request_number_initial = $branchAbbreviation . '-PB' . date('mdy');
+                $request_number_initial = $branchAbbreviation . '-PB' . date('y');
 
                 // Fetch the last `request_number` with the matching prefix
                 $fetch_validate = PassbookForCollectionTransaction::select('request_number')

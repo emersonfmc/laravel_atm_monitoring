@@ -1,51 +1,98 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Settings;
 
+use App\Models\User;
 use App\Models\Branch;
+use App\Models\Company;
 use App\Models\DataArea;
 use App\Models\SystemLogs;
-
 use App\Models\DataDistrict;
 use Illuminate\Http\Request;
 use App\Models\DataBankLists;
 use App\Models\DataUserGroup;
-
 use Illuminate\Support\Carbon;
-
+use App\Models\DataDepartments;
 use App\Models\MaintenancePage;
 use App\Models\DataReleaseOption;
 use App\Models\DataCollectionDate;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-
 use App\Models\AtmTransactionAction;
 use Illuminate\Support\Facades\Auth;
+
 use App\Models\DataPensionTypesLists;
 use App\Models\DataTransactionAction;
 use App\Models\AtmTransactionSequence;
-use App\Models\DataDepartments;
 use App\Models\DataTransactionSequence;
 use Yajra\DataTables\Facades\DataTables;
 
 class SettingsController extends Controller
 {
-    public function settings_dashboard()
+    public function settings_monitoring_dashboard_data(Request $request)
     {
+        $UserCount = User::where('status', 'Active')->count();
+        $AreaCount = DataArea::where('status', 'Active')->count();
+        $DistrictCount = DataDistrict::where('status', '1')->count();
+        $BranchCount = Branch::where('status', 'Active')->count();
+        $UserGroupCount = DataUserGroup::where('status', 'Active')->count();
+        $BanksCount = DataBankLists::where('status', 'Active')->count();
+
+        // Return the counts as a JSON response
+        return response()->json([
+            'UserCount' => $UserCount,
+            'AreaCount' => $AreaCount,
+            'DistrictCount' => $DistrictCount,
+            'BranchCount' => $BranchCount,
+            'UserGroupCount' => $UserGroupCount,
+            'BanksCount' => $BanksCount,
+        ]);
+    }
+
+    public function settings_system_logs_data()
+    {
+        // Fetch only 5 records ordered by id in descending order
+        $systemLogs = SystemLogs::with('Employee')
+            ->orderBy('id', 'desc')
+            ->take(5); // Limit to 5 records
+
+        return DataTables::of($systemLogs)
+            ->setRowId('id')
+            ->addColumn('differForHumans', function ($log) {
+                $now = Carbon::now();
+                $diffInMinutes = $log->created_at->diffInMinutes($now);
+                $days = intdiv($diffInMinutes, 1440);
+                $remainingMinutes = $diffInMinutes % 1440;
+                $hours = intdiv($remainingMinutes, 60);
+                $minutes = $remainingMinutes % 60;
+
+                if ($days > 0) {
+                    return $days . ' day' . ($days > 1 ? 's' : '') . ' and ' . $hours . ' hr' . ($hours > 1 ? 's' : '') . ' ago';
+                } elseif ($hours > 0) {
+                    return $hours . ' hr' . ($hours > 1 ? 's' : '') . ' and ' . $minutes . ' min' . ($minutes > 1 ? 's' : '') . ' ago';
+                } else {
+                    return $minutes . ' min' . ($minutes > 1 ? 's' : '') . ' ago';
+                }
+            })
+            ->orderColumn('id', 'id $1') // Allows DataTables to control ordering
+            ->rawColumns(['differForHumans'])
+            ->make(true);
+    }
+
+
+
+    public function settings_dashboard(){
         return view('pages.pages_backend.settings_dashboard');
     }
 
-
-    public function users_group_page()
-    {
+    public function users_group_page(){
         $user = Auth::user();
         $user_types = $user->user_types;
 
-        return view('pages.pages_backend.settings.users_group_page', compact('user_types'));
+        return view('pages.pages_backend.settings.settings_users_group_page', compact('user_types'));
     }
 
-    public function users_group_data()
-    {
+    public function users_group_data(){
        $user_group = DataUserGroup::with('Company')
             ->orderBy('updated_at', 'desc') // Explicitly set order here
             ->get();
@@ -55,14 +102,12 @@ class SettingsController extends Controller
         ->make(true);
     }
 
-    public function users_group_get($id)
-    {
+    public function users_group_get($id){
         $TblUserGroup = DataUserGroup::with('Company')->findOrFail($id);
         return response()->json($TblUserGroup);
     }
 
-    public function users_group_create(Request $request)
-    {
+    public function users_group_create(Request $request){
         DB::beginTransaction();
         try
         {
@@ -78,7 +123,7 @@ class SettingsController extends Controller
                 'system' => 'ATM Monitoring',
                 'action' => 'Create',
                 'title' => 'Create New Usergroup',
-                'description' => 'Creation of New Usergroup' . $request->user_group,
+                'description' => 'Creation of New Usergroup - ' . $request->user_group,
                 'employee_id' => Auth::user()->employee_id,
                 'ip_address' => $request->ip(),
                 'created_at' => Carbon::now(),
@@ -102,8 +147,7 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function users_group_update(Request $request)
-    {
+    public function users_group_update(Request $request){
         DB::beginTransaction();
         try
         {
@@ -121,7 +165,7 @@ class SettingsController extends Controller
                 'system' => 'ATM Monitoring',
                 'action' => 'Update',
                 'title' => 'Update Usergroup',
-                'description' => 'Updating of Usergroup' . $TblUserGroup->user_group,
+                'description' => 'Updating of Usergroup - ' . $TblUserGroup->user_group,
                 'employee_id' => Auth::user()->employee_id,
                 'ip_address' => $request->ip(),
                 'created_at' => Carbon::now(),
@@ -145,13 +189,11 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function districts_page()
-    {
-        return view('pages.pages_backend.settings.district_page');
+    public function districts_page(){
+        return view('pages.pages_backend.settings.settings_district_page');
     }
 
-    public function districts_data()
-    {
+    public function districts_data(){
        $district = DataDistrict::with('Company')
             ->latest('updated_at')
             ->get();
@@ -161,14 +203,12 @@ class SettingsController extends Controller
         ->make(true);
     }
 
-    public function districtsGet($id)
-    {
+    public function districtsGet($id){
         $TblDistrict = DataDistrict::with('Company')->findOrFail($id);
         return response()->json($TblDistrict);
     }
 
-    public function districtsCreate(Request $request)
-    {
+    public function districtsCreate(Request $request){
 
         // Proceed with inserting if validation passes
         DataDistrict::create([
@@ -185,7 +225,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Create',
             'title' => 'Create New District',
-            'description' => 'Creation of New District' .  $request->district_number .' - '.$request->district_name,
+            'description' => 'Creation of New District - ' .  $request->district_number .' - '.$request->district_name,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -198,8 +238,7 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function districtsUpdate(Request $request)
-    {
+    public function districtsUpdate(Request $request){
         // Find the user group by ID
         $TblDistrict = DataDistrict::findOrFail($request->item_id);
 
@@ -216,7 +255,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Update',
             'title' => 'Update District',
-            'description' => 'Updating of District' .  $TblDistrict->district_number .' - '.$TblDistrict->district_name,
+            'description' => 'Updating of District - ' .  $TblDistrict->district_number .' - '.$TblDistrict->district_name,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -229,32 +268,33 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function area_page()
-    {
+    public function area_page(){
         $districts = DataDistrict::latest('updated_at')->get();
 
-        return view('pages.pages_backend.settings.area_page', compact('districts'));
+        return view('pages.pages_backend.settings.settings_area_page', compact('districts'));
     }
 
-    public function area_data()
-    {
-       $district = DataArea::with('Company','District')
-            ->latest('updated_at')
-            ->get();
+    public function area_data(){
+        $DataArea = DataArea::with('Company','District')
+             ->latest('updated_at')
+             ->get();
 
-        return DataTables::of($district)
-        ->setRowId('id')
-        ->make(true);
+         return DataTables::of($DataArea)
+         ->setRowId('id')
+         ->addColumn('district_details', function($row) {
+             return '<span class="fw-bold text-primary">' . $row->District->district_number . '</span> - <span class="fw-bold">' . $row->District->district_name . '</span>';
+         })
+         ->rawColumns(['district_details']) // Render HTML in both the action and pending_to columns
+         ->make(true);
     }
 
-    public function areaGet($id)
-    {
+
+    public function areaGet($id){
         $TblArea = DataArea::findOrFail($id);
         return response()->json($TblArea);
     }
 
-    public function areaCreate(Request $request)
-    {
+    public function areaCreate(Request $request){
 
         // Proceed with inserting if validation passes
         DataArea::create([
@@ -272,7 +312,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Create',
             'title' => 'Create Area',
-            'description' => 'Creation of New Area' .  $request->area_no .' - '.$request->area_supervisor,
+            'description' => 'Creation of New Area - ' .  $request->area_no .' - '.$request->area_supervisor,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -285,8 +325,7 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function areaUpdate(Request $request)
-    {
+    public function areaUpdate(Request $request){
         // Find the user group by ID
         $TblArea = DataArea::findOrFail($request->item_id);
         $TblArea->update([  // Update the instance instead of using the class method
@@ -302,7 +341,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Update',
             'title' => 'Update Area',
-            'description' => 'Updating of Area' .  $TblArea->area_no .' - '.$TblArea->area_supervisor,
+            'description' => 'Updating of Area - ' .  $TblArea->area_no .' - '.$TblArea->area_supervisor,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -315,16 +354,14 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function branch_page()
-    {
+    public function branch_page(){
         $TblDistrict = DataDistrict::latest('updated_at')
             ->get();
 
-        return view('pages.pages_backend.settings.branch_page', compact('TblDistrict'));
+        return view('pages.pages_backend.settings.settings_branch_page', compact('TblDistrict'));
     }
 
-    public function branch_data()
-    {
+    public function branch_data(){
        $branch = Branch::with('Company','District','Area')
             ->latest('updated_at')
             ->get();
@@ -334,28 +371,24 @@ class SettingsController extends Controller
         ->make(true);
     }
 
-    public function branchGet($id)
-    {
+    public function branchGet($id){
         $Branch = Branch::with('Company','District','Area')->findOrFail($id);
         return response()->json($Branch);
     }
 
-    public function areaGetBydistrict(Request $request)
-    {
+    public function areaGetBydistrict(Request $request){
         // $district_id = $request->district_id;
         $TblArea = DataArea::where('district_id', $request->district_id)->get(); // get() instead of first()
         return response()->json($TblArea);
     }
 
-    public function branchGetByarea(Request $request)
-    {
+    public function branchGetByarea(Request $request){
         // $district_id = $request->district_id;
         $Branch = Branch::where('area_id', $request->area_id)->get(); // get() instead of first()
         return response()->json($Branch);
     }
 
-    public function branchCreate(Request $request)
-    {
+    public function branchCreate(Request $request){
         // Extract the first two letters of branch_location and convert to uppercase
         $branchAbbreviation = strtoupper(substr($request->branch_location, 0, 2));
 
@@ -376,7 +409,7 @@ class SettingsController extends Controller
         SystemLogs::create([
             'system' => 'ATM Monitoring',
             'action' => 'Create New Branch',
-            'description' => 'Creation of New Branch' .  $request->branch_location,
+            'description' => 'Creation of New Branch - ' .  $request->branch_location,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -389,8 +422,7 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function branchUpdate(Request $request)
-    {
+    public function branchUpdate(Request $request){
         // Find the user group by ID
         $AtmBankLists = Branch::findOrFail($request->item_id);
 
@@ -410,7 +442,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Update',
             'title' => 'Update Branch',
-            'description' => 'Updating of Branch' .  $AtmBankLists->branch_location,
+            'description' => 'Updating of Branch - ' .  $AtmBankLists->branch_location,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -423,13 +455,11 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function bank_page()
-    {
-        return view('pages.pages_backend.settings.bank_lists_page');
+    public function bank_page(){
+        return view('pages.pages_backend.settings.settings_bank_lists_page');
     }
 
-    public function bank_data()
-    {
+    public function bank_data(){
        $branch = DataBankLists::latest('updated_at')
             ->get();
 
@@ -438,14 +468,12 @@ class SettingsController extends Controller
         ->make(true);
     }
 
-    public function bankGet($id)
-    {
+    public function bankGet($id){
         $AtmBankLists = DataBankLists::findOrFail($id);
         return response()->json($AtmBankLists);
     }
 
-    public function bankCreate(Request $request)
-    {
+    public function bankCreate(Request $request){
 
         // Proceed with inserting if validation passes
         DataBankLists::create([
@@ -459,7 +487,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Create',
             'title' => 'Create New Bank',
-            'description' => 'Creation of New Bank' .  $request->bank_name,
+            'description' => 'Creation of New Bank - ' .  $request->bank_name,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -472,8 +500,7 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function bankUpdate(Request $request)
-    {
+    public function bankUpdate(Request $request){
         // Find the user group by ID
         $AtmBankLists = DataBankLists::findOrFail($request->item_id);
 
@@ -488,7 +515,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Update',
             'title' => 'Update Bank',
-            'description' => 'Updating of Bank' .  $AtmBankLists->bank_name,
+            'description' => 'Updating of Bank - ' .  $AtmBankLists->bank_name,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -501,13 +528,11 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function pension_types_page()
-    {
-        return view('pages.pages_backend.settings.pension_types_page');
+    public function pension_types_page(){
+        return view('pages.pages_backend.settings.settings_pension_types_page');
     }
 
-    public function pension_types_data()
-    {
+    public function pension_types_data(){
        $branch = DataPensionTypesLists::latest('updated_at')
             ->get();
 
@@ -516,8 +541,7 @@ class SettingsController extends Controller
         ->make(true);
     }
 
-    public function pension_typesGet($id)
-    {
+    public function pension_typesGet($id){
         $AtmPensionTypesLists = DataPensionTypesLists::findOrFail($id);
         return response()->json($AtmPensionTypesLists);
     }
@@ -537,7 +561,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Create',
             'title' => 'Create Pension Types',
-            'description' => 'Creation of New Pension Types' .  $request->types . ' - ' . $request->pension_name,
+            'description' => 'Creation of New Pension Types - ' .  $request->types . ' - ' . $request->pension_name,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -568,7 +592,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Update',
             'title' => 'Update Pension Types',
-            'description' => 'Updating of Pension Types' .  $AtmPensionTypesLists->types . ' - ' . $AtmPensionTypesLists->pension_name,
+            'description' => 'Updating of Pension Types - ' .  $AtmPensionTypesLists->types . ' - ' . $AtmPensionTypesLists->pension_name,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -586,7 +610,7 @@ class SettingsController extends Controller
 
         $DataUserGroup = DataUserGroup::where('status','Active')->get();
 
-        return view('pages.pages_backend.settings.transaction_action_page', compact('DataUserGroup'));
+        return view('pages.pages_backend.settings.settings_transaction_action_page', compact('DataUserGroup'));
     }
 
     public function transaction_action_data()
@@ -629,7 +653,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Create',
             'title' => 'Create Transaction Action',
-            'description' => 'Creation of Transaction Action' .  $request->name,
+            'description' => 'Creation of Transaction Action - ' .  $request->name,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -659,7 +683,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Update',
             'title' => 'Update Transaction Action',
-            'description' => 'Updating of Transaction Action' .  $DataTransactionAction->name,
+            'description' => 'Updating of Transaction Action - ' .  $DataTransactionAction->name,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -674,7 +698,7 @@ class SettingsController extends Controller
 
     public function release_reason_page()
     {
-        return view('pages.pages_backend.settings.release_reason_page');
+        return view('pages.pages_backend.settings.settings_release_reason_page');
     }
 
     public function release_reason_data()
@@ -710,7 +734,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Create',
             'title' => 'Create Release Reason',
-            'description' => 'Creation of Release Reason' .  $request->reason . ' - ' . $request->description,
+            'description' => 'Creation of Release Reason | ' .  $request->reason . ' - ' . $request->description,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -741,7 +765,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Update',
             'title' => 'Update Release Reason',
-            'description' => 'Updating of Release Reason' .  $DataReleaseOption->reason . ' - ' . $DataReleaseOption->description .' into '. $request->reason .' - ' . $request->description,
+            'description' => 'Updating of Release Reason | ' .  $DataReleaseOption->reason . ' - ' . $DataReleaseOption->description .' into '. $request->reason .' - ' . $request->description,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -756,7 +780,7 @@ class SettingsController extends Controller
 
     public function collection_date_page()
     {
-        return view('pages.pages_backend.settings.collection_date');
+        return view('pages.pages_backend.settings.settings_collection_date');
     }
 
     public function collection_date_data()
@@ -790,7 +814,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Create',
             'title' => 'Create Collection Date',
-            'description' => 'Creation of Collection Date' .  $request->collection_date,
+            'description' => 'Creation of Collection Date - ' .  $request->collection_date,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -820,7 +844,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Update',
             'title' => 'Update Collection Date',
-            'description' => 'Updating of Collection Date' .  $DataCollectionDate->collection_date .' into '. $request->collection_date,
+            'description' => 'Updating of Collection Date | ' .  $DataCollectionDate->collection_date .' into '. $request->collection_date,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -835,7 +859,7 @@ class SettingsController extends Controller
 
     public function maintenance_page()
     {
-        return view('pages.pages_backend.settings.maintenance_page');
+        return view('pages.pages_backend.settings.settings_maintenance_page');
     }
 
     public function maintenance_data()
@@ -869,7 +893,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Create',
             'title' => 'Create Maintenance Page',
-            'description' => 'Creation of Maintenance Page' .  $request->pages_name,
+            'description' => 'Creation of Maintenance Page - ' .  $request->pages_name,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -896,7 +920,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Update',
             'title' => 'Update Maintenance Page',
-            'description' => 'Updating of Maintenance Page' .  $MaintenancePage->pages_name .' into '. $request->pages_name,
+            'description' => 'Updating of Maintenance Page | ' .  $MaintenancePage->pages_name .' into '. $request->pages_name,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -911,7 +935,7 @@ class SettingsController extends Controller
 
     public function departmentsPage()
     {
-        return view('pages.pages_backend.settings.departments_page');
+        return view('pages.pages_backend.settings.settings_departments_page');
     }
 
     public function departmentsData()
@@ -945,7 +969,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Create',
             'title' => 'Create Departments Page',
-            'description' => 'Creation of Departments Page' .  $request->name,
+            'description' => 'Creation of Departments Page - ' .  $request->name,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -972,7 +996,7 @@ class SettingsController extends Controller
             'system' => 'ATM Monitoring',
             'action' => 'Update',
             'title' => 'Update Departments Page',
-            'description' => 'Updating of Departments Page' .  $DataDepartments->name .' into '. $request->name,
+            'description' => 'Updating of Departments Page | ' .  $DataDepartments->name .' into '. $request->name,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -985,10 +1009,82 @@ class SettingsController extends Controller
         ]);
     }
 
+    public function companyPage(){
+        return view('pages.pages_backend.settings.settings_company');
+    }
+
+    public function companyData(){
+       $DataCompany = Company::latest('updated_at')
+            ->whereNull('deleted_at')
+            ->get();
+
+        return DataTables::of($DataCompany)
+            ->setRowId('id')
+            ->make(true);
+    }
+
+    public function companyGet($id){
+        $DataCompany = Company::findOrFail($id);
+        return response()->json($DataCompany);
+    }
+
+    public function companyCreate(Request $request){
+        Company::create([
+            'company_name' => $request->name,
+            'status' => 'Active',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // Create System Logs used for Auditing of Logs
+        SystemLogs::create([
+            'system' => 'ATM Monitoring',
+            'action' => 'Create',
+            'title' => 'Create Company',
+            'description' => 'Creation of Company - ' .  $request->name,
+            'employee_id' => Auth::user()->employee_id,
+            'ip_address' => $request->ip(),
+            'created_at' => Carbon::now(),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Company Has Been Created successfully!'
+        ]);
+    }
+
+    public function companyUpdate(Request $request){
+        $DataCompany = Company::findOrFail($request->item_id);
+        $DataCompany->update([  // Update the instance instead of using the class method
+            'company_name' => $request->name,
+            'status' => $request->status,
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // Create System Logs used for Auditing of Logs
+        SystemLogs::create([
+            'system' => 'ATM Monitoring',
+            'action' => 'Update',
+            'title' => 'Update Company',
+            'description' => 'Updating of Company | ' .  $DataCompany->name .' into '. $request->name,
+            'employee_id' => Auth::user()->employee_id,
+            'ip_address' => $request->ip(),
+            'created_at' => Carbon::now(),
+            'company_id' => Auth::user()->company_id,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Company Updated Successfully!'  // Changed message to reflect update action
+        ]);
+    }
+
     public function login_page()
     {
         return view('auth.login_page');
     }
+
 
 
 

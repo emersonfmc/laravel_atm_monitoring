@@ -14,20 +14,56 @@ class DataDepartmentsSeeder extends Seeder
         $faker = Faker::create();
             $data = [
                         [
+                            'name' => 'Information Technology',
+                            'status' => 'Active',
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ],
+                        [
                             'name' => 'Operation',
-                            'status' => 'active',
+                            'status' => 'Active',
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ],
                         [
                             'name' => 'Accounting',
-                            'status' => 'active',
+                            'status' => 'Active',
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ],
                         [
                             'name' => 'Collection',
-                            'status' => 'active',
+                            'status' => 'Active',
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ],
+                        [
+                            'name' => 'Treasury',
+                            'status' => 'Active',
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ],
+                        [
+                            'name' => 'Audit',
+                            'status' => 'Active',
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ],
+                        [
+                            'name' => 'Purchasing',
+                            'status' => 'Active',
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ],
+                        [
+                            'name' => 'Human Resources',
+                            'status' => 'Active',
+                            'created_at' => Carbon::now(),
+                            'updated_at' => Carbon::now(),
+                        ],
+                        [
+                            'name' => 'Finances',
+                            'status' => 'Active',
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ],

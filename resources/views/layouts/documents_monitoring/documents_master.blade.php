@@ -10,7 +10,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ URL::asset('assets/images/favicon.ico') }}">
-    @include('layouts.documents.documents_head-css')
+    @include('layouts.documents_monitoring.documents_head-css')
 </head>
 
 @section('body')
@@ -18,8 +18,8 @@
 @show
     <!-- Begin page -->
     <div id="layout-wrapper">
-        @include('layouts.documents.documents_topbar')
-        @include('layouts.documents.documents_sidebar')
+        @include('layouts.documents_monitoring.documents_topbar')
+        @include('layouts.documents_monitoring.documents_sidebar')
         <!-- ============================================================== -->
         <!-- Start right Content here -->
         <!-- ============================================================== -->
@@ -43,7 +43,7 @@
     <!-- /Right-bar -->
 
     <!-- JAVASCRIPT -->
-    @include('layouts.documents.documents_vendor-scripts')
+    @include('layouts.documents_monitoring.documents_vendor-scripts')
 </body>
 
 </html>
