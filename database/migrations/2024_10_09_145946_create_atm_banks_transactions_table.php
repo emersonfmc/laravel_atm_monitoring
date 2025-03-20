@@ -19,9 +19,6 @@ return new class extends Migration
             $table->unsignedBigInteger('client_banks_id')->nullable();
             $table->unsignedBigInteger('transaction_actions_id')->nullable();
             $table->string('request_by_employee_id')->nullable();
-            $table->string('oc_request_number')->nullable();
-            $table->enum('oc_transaction',['YES','NO'])->default('NO');
-            $table->string('oc_request_type')->nullable();
             $table->string('transaction_number')->nullable();
             $table->string('bank_account_no')->nullable();
             $table->unsignedBigInteger('branch_id')->nullable();
@@ -32,6 +29,11 @@ return new class extends Migration
             $table->enum('status',['ON GOING','CANCELLED','COMPLETED'])->nullable();
 
             $table->integer('yellow_copy')->nullable();
+
+            $table->string('oc_request_number')->nullable()->comment('This is for creation of Outside Collection Multiple');
+            $table->enum('oc_transaction',['YES','NO'])->default('NO')->comment('If the transaction is Outside Collection it will be YES and NO if not');
+            $table->string('oc_request_type')->nullable()->comment('Null if not outside collection, 1 going to bank and 2 returning to HO and 3 For Completed');
+            $table->unsignedBigInteger('as_tracking_id')->comment('If the transaction is having a open pending to Area Supervisor');
             // $table->unsignedBigInteger('released_client_images_id')->nullable();
 
             $table->foreign('client_banks_id')->references('id')->on('atm_client_banks')->onDelete('set null')->onUpdate('cascade');

@@ -1,4 +1,4 @@
-@extends('layouts.settings.settings_master')
+@extends('layouts.settings_monitoring.settings_master')
 
 @section('css')
     <!-- DataTables -->
@@ -9,7 +9,7 @@
 
     @component('components.breadcrumb')
         @slot('li_1') Settings @endslot
-        @slot('title') Area @endslot
+        @slot('title') District @endslot
     @endcomponent
 
     <div class="row">
@@ -19,29 +19,28 @@
 
                     <div class="row">
                         <div class="col-md-8 text-start">
-                            <h4 class="card-title">Area</h4>
+                            <h4 class="card-title">District</h4>
                             <p class="card-title-desc">
                                 A district head is responsible for managing and overseeing the operations,
                                 administration, and development activities within a district
                             </p>
                         </div>
                         <div class="col-md-4 text-end">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAreaModal"><i
-                                class="fas fa-plus-circle me-1"></i> Create Area</button>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createDistrictModal">
+                                <i class="fas fa-plus-circle me-1"></i> Create District</button>
                         </div>
                     </div>
                     <hr>
 
 
                     <div class="table-responsive">
-                        <table id="FetchingDatatable" class="table table-border dt-responsive wrap table-design" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <table id="SettingsDistrictTable" class="table table-border dt-responsive wrap table-design" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                             <thead class="table-light">
                                 <tr>
                                     <th>Sl</th>
-                                    <th>Area No.</th>
-                                    <th>Area Name</th>
-                                    <th>District</th>
-                                    {{-- <th>Email</th> --}}
+                                    <th>District Number</th>
+                                    <th>District Name</th>
+                                    <th>Email</th>
                                     <th>Created Date</th>
                                     <th>Action</th>
                                 </tr>
@@ -58,42 +57,36 @@
         </div> <!-- end col -->
     </div> <!-- end row -->
 
-    <div class="modal fade" id="createAreaModal" data-bs-backdrop="static" tabindex="-1" role="dialog"district_id
-        aria-labelledby="createAreaModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal fade" id="createDistrictModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="createDistrictLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-uppercase">Create Area</h5>
-                    <button type="button" class="btn-close closeCreateModal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title fw-bold text-uppercase" id="createDistrictLabel">Create District</h5>
+                    <button type="button" class="btn-close closeDistrictModal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" action="{{ route('settings.area.create') }}" id="createValidateForm">
+                    <form method="post" action="{{ route('settings.districts.create')  }}"  id="addDistrictForm">
                         @csrf
 
-                        <div class="form-group mb-3">
-                            <label class="fw-bold h6">Area</label>
-                            <input type="text" name="area_no" class="form-control" id="area_no"
-                                placeholder="Enter Area No" minlength="0" maxlength="50" required>
+                        <div class="form-group mb-2">
+                            <label class="fw-bold h6">District Number</label>
+                            <input type="text" name="district_number" id="district_number" class="form-control" placeholder="District Number" required>
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label class="fw-bold h6">Area Supervisor</label>
-                            <input type="text" name="area_supervisor" class="form-control" id="area_supervisor"
-                                placeholder="Enter Area Supervisor" minlength="0" maxlength="50" required>
+                        <div class="form-group mb-2">
+                            <label class="fw-bold h6">District Name</label>
+                            <input type="text" name="district_name" id="district_name" class="form-control" placeholder="District Name" required>
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label class="fw-bold h6">District Manager</label>
-                            <select name="district_id" id="district_id" class="form-select select2" required>
-                                <option value="" selected disabled>Select District Manager</option>
-                                @foreach ($districts as $district)
-                                    <option value="{{ $district->id }}">{{  $district->district_number .' / '. $district->district_name }}</option>
-                                @endforeach
-                            </select>
+                        <div class="form-group mb-2">
+                            <label class="fw-bold h6">Email</label>
+                            <input type="text" name="email" id="email" class="form-control" placeholder="Email" required>
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary closeCreateModal" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary closeDistrictModal" data-bs-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </form>
@@ -102,51 +95,37 @@
         </div>
     </div>
 
-    <div class="modal fade" id="updateAreaModal" data-bs-backdrop="static" tabindex="-1" role="dialog"update_district_id
-        aria-labelledby="updateAreaModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal fade" id="updateDistrictModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="createDistrictLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-uppercase">Update Area</h5>
-                    <button type="button" class="btn-close closeUpdateModal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title fw-bold text-uppercase" id="createDistrictLabel">Update District</h5>
+                    <button type="button" class="btn-close closeDistrictModal" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="post" action="{{ route('settings.area.update') }}" id="updateValidateForm">
+                    <form method="post" action="{{ route('settings.districts.update')  }}"  id="updateDistrictForm">
                         @csrf
                         <input type="hidden" id="item_id" name="item_id">
 
-                        <div class="form-group mb-3">
-                            <label class="fw-bold h6">Area</label>
-                            <input type="text" name="area_no" class="form-control" id="update_area_no"
-                                placeholder="Enter Area" minlength="0" maxlength="50" required>
+                        <div class="form-group mb-2">
+                            <label class="fw-bold h6">District Number</label>
+                            <input type="text" name="district_number" id="update_district_number" class="form-control" placeholder="District Number" required>
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label class="fw-bold h6">Area Supervisor</label>
-                            <input type="text" name="area_supervisor" class="form-control" id="update_area_supervisor"
-                                placeholder="Enter Area Supervisor" minlength="0" maxlength="50" required>
+                        <div class="form-group mb-2">
+                            <label class="fw-bold h6">District Name</label>
+                            <input type="text" name="district_name" id="update_district_name" class="form-control" placeholder="District Name" required>
                         </div>
 
-                        <div class="form-group mb-3">
-                            <label class="fw-bold h6">District Manager</label>
-                            <select name="district_id" id="update_district_id" class="form-select select2" required>
-                                @foreach ($districts as $district)
-                                    <option value="{{ $district->id }}">{{  $district->district_number .' / '. $district->district_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label class="fw-bold h6">Status</label>
-                            <select name="status" id="update_status" class="form-select" required>
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
-
-                            </select>
+                        <div class="form-group mb-2">
+                            <label class="fw-bold h6">Email</label>
+                            <input type="text" name="email" id="update_email" class="form-control" placeholder="Email" required>
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary closeUpdateModal" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-success">Update</button>
                         </div>
                     </form>
@@ -155,15 +134,13 @@
         </div>
     </div>
 
+
     <script>
         $(document).ready(function () {
-            $('#district_id').select2({ dropdownParent: $('#createAreaModal') });
-            $('#update_district_id').select2({ dropdownParent: $('#updateAreaModal') });
+            var SettingsDistrictTableBody = $('#SettingsDistrictTable tbody');
 
-            var FetchingDatatableBody = $('#FetchingDatatable tbody');
-
-            const dataTable = new ServerSideDataTable('#FetchingDatatable');
-            var url = '{!! route('settings.area.data') !!}';
+            const dataTable = new ServerSideDataTable('#SettingsDistrictTable');
+            var url = '{!! route('settings.district.data') !!}';
             const buttons = [{
                 text: 'Delete',
                 action: function(e, dt, node, config) {
@@ -182,8 +159,8 @@
                     searchable: true,
                 },
                 {
-                    data: 'area_no',
-                    name: 'area_no',
+                    data: 'district_number',
+                    name: 'district_number',
                     render: function(data, type, row, meta) {
                         return '<span class="fw-bold h6 text-primary">' + data + '</span>';
                     },
@@ -191,8 +168,8 @@
                     searchable: true,
                 },
                 {
-                    data: 'area_supervisor',
-                    name: 'area_supervisor',
+                    data: 'district_name',
+                    name: 'district_name',
                     render: function(data, type, row, meta) {
                         return '<span class="fw-bold h6">' + data + '</span>';
                     },
@@ -200,23 +177,14 @@
                     searchable: true,
                 },
                 {
-                    data: 'district_id',
-                    name: 'district.district_name',
+                    data: 'email',
+                    name: 'email',
                     render: function(data, type, row, meta) {
-                        return row.district ? '<span>' + row.district.district_name + '</span>' : ''; // Check if company exists
+                        return '<span">' + data + '</span>';
                     },
                     orderable: true,
                     searchable: true,
                 },
-                // {
-                //     data: 'email',
-                //     name: 'email',
-                //     render: function(data, type, row, meta) {
-                //         return '<span">' + data + '</span>';
-                //     },
-                //     orderable: true,
-                //     searchable: true,
-                // },
                 {
                     data: 'created_at',
                     name: 'created_at',
@@ -234,14 +202,14 @@
                     name: 'action',
                     render: function(data, type, row) {
                         return `
-                            <a href="#" class="text-warning editBtn me-2" data-id="${row.id}"
-                                data-bs-toggle="tooltip" data-bs-placement="top" title="Edit ">
-                                <i class="fas fa-pencil-alt me-2"></i>
+                            <a href="#" class="text-danger deleteBtn me-2" data-id="${row.id}"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                <i class="fas fa-trash-alt me-2"></i>
                             </a>
 
-                            <a href="#" class="text-danger deleteBtn me-2" data-id="${row.id}"
-                                data-bs-toggle="tooltip" data-bs-placement="top" title="Delete ">
-                                <i class="fas fa-trash-alt me-2"></i>
+                            <a href="#" class="text-warning editBtn me-2" data-id="${row.id}"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                <i class="fas fa-pencil-alt me-2"></i>
                             </a>`;
                     },
                     orderable: false,
@@ -250,11 +218,26 @@
             ];
             dataTable.initialize(url, columns);
 
-            $('#createValidateForm').validate({
+            function closeAddDistrictModal() {
+                $('#createDistrictModal').modal('hide');
+                $('#SettingsDistrictTable tbody').empty();
+            }
+
+            function closeUpdateDistrictModal() {
+                $('#updateDistrictModal').modal('hide');
+                $('#SettingsDistrictTable tbody').empty();
+            }
+
+            $('#addDistrictForm').validate({
                 rules: {
-                    area: { required: true, },
-                    area_supervisor: { required: true, },
-                    district_id: { required: true, },
+                    district_number: { required: true },
+                    district_name: { required: true },
+                    email: { required: true }
+                },
+                messages: {
+                    district_number: { required: 'Please Enter District Number' },
+                    district_name: { required: 'Please Enter District Name' },
+                    email: { required: 'Please Enter Email' }
                 },
                 errorElement: 'span',
                 errorPlacement: function(error, element) {
@@ -268,7 +251,7 @@
                     $(element).removeClass('is-invalid');
                 },
                 submitHandler: function(form) {
-                    var hasRows = FetchingDatatableBody.children('tr').length > 0;
+                    var hasRows = SettingsDistrictTableBody.children('tr').length > 0;
                     if (hasRows) {
                         Swal.fire({
                             title: 'Confirmation',
@@ -286,10 +269,10 @@
                                     type: form.method,
                                     data: $(form).serialize(),
                                     success: function(response) {
-                                        closeCreateModal();
+                                        closeAddDistrictModal();
                                         Swal.fire({
                                             title: 'Successfully Added!',
-                                            text: 'Area is successfully added!',
+                                            text: 'District is successfully Created!',
                                             icon: 'success',
                                             showCancelButton: false,
                                             showConfirmButton: true,
@@ -346,11 +329,16 @@
                 }
             });
 
-            $('#updateValidateForm').validate({
+            $('#updateDistrictForm').validate({
                 rules: {
-                    area: { required: true, },
-                    area_supervisor: { required: true, },
-                    district_id: { required: true, },
+                    district_number: { required: true },
+                    district_name: { required: true },
+                    email: { required: true }
+                },
+                messages: {
+                    district_number: { required: 'Please Enter District Number' },
+                    district_name: { required: 'Please Enter District Name' },
+                    email: { required: 'Please Enter Email' }
                 },
                 errorElement: 'span',
                 errorPlacement: function(error, element) {
@@ -364,7 +352,7 @@
                     $(element).removeClass('is-invalid');
                 },
                 submitHandler: function(form) {
-                    var hasRows = FetchingDatatableBody.children('tr').length > 0;
+                    var hasRows = SettingsDistrictTableBody.children('tr').length > 0;
                     if (hasRows) {
                         Swal.fire({
                             title: 'Confirmation',
@@ -382,10 +370,10 @@
                                     type: form.method,
                                     data: $(form).serialize(),
                                     success: function(response) {
-                                        closeUpdateModal();
+                                        closeUpdateDistrictModal();
                                         Swal.fire({
                                             title: 'Successfully Updated!',
-                                            text: 'Area is successfully Updated!',
+                                            text: 'Disrict is successfully Updated!',
                                             icon: 'success',
                                             showCancelButton: false,
                                             showConfirmButton: true,
@@ -442,38 +430,29 @@
                 }
             });
 
-            $('#FetchingDatatable').on('click', '.editBtn', function(e) {
+            $('#SettingsDistrictTable').on('click', '.editBtn', function(e) {
                 e.preventDefault();
                 var itemID = $(this).data('id');
+                console.log(itemID);
 
-                var url = "/settings/area/get/" + itemID;
+                var url = "/settings/districts/get/" + itemID;
 
                 $.get(url, function(data) {
+                    console.log(data);
                     $('#item_id').val(data.id);
-                    $('#update_area_no').val(data.area_no);
-                    $('#update_area_supervisor').val(data.area_supervisor);
-                    $('#update_district_id').val(data.district_id);
-                    $('#update_status').val(data.status);
-                    $('#updateAreaModal').modal('show');
+                    $('#update_district_number').val(data.district_number);
+                    $('#update_district_name').val(data.district_name);
+                    $('#update_email').val(data.email);
+
+                    $('#updateDistrictModal').modal('show');
                 });
             });
-
-            function closeCreateModal() {
-                $('#createAreaModal').modal('hide');
-                $('#FetchingDatatable tbody').empty();
-                // $('#FetchingDatatable').addClass('d-none');
-            }
-
-            function closeUpdateModal() {
-                $('#updateAreaModal').modal('hide');
-                $('#FetchingDatatable tbody').empty();
-                // $('#usersGroupPageTable').addClass('d-none');
-            }
-
 
 
         });
     </script>
+
+
 
 
 

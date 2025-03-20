@@ -17,6 +17,22 @@
                     </a>
                 </li>
 
+                <li>
+                    <a href="{{ route('settings.company.page') }}" class="waves-effect">
+                        <i class="fas fa-globe-americas text-success"></i>
+                        <span key="settings-company">Company</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('users.page') }}" class="waves-effect">
+                        <i class="fas fa-users text-info"></i>
+                        <span key="settings-user">Users</span>
+                    </a>
+                </li>
+
+
+
                 <li class="mm-active">
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="fa fa-cog text-primary" aria-hidden="true"></i>
@@ -98,7 +114,7 @@
 
                 <li>
                     <a href="{{ route('settings.maintenance.page') }}" class="waves-effect">
-                        <i class="fas fa-tools fs-5 text-info "></i>
+                        <i class="fas fa-tools fs-5 text-danger "></i>
                         <span key="sub-maintenance">Maintenance</span>
                     </a>
                 </li>

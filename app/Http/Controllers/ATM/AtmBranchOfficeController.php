@@ -38,6 +38,7 @@ class AtmBranchOfficeController extends Controller
     {
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
+        $userDepartment = Auth::user()->department;
 
         // Start the query with the necessary relationships
         $query = AtmClientBanks::with('ClientInformation', 'Branch', 'AtmBanksTransaction')
@@ -59,8 +60,8 @@ class AtmBranchOfficeController extends Controller
             ->addColumn('action', function($row) use ($userGroup) {
                 $hasOngoingTransaction = false;
                 $latestTransaction = null;
-                $latestTransactionId = null;
-                $action = ''; // Initialize a variable to hold the buttons
+                $action = ''; // Initialize a variable to hold the buttons\
+                $add_atm = '';
 
                 if ($row->AtmBanksTransaction) {
                     // Filter for ongoing transactions
@@ -75,12 +76,11 @@ class AtmBranchOfficeController extends Controller
 
                     // Check for completed transactions and get the latest one
                     $completedTransactions = $row->AtmBanksTransaction->filter(function ($transaction) {
-                        return $transaction->status === 'COMPLETED';
+                        return $transaction->status === 'COMPLETED' && $transaction->oc_transaction == 'NO';
                     })->sortByDesc('id'); // Sort by id in descending order
 
                     if ($completedTransactions->isNotEmpty()) {
                         $latestTransaction = $completedTransactions->first();
-                        $latestTransactionId = $latestTransaction->id;
                     }
                 } else {
                     $action = '<button type="button" class="btn btn-warning borrow_transaction"
@@ -96,11 +96,10 @@ class AtmBranchOfficeController extends Controller
                 if (in_array($userGroup, ['Developer', 'Admin', 'Branch Head', 'Everfirst Admin'])) {
                     if ($hasOngoingTransaction) {
                         // Display the spinning icon if there is any ongoing transaction
-                        $action = '<i class="fas fa-spinner fa-spin fs-3 text-success me-4"></i>';
-                    }
-                    else if ($latestTransaction && $latestTransaction->transaction_actions_id) {
+                        $action = '<i class="fas fa-spinner fa-spin fs-3 text-success"></i>';
+                    } else if ($latestTransaction && $latestTransaction->transaction_actions_id) {
                         // Generate buttons based on `transaction_actions_id`
-                        if ($latestTransaction->transaction_actions_id == 3 || $latestTransaction->transaction_actions_id == 9) {
+                        if ($latestTransaction->transaction_actions_id == 3 || $latestTransaction->transaction_actions_id == 9) { // Safekeep and Release
                             $action = '<button type="button" class="btn btn-success release_transaction me-2"
                                             data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
@@ -108,8 +107,7 @@ class AtmBranchOfficeController extends Controller
                                             title="Releasing of Transaction">
                                             <i class="fas fa-sign-in-alt"></i>
                                         </button>';
-                        }
-                        else if ($latestTransaction->transaction_actions_id == 1) {
+                        } else if ($latestTransaction->transaction_actions_id == 1) { // Borrow Transaction
                             $action = '<button type="button" class="btn btn-warning borrow_transaction me-2"
                                             data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
@@ -117,8 +115,7 @@ class AtmBranchOfficeController extends Controller
                                             title="Returning of Borrow Transaction">
                                            <i class="fas fa-undo"></i>
                                         </button>';
-                        }
-                        else if ($latestTransaction->transaction_actions_id == 11) {
+                        } else if ($latestTransaction->transaction_actions_id == 11) { // Replacement Transaction
                             $action = '<button type="button" class="btn btn-primary replacement_atm_transaction me-2"
                                             data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
@@ -126,8 +123,7 @@ class AtmBranchOfficeController extends Controller
                                             title="Replacement of ATM / Passbook Transaction">
                                           <i class="fas fa-exchange-alt"></i>
                                         </button>';
-                        }
-                        else if ($latestTransaction->transaction_actions_id == 13) {
+                        } else if ($latestTransaction->transaction_actions_id == 13) { // Cancelled Loan Transaction
                             $action = '<button type="button" class="btn btn-danger cancelled_loan_transaction me-2"
                                             data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
@@ -135,8 +131,7 @@ class AtmBranchOfficeController extends Controller
                                             title="Cancelled Loan Transaction">
                                           <i class="fas fa-times-circle"></i>
                                         </button>';
-                        }
-                        else if ($latestTransaction->transaction_actions_id == 16) {
+                        } else if ($latestTransaction->transaction_actions_id == 16) { // Release w/ Balance Transaction
                             $action = '<button type="button" class="btn btn-danger release_balance_transaction me-2"
                                             data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
@@ -144,8 +139,7 @@ class AtmBranchOfficeController extends Controller
                                             title="Release with Outstanding Balance Transaction">
                                           <i class="fas fa-sign-in-alt"></i>
                                         </button>';
-                        }
-                        else {
+                        } else {
                             $action = '<button type="button" class="btn btn-warning borrow_transaction me-2"
                                             data-id="'.$row->id.'"
                                             data-bs-toggle="tooltip"
@@ -153,6 +147,19 @@ class AtmBranchOfficeController extends Controller
                                             title="Returning of Borrow Transaction">
                                            <i class="fas fa-undo"></i>
                                         </button>';
+                        }
+
+                        // For ADD ATM Transaction
+                        if ($latestTransaction->transaction_actions_id == 5 || $latestTransaction->transaction_actions_id == 22){
+                            $add_atm = '<a href="#" class="btn btn-success addAtmTransaction me-2 me-2"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                title="Add ATM"
+                                            data-id="' . $row->id . '">
+                                            <i class="fas fa-credit-card"></i>
+                                        </a>';
+                        } else {
+                            $add_atm = '';
                         }
                     }
                     else {
@@ -165,16 +172,9 @@ class AtmBranchOfficeController extends Controller
                                     </button>';
                     }
 
-                    $action .= '<a href="#" class="btn btn-success addAtmTransaction me-2 me-2"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        title="Add ATM"
-                                    data-id="' . $row->id . '">
-                                    <i class="fas fa-credit-card"></i>
-                                </a>';
                 }
 
-                return $action; // Return the action content
+                return $action .' '. $add_atm; // Return the action content
             })
             ->addColumn('pending_to', function($row) {
                 $groupName = ''; // Variable to hold the group name
@@ -255,13 +255,11 @@ class AtmBranchOfficeController extends Controller
 
                 if ($pensionDetails) {
                     $PensionNumber = $pensionDetails->pension_number ?? '';
-                    $PensionType = $pensionDetails->pension_account_type ?? '';
-                    $AccountType = $pensionDetails->pension_type ?? '';
+                    $PensionType = $pensionDetails->pension_type ?? '';
 
                     // Combine the parts into the full name
                     $pension_details = "<span class='fw-bold text-primary h6 pension_number_mask_display'>{$PensionNumber}</span><br>
-                                       <span class='fw-bold'>{$PensionType}</span><br>
-                                       <span class='fw-bold text-success'>{$AccountType}</span>";
+                                       <span class='fw-bold text-success'>{$PensionType}</span>";
                 } else {
                     // Fallback if client information is missing
                     $pension_details = 'N/A';
@@ -269,16 +267,31 @@ class AtmBranchOfficeController extends Controller
 
                 return $pension_details;
             })
-            ->addColumn('pin_code_details', function ($row) {
-                if ($row->atm_type == 'ATM') {
-                    if ($row->pin_no != NULL) {
-                        $pin_code_details = '<a href="#" class="text-info fs-4 view_pin_code" data-pin="' . $row->pin_no . '"
-                        data-bank_account_no="' . $row->bank_account_no . '"><i class="fas fa-eye"></i></a>';
+            ->addColumn('pin_code_details', function ($row) use ($userGroup, $userDepartment){
+                // Define the user groups that need access
+                $authorizedUserGroups = ['Developer', 'Admin', 'Everfirst Admin',
+                    'Collection Receiving Clerk', 'Collection Head',
+                    'Collection Staff', 'Collection Staff / Releasing',
+                    'Collection Custodian', 'Collection Supervisor', 'Checker'];
+
+                if (in_array($userGroup, $authorizedUserGroups) || $userDepartment == 'Collection') {
+                    if ($row->atm_type == 'ATM') {
+                        if ($row->pin_no != NULL) {
+                            $pin_code_details =
+                                '<a href="#" class="text-info fs-4 view_pin_code"
+                                    data-pin="' . $row->pin_no . '"
+                                    data-transaction_number="' . $row->transaction_number . '"
+                                    data-bank_account_no="' . $row->bank_account_no . '">
+                                    <i class="fas fa-eye"></i>
+                                </a>';
+                        } else {
+                            $pin_code_details = 'No Pin Code';
+                        }
                     } else {
                         $pin_code_details = 'No Pin Code';
                     }
                 } else {
-                    $pin_code_details = 'No Pin Code';
+                    $pin_code_details = '********';
                 }
 
                 return $pin_code_details;
@@ -307,6 +320,7 @@ class AtmBranchOfficeController extends Controller
     {
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
+        $userDepartment = Auth::user()->department;
 
         // Start the query with the necessary relationships
         $query = AtmClientBanks::with('ClientInformation', 'Branch', 'AtmBanksTransaction')
@@ -454,7 +468,36 @@ class AtmBranchOfficeController extends Controller
                 // Prepare the output
                 return $atmTransactionActionName . ' <div class="text-dark"> ' . $groupName .'</div>'; // Combine the group name and action name
             })
-            ->rawColumns(['action','pending_to']) // Render the HTML in the 'action' column
+            ->addColumn('pin_code_details', function ($row) use ($userGroup, $userDepartment){
+                // Define the user groups that need access
+                $authorizedUserGroups = ['Developer', 'Admin', 'Everfirst Admin',
+                    'Collection Receiving Clerk', 'Collection Head',
+                    'Collection Staff', 'Collection Staff / Releasing',
+                    'Collection Custodian', 'Collection Supervisor', 'Checker'];
+
+                if (in_array($userGroup, $authorizedUserGroups) || $userDepartment == 'Collection') {
+                    if ($row->atm_type == 'ATM') {
+                        if ($row->pin_no != NULL) {
+                            $pin_code_details =
+                                '<a href="#" class="text-info fs-4 view_pin_code"
+                                    data-pin="' . $row->pin_no . '"
+                                    data-transaction_number="' . $row->transaction_number . '"
+                                    data-bank_account_no="' . $row->bank_account_no . '">
+                                    <i class="fas fa-eye"></i>
+                                </a>';
+                        } else {
+                            $pin_code_details = 'No Pin Code';
+                        }
+                    } else {
+                        $pin_code_details = 'No Pin Code';
+                    }
+                } else {
+                    $pin_code_details = '********';
+                }
+
+                return $pin_code_details;
+            })
+            ->rawColumns(['action','pending_to','pin_code_details']) // Render the HTML in the 'action' column
             ->make(true);
     }
 
