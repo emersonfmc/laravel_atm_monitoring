@@ -155,7 +155,7 @@ class BranchesSeeder extends Seeder
                         [2,	4,	'MN',	'Malanday',	'Bernard Matthew A. Juson',2, 'Active','2025-02-03 14:53:34'],
                         [2,	3,	'VC',	'Vicas',	    'Oliver C. Balana', 2, 'Active','2025-02-19 14:53:34'],
                         [6,	11,	'LC',	'Lucena',	    'Edizon Dahilig', 2, 'Active','2025-02-19 14:53:34'],
-                        [2,	4,	'CY',	'Caybiga',	    '', 2, 'Active','2025-02-19 14:53:34'],
+                        [2,	4,	'C',	'Caybiga',	    'Mariane V. Pineda', 2, 'Active','2025-02-19 14:53:34'],
                         [2,	4,	'FR',	'Frisco',	    '', 2, 'Active','2025-02-19 14:53:34'],
                         [2,	4,	'MB',	'Mabini',	    '', 2, 'Active','2025-02-19 14:53:34'],
                         [2,	4,	'MN',	'Molino',	    '', 2, 'Active','2025-02-19 14:53:34'],

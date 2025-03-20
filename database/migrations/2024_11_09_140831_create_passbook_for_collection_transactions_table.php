@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('branch_id')->nullable();
             $table->string('request_number')->nullable();
             $table->string('reference_no')->nullable();
+            $table->dateTime('pick_up_date')->nullable();
             $table->string('request_by_employee_id')->nullable();
 
             $table->string('scan_by_employee_id')->nullable();

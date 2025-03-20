@@ -73,12 +73,12 @@ class ClientContoller extends Controller
                 // Add buttons for users in Collection Staff and others
                 if (in_array($userGroup, ['Collection Staff', 'Developer', 'Admin', 'Everfirst Admin'])) {
                     // Show the button to transfer branch transaction and edit information
-                    $action .= '<a href="#" class="text-success fw-bold add_more_atm me-2 mb-2"
+                    $action .= '<a href="#" class="btn btn-success fw-bold add_more_atm"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top"
                                     title="Add More ATM / PB"
                                     data-id="' . $row->id . '">
-                                    <i class="far fa-credit-card fs-5"></i>
+                                    <i class="fas fa-credit-card"></i>
                                  </a>';
                 } else {
                      $action .= '';
@@ -169,7 +169,7 @@ class ClientContoller extends Controller
                     'pension_number' => $pension_number ?? NULL,
                     'branch_id' => $branch_id ?? NULL,
                     'pension_type' => $request->pension_type ?? NULL,
-                    'pension_account_type' => $request->pension_account_type ?? NULL,
+                    'account_type' => $request->account_type ?? NULL,
                     'first_name' => $request->first_name ?? NULL,
                     'middle_name' => $request->middle_name ?? NULL,
                     'last_name' => $request->last_name ?? NULL,
@@ -311,6 +311,97 @@ class ClientContoller extends Controller
         return response()->json(['success' => 'Pension number is valid.'], 200);
     }
 
+    public function addMoreAtm(Request $request)
+    {
+        $information_id  = $request->information_id;
+
+        // Fetch Data From AtmClientBanks
+            $ClientInformation = ClientInformation::findOrFail($information_id);
+
+            $client_information_id = $ClientInformation->id;
+            $branch_id = $ClientInformation->branch_id;
+        // Fetch Data From AtmClientBanks
+
+                $BankAccountNo = str_replace('-', '', $request->atm_number);
+
+                // Validate First Existing Bank Account No Start
+                        $existingAccount = AtmClientBanks::where('bank_account_no', $BankAccountNo)
+                            ->whereNotNull('bank_account_no')
+                            ->first(); // Fetch the first match
+
+                        // If a duplicate is found, return an error response
+                        if ($existingAccount) {
+                            return response()->json([
+                                'status' => 'error',
+                                'message' => "Duplicate ATM / Passbook / Sim Number: {$BankAccountNo},"
+                            ]);
+                        }
+                // Validate First Existing Bank Account No End
+
+                // Create Transaction Number
+                    $BranchGet = Branch::where('id', $branch_id)->first();
+                    $branch_abbreviation = $BranchGet->branch_abbreviation;
+
+                    // Fetch the last transaction number based on the branch_id and branch_code
+                    $lastTransaction = AtmClientBanks::where('branch_id', $branch_id)
+                        ->orderBy('transaction_number', 'desc') // Order by transaction_number in descending order
+                        ->first();
+
+                    if ($lastTransaction) {
+                        $lastPart = substr($lastTransaction->transaction_number, strrpos($lastTransaction->transaction_number, '-') + 1);
+                        $lastadded = (int)$lastPart;
+                    } else {
+                        $lastadded = 0;
+                    }
+
+                    $transactionCounter = $lastadded + 1;
+                    $TransactionNumber = $branch_abbreviation . '-' . date('y') . '-' . str_pad($transactionCounter, 5, '0', STR_PAD_LEFT);
+                // Create Transaction Number
+
+                $expirationDate = $request->expiration_date;
+
+                if ($expirationDate) {
+                    $expirationDate .= '-01';
+                } else {
+                    $expirationDate = null;
+                }
+
+                AtmClientBanks::create([
+                    'client_information_id' => $client_information_id,
+                    'transaction_number' => $TransactionNumber,
+                    'branch_id' => $branch_id ?? NULL,
+                    'atm_type' => $request->atm_type ?? NULL,
+                    'atm_status' => $request->atm_status ?? NULL,
+                    'cash_box_no' => $request->cash_box_no ?? NULL,
+                    'location' => 'Head Office',
+                    'bank_account_no' => $BankAccountNo ?? NULL,
+                    'bank_name' => $request->bank_name ?? NULL,
+                    'pin_no' => $request->pin_code ?? NULL,
+                    'expiration_date' => $expirationDate,
+                    'collection_date' => $request->collection_date ?? NULL,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
+
+                // // Create System Logs used for Auditing of Logs
+                // SystemLogs::create([
+                //     'system' => 'ATM Monitoring',
+                //     'action' => 'Create',
+                //     'title' => 'Create Transaction | Add ATM',
+                //     'description' => $reason .' | '.$TransactionNumber,
+                //     'employee_id' => Auth::user()->employee_id,
+                //     'ip_address' => $request->ip(),
+                //     'created_at' => Carbon::now(),
+                //     'company_id' => Auth::user()->company_id,
+                // ]);
+
+
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Transaction Created successfully!'  // Changed message to reflect update action
+        ]);
+    }
 
 
 

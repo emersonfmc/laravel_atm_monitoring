@@ -170,13 +170,11 @@ class AtmTransactionController extends Controller
 
                 if ($pensionDetails) {
                     $PensionNumber = $pensionDetails->pension_number ?? '';
-                    $PensionType = $pensionDetails->pension_account_type ?? '';
-                    $AccountType = $pensionDetails->pension_type ?? '';
+                    $PensionType = $pensionDetails->pension_type ?? '';
 
                     // Combine the parts into the full name
                     $pension_details = "<span class='fw-bold text-primary h6 pension_number_mask_display'>{$PensionNumber}</span><br>
-                                       <span class='fw-bold'>{$PensionType}</span><br>
-                                       <span class='fw-bold text-success'>{$AccountType}</span>";
+                                       <span class='fw-bold text-success'>{$PensionType}</span>";
                 } else {
                     // Fallback if client information is missing
                     $pension_details = 'N/A';
@@ -1739,13 +1737,11 @@ class AtmTransactionController extends Controller
 
                 if ($pensionDetails) {
                     $PensionNumber = $pensionDetails->pension_number ?? '';
-                    $PensionType = $pensionDetails->pension_account_type ?? '';
-                    $AccountType = $pensionDetails->pension_type ?? '';
+                    $PensionType = $pensionDetails->pension_type ?? '';
 
                     // Combine the parts into the full name
                     $pension_details = "<span class='fw-bold text-primary h6 pension_number_mask_display'>{$PensionNumber}</span><br>
-                                       <span class='fw-bold'>{$PensionType}</span><br>
-                                       <span class='text-success'>{$AccountType}</span>";
+                                       <span class='fw-bold text-success'>{$PensionType}</span>";
                 } else {
                     // Fallback if client information is missing
                     $pension_details = 'N/A';
@@ -1870,13 +1866,11 @@ class AtmTransactionController extends Controller
 
                 if ($pensionDetails) {
                     $PensionNumber = $pensionDetails->pension_number ?? '';
-                    $PensionType = $pensionDetails->pension_account_type ?? '';
-                    $AccountType = $pensionDetails->pension_type ?? '';
+                    $PensionType = $pensionDetails->pension_type ?? '';
 
                     // Combine the parts into the full name
                     $pension_details = "<span class='fw-bold text-primary h6 pension_number_mask_display'>{$PensionNumber}</span><br>
-                                       <span class='fw-bold'>{$PensionType}</span><br>
-                                       <span class='text-success'>{$AccountType}</span>";
+                                       <span class='fw-bold text-success'>{$PensionType}</span>";
                 } else {
                     // Fallback if client information is missing
                     $pension_details = 'N/A';
@@ -1952,9 +1946,7 @@ class AtmTransactionController extends Controller
                         'message' => "Duplicate ATM / Passbook / Sim Number: {$BankAccountNo},"
                     ]);
                 }
-            }
-            else
-            {
+            } else {
                 $expirationDate = $request->expiration_date;
 
                 if ($expirationDate) {
@@ -1969,7 +1961,6 @@ class AtmTransactionController extends Controller
                     'branch_id' => $request->branch_id ?? NULL,
                     'atm_type' => $request->atm_type ?? NULL,
                     'atm_status' => $request->atm_status ?? NULL,
-                    'location' => 'Branch',
                     'bank_account_no' => $BankAccountNo ?? NULL,
                     'bank_name' => $request->bank_name ?? NULL,
                     'pin_no' => $request->pin_code ?? NULL,
@@ -1989,12 +1980,11 @@ class AtmTransactionController extends Controller
                 // Replacement count remains unchanged if replace_status is not 'yes'
 
                 $ClientInformationId = $AtmClientBanks->client_information_id;
-
                 $ClientInformation = ClientInformation::findOrFail($ClientInformationId);
                 $ClientInformation->update([
                     'branch_id' => $request->branch_id ?? NULL,
                     'pension_type' => $request->pension_type ?? NULL,
-                    'pension_account_type' => $request->pension_account_type ?? NULL,
+                    'account_type' => $request->account_type ?? NULL,
                     'first_name' => $request->first_name ?? NULL,
                     'middle_name' => $request->middle_name ?? NULL,
                     'last_name' => $request->last_name ?? NULL,

@@ -17,8 +17,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('branch_id');
             $table->string('pension_number')->nullable();
-            $table->enum('pension_type', ['SSS', 'GSIS'])->nullable();
-            $table->string('pension_account_type')->nullable();
+            $table->string('pension_type')->nullable();
+            $table->enum('account_type', ['SSS', 'GSIS'])->nullable();
             $table->string('first_name')->nullable();
             $table->string('middle_name')->nullable();
             $table->string('last_name')->nullable();
@@ -26,7 +26,6 @@ return new class extends Migration
             $table->date('birth_date')->nullable();
             $table->enum('passbook_for_collection',['yes','no'])->nullable();
             $table->foreign('branch_id')->references('id')->on('branches')->onDelete('cascade')->onUpdate('cascade');
-
             $table->softDeletes();
             $table->timestamps();
         });

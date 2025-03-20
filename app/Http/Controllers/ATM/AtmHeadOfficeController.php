@@ -259,13 +259,11 @@ class AtmHeadOfficeController extends Controller
 
                 if ($pensionDetails) {
                     $PensionNumber = $pensionDetails->pension_number ?? '';
-                    $PensionType = $pensionDetails->pension_account_type ?? '';
-                    $AccountType = $pensionDetails->pension_type ?? '';
+                    $PensionType = $pensionDetails->pension_type ?? '';
 
                     // Combine the parts into the full name
                     $pension_details = "<span class='fw-bold text-primary h6 pension_number_mask_display'>{$PensionNumber}</span><br>
-                                       <span class='fw-bold'>{$PensionType}</span><br>
-                                       <span class='fw-bold text-success'>{$AccountType}</span>";
+                                       <span class='fw-bold text-success'>{$PensionType}</span>";
                 } else {
                     // Fallback if client information is missing
                     $pension_details = 'N/A';

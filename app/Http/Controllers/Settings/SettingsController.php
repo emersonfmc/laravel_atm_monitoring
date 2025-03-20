@@ -275,14 +275,19 @@ class SettingsController extends Controller
     }
 
     public function area_data(){
-       $district = DataArea::with('Company','District')
-            ->latest('updated_at')
-            ->get();
+        $DataArea = DataArea::with('Company','District')
+             ->latest('updated_at')
+             ->get();
 
-        return DataTables::of($district)
-        ->setRowId('id')
-        ->make(true);
+         return DataTables::of($DataArea)
+         ->setRowId('id')
+         ->addColumn('district_details', function($row) {
+             return '<span class="fw-bold text-primary">' . $row->District->district_number . '</span> - <span class="fw-bold">' . $row->District->district_name . '</span>';
+         })
+         ->rawColumns(['district_details']) // Render HTML in both the action and pending_to columns
+         ->make(true);
     }
+
 
     public function areaGet($id){
         $TblArea = DataArea::findOrFail($id);

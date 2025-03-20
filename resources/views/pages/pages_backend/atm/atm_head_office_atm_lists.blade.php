@@ -326,9 +326,9 @@
                                       </div>
 
                                       <div class="form-group mb-2 row align-items-center">
-                                        <label class="col-form-label col-4 fw-bold">ATM / Passbook / Sim No.</label>
+                                        <label class="col-form-label col-4 fw-bold">Card No.</label>
                                         <div class="col-8">
-                                          <input type="text" name="atm_number" class="atm_card_input_mask form-control" placeholder="ATM / Passbook / Sim No." required>
+                                          <input type="text" name="atm_number" class="atm_card_input_mask form-control" placeholder="Card No." required>
                                         </div>
                                       </div>
                                       <div class="form-group mb-2 row align-items-center">
@@ -474,7 +474,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="EditInformationTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
+    <div class="modal fade" id="editInformationTransactionModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="createTransactionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
             <div class="modal-content">
@@ -488,7 +488,9 @@
                         <input type="hidden" name="atm_id" id="edit_atm_id">
                         <div class="form-group">
                             <div id="edit_fullname" class="fw-bold h4"></div>
-                            <span id="edit_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="edit_pension_account_type" class="fw-bold h5"></span>
+                            <span id="edit_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span>
+                            /
+                            <span id="edit_pension_type_display" class="fw-bold h5"></span>
                         </div>
                         <hr>
                         <div class="row">
@@ -505,16 +507,16 @@
                                 </select>
                             </div>
                             <div class="col-3 form-group mb-3">
-                                <label class="fw-bold h6">Pension Type</label>
-                                <select name="pension_type" id="edit_pension_type" class="form-select">
+                                <label class="fw-bold h6">Account Type</label>
+                                <select name="account_type" id="edit_account_type" class="form-select">
                                     <option value="SSS">SSS</option>
                                     <option value="GSIS">GSIS</option>
                                 </select>
                             </div>
                             <div class="col-3 form-group mb-3">
                                 <input type="hidden" id="edit_pension_account_type_value">
-                                <label class="fw-bold h6">Pension Account Type</label>
-                                <select name="pension_account_type" id="edit_pension_account_type_fetch" class="form-select select2">
+                                <label class="fw-bold h6">Pension Type</label>
+                                <select name="pension_type" id="edit_pension_account_type_fetch" class="form-select select2">
                                 </select>
                             </div>
                             <hr>
@@ -722,8 +724,8 @@
                     render: function(data, type, row) {
                         return row.action + ' ' + row.passbook_for_collection; // Concatenate action and passbook_for_collection
                     },
-                    orderable: false,
-                    searchable: false,
+                    orderable: true,
+                    searchable: true,
                 },
                 // Transaction Type and Pending By
                 {
@@ -836,7 +838,7 @@
                         return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span>
                                 ${replacementCountDisplay}<br>
                                 <span>${row.bank_name}</span><br>
-                                <span class="text-primary">${row.collection_date}</span>`;
+                                <span class="fw-bold text-primary">${row.collection_date}</span>`;
 
                     },
                     orderable: true,
@@ -1546,13 +1548,13 @@
             // Transfer to Other Branch
 
             // Edit Transaction
-                $('#EditInformationTransactionModal').on('shown.bs.modal', function () {
-                    $('#edit_branch_id').select2({ dropdownParent: $('#EditInformationTransactionModal'), });
-                    $('#edit_pension_account_type_fetch').select2({ dropdownParent: $('#EditInformationTransactionModal'), });
-                    $('#edit_bank_name').select2({ dropdownParent: $('#EditInformationTransactionModal'), });
+                $('#editInformationTransactionModal').on('shown.bs.modal', function () {
+                    $('#edit_branch_id').select2({ dropdownParent: $('#editInformationTransactionModal'), });
+                    $('#edit_pension_account_type_fetch').select2({ dropdownParent: $('#editInformationTransactionModal'), });
+                    $('#edit_bank_name').select2({ dropdownParent: $('#editInformationTransactionModal'), });
                 });
 
-                $('#edit_pension_type').on('change', function() {
+                $('#edit_account_type').on('change', function() {
                     var selected_pension_types = $(this).val();
 
                     setTimeout(function() {
@@ -1617,6 +1619,7 @@
                                                         +(data.client_information.middle_name ?? '') +' '
                                                         + (data.client_information.suffix ?? ''));
 
+                            $('#edit_pension_type_display').text(data.client_information.pension_type ?? '');
                             $('#edit_branch_id').val(data.branch_id ?? '').trigger('change');
 
                             $('#edit_pension_number_display').text(data.client_information.pension_number ?? '');
@@ -1647,16 +1650,16 @@
 
                             $('#edit_transaction_number').val(data.transaction_number ?? '');
 
-                            $('#edit_pension_type').val(data.client_information.pension_type).trigger('change');
-                            $('#edit_pension_account_type_value').val(data.client_information.pension_account_type);
-                            $('#edit_pension_account_type_fetch').val(data.client_information.pension_account_type).trigger('change');
+                            $('#edit_account_type').val(data.client_information.account_type).trigger('change');
+                            $('#edit_pension_account_type_value').val(data.client_information.pension_type);
+                            $('#edit_pension_account_type_fetch').val(data.client_information.pension_type).trigger('change');
                             $('#edit_first_name').val(data.client_information.first_name ?? '');
                             $('#edit_middle_name').val(data.client_information.middle_name ?? '');
                             $('#edit_last_name').val(data.client_information.last_name ?? '');
                             $('#edit_suffix').val(data.client_information.suffix ?? '').trigger('change');
                             $('#edit_birth_date').val(data.client_information.birth_date ?? '');
 
-                            $('#EditInformationTransactionModal').modal('show');
+                            $('#editInformationTransactionModal').modal('show');
                         },
                         error: function(xhr, status, error) {
                             console.error("An error occurred: " + error);
@@ -1665,7 +1668,7 @@
                 });
 
                 function EditClientTransactionModal() {
-                    $('#EditInformationTransactionModal').modal('hide');
+                    $('#editInformationTransactionModal').modal('hide');
                     $('#FetchingDatatable tbody').empty();
                 }
 

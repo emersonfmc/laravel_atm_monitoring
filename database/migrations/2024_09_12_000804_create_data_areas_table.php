@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('area_no')->nullable();
             $table->string('area_supervisor')->nullable();
+            $table->string('email')->nullable();
             $table->unsignedBigInteger('district_id')->nullable();
             $table->unsignedBigInteger('company_id')->nullable();
             $table->foreign('district_id')->references('id')->on('data_districts')->onDelete('restrict')->onUpdate('cascade');

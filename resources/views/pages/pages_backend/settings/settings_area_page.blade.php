@@ -39,8 +39,8 @@
                                 <tr>
                                     <th>Sl</th>
                                     <th>Area No.</th>
-                                    <th>Area Name</th>
-                                    <th>District</th>
+                                    <th>Area Supervisor</th>
+                                    <th>District Manager</th>
                                     {{-- <th>Email</th> --}}
                                     <th>Created Date</th>
                                     <th>Action</th>
@@ -58,7 +58,7 @@
         </div> <!-- end col -->
     </div> <!-- end row -->
 
-    <div class="modal fade" id="createAreaModal" data-bs-backdrop="static" tabindex="-1" role="dialog"district_id
+    <div class="modal fade" id="createAreaModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="createAreaModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -102,7 +102,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="updateAreaModal" data-bs-backdrop="static" tabindex="-1" role="dialog"update_district_id
+    <div class="modal fade" id="updateAreaModal" data-bs-backdrop="static" tabindex="-1" role="dialog"
         aria-labelledby="updateAreaModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -191,19 +191,19 @@
                     searchable: true,
                 },
                 {
-                    data: 'area_supervisor',
-                    name: 'area_supervisor',
+                    data: null,
                     render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6">' + data + '</span>';
+                        return `<span class="fw-bold h6">${row.area_supervisor}</span><br>
+                                <span class="text-primary">${row.email}</span>`;
                     },
                     orderable: true,
                     searchable: true,
                 },
+
                 {
-                    data: 'district_id',
-                    name: 'district.district_name',
+                    data: null,
                     render: function(data, type, row, meta) {
-                        return row.district ? '<span>' + row.district.district_name + '</span>' : ''; // Check if company exists
+                        return `<span class="fw-bold h6">${row.district_details}</span>`;
                     },
                     orderable: true,
                     searchable: true,

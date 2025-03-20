@@ -78,7 +78,7 @@
                                     <th>Clients</th>
                                     <th>Pension No. / Type</th>
                                     <th>Transaction Number</th>
-                                    <th>ATM / Passbook / Simcard</th>
+                                    <th>Card No.</th>
                                     <th>Bank</th>
                                     <th>PIN Code</th>
                                     <th>Type</th>
@@ -139,7 +139,7 @@
                             <div class="col-md-3">
                                 <div class="form-group mb-3">
                                     <label class="fw-bold h6">Pension Number Type</label>
-                                    <select name="pension_type" id="pension_type" class="form-select" required>
+                                    <select name="account_type" id="pension_type" class="form-select" required>
                                         <option value="" selected disabled>Pension Number Type</option>
                                         <option value="SSS">SSS</option>
                                         <option value="GSIS">GSIS</option>
@@ -150,7 +150,7 @@
                             <div class="col-md-3">
                                 <div class="form-group mb-3">
                                     <label class="fw-bold h6">Pension Account Type</label>
-                                    <select name="pension_account_type" id="pension_account_type" class="form-select select2" required disabled>
+                                    <select name="pension_type" id="pension_account_type" class="form-select select2" required disabled>
                                         <option value="" selected disabled>Pension Account Type</option>
                                     </select>
                                 </div>
@@ -391,6 +391,130 @@
         </div>
     </div>
 
+    <div class="modal fade" id="addAtmInformationModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-keyboard="false">
+        <div class="modal-dialog" style="max-width: 60%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold text-uppercase" id="exampleModalLabel">Add ATM</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('add.more.atm') }}" method="POST" id="addAtmValidationForm">
+                    @csrf
+                    <div class="modal-body">
+                        <input type="text" name="information_id" id="add_more_information_id">
+
+                        <div class="row">
+                            <div class="col-8 text-start">
+                                <div class="form-group mb-3">
+                                    <div class="fw-bold h4" id="add_more_fullname"></div>
+                                    <span class="fw-bold h5 text-primary ms-4" id="add_more_pension_number"></span> /
+                                    <span class="fw-bold h5" id="add_more_pension_type"> /
+                                    <span class="fw-bold h5" id="add_more_account_type">
+                                </div>
+                            </div>
+                            <div class="col-4 text-end">
+                                <div class="form-group mb-3">
+                                    <label class="fw-bold h6">Date Created</label>
+                                    <div class="fw-bold h6 text-primary" id="add_more_created_at"></div>
+                                </div>
+                            </div>
+                            <hr>
+
+                            <div class="form-group mb-3 col-3">
+                                <label class="fw-bold h6">Birth Date</label>
+                                <input type="text" class="form-control" id="add_more_birth_date" readonly>
+                            </div>
+
+                            <div class="form-group mb-3 col-3">
+                                <label class="fw-bold h6">Branch</label>
+                                <input type="text" class="form-control" id="add_more_branch_location" readonly>
+                            </div>
+
+                            <div class="form-group mb-3 col-3">
+                                <label class="fw-bold h6">Collection Date</label>
+                                <select name="collection_date" id="collection_date" class="form-select" required>
+                                    <option value="" selected disabled>Collection Date</option>
+                                    @foreach ($DataCollectionDates as $DataCollectionDate)
+                                        <option value="{{ $DataCollectionDate->collection_date }}">{{ $DataCollectionDate->collection_date }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row atm-details mt-2">
+                            <hr>
+                            <label class="fw-bold h6 text-center mb-3 text-primary">
+                                ATM / Passsbook / Simcard Details
+                            </label>
+
+                            <hr>
+                            <div class="col-md-6">
+                                <div class="form-group mb-2 row align-items-center">
+                                    <label class="col-form-label col-4 fw-bold">Type</label>
+                                    <div class="col-sm-5">
+                                        <select name="atm_type" id="atm_type_add_atm" class="form-select" required>
+                                        <option value="" selected disabled>Type</option>
+                                        <option value="ATM">ATM</option>
+                                        <option value="Passbook">Passbook</option>
+                                        <option value="Sim Card">Sim Card</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <select name="atm_status" id="atm_status_add_atm" class="form-select" required>
+                                        <option value="">ATM Status</option>
+                                        <option value="new" selected>New</option>
+                                        <option value="old">Old</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-2 row align-items-center">
+                                    <label class="col-form-label col-4 fw-bold">Card No.</label>
+                                    <div class="col-8">
+                                        <input type="text" name="atm_number" class="atm_card_input_mask form-control" placeholder="Card No." required>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-2 row align-items-center">
+                                    <label class="font-size col-form-label col-4 fw-bold">Banks</label>
+                                    <div class="col-8">
+                                        <div class="form-group">
+                                            <select name="bank_name" id="add_atm_bank_name" class="form-select select2" required>
+                                                <option value="" selected disabled>Banks</option>
+                                                @foreach ($DataBankLists as $bank)
+                                                        <option value="{{ $bank->bank_name }}">{{ $bank->bank_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-2 row align-items-center">
+                                    <label class="col-form-label col-4 fw-bold">Pin Code</label>
+                                    <div class="col-5">
+                                        <input type="number" name="pin_code" class="form-control" placeholder="PIN Code">
+                                    </div>
+                                    <div class="col-3">
+                                        <input type="number" name="cash_box_no" class="form-control" placeholder="Cash Box" min="0" max="100">
+                                    </div>
+                                </div>
+                                <div class="form-group mb-2 row align-items-center">
+                                    <label class="col-form-label col-4 fw-bold">Expiration Date</label>
+                                    <div class="col-8">
+                                        <input type="month" name="expiration_date" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                        <button type="submit" class="btn btn-success">Add ATM / PB</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         $(document).ready(function () {
             var FetchingDatatableBody = $('#FetchingDatatable tbody');
@@ -410,9 +534,9 @@
                     name: 'action',
                     render: function(data, type, row) {
                         return `
-                            <a href="#" class="text-info viewBtn me-1" data-id="${row.id}"
+                            <a href="#" class="btn btn-info view_btn" data-id="${row.id}"
                                 data-bs-toggle="tooltip" data-bs-placement="top" title="View ">
-                                <i class="fas fa-eye me-2 fs-5"></i>
+                                <i class="fas fa-eye"></i>
                             </a>
 
                             <span>${row.action ?? ''}</span>`;
@@ -447,8 +571,7 @@
                     name: 'pension_number', // Ensure it matches the database column
                     render: function(data, type, row, meta) {
                         return `<span class="fw-bold text-primary h6 pension_number_mask_display">${row.pension_number}</span><br>
-                                <span class="fw-bold">${row.pension_type}</span><br>
-                                <span class="fw-bold text-success">${row.pension_account_type}</span>`;
+                                <span class="fw-bold text-success">${row.pension_type}</span>`;
                     },
                     orderable: true,
                     searchable: true,
@@ -597,7 +720,7 @@
                 }
             });
 
-            $('#FetchingDatatable').on('click', '.viewBtn', function(e) {
+            $('#FetchingDatatable').on('click', '.view_btn', function(e) {
                 e.preventDefault();
                 var itemID = $(this).data('id');
 
@@ -660,6 +783,174 @@
                 });
             });
 
+            // Add More ATM / PB Transaction
+                $('#addAtmInformationModal').on('shown.bs.modal', function () {
+                    $('#add_atm_bank_name').select2({ dropdownParent: $('#addAtmInformationModal'), });
+                });
+
+                $('#FetchingDatatable').on('click', '.add_more_atm', function(e) {
+                    e.preventDefault();
+                    var itemID = $(this).data('id');
+
+                    var url = "/clients/get/" + itemID;
+
+                    $.get(url, function(data) {
+                        $('#add_more_information_id').val(data.id);
+                        $('#item_id').val(data.id);
+                        $('#userTypeSelectUpdate').val(data.user_types).trigger('change');
+
+                        // Format birth_date and created_at
+                        let formattedBirthDate = data.birth_date ? new Date(data.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+                        let formattedCreatedAt = data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+
+                        // Display formatted dates or blank if not valid
+                        $('#add_more_birth_date').val(formattedBirthDate);
+                        $('#add_more_created_at').text(formattedCreatedAt);
+                        $('#add_more_fullname').text(`${data.last_name} ${data.first_name} ${data.middle_name ?? ''} ${data.suffix ?? ''}`.trim());
+                        $('#add_more_pension_number').text(data.pension_number ?? '');
+                        $('#add_more_pension_number').inputmask("99-9999999-99");
+
+                        $('#add_more_pension_type').text(data.pension_type ?? '');
+                        $('#add_more_account_type').text(data.account_type ?? '');
+                        $('#add_more_branch_location').val(data.branch.branch_location ?? '');
+
+                        $('#addAtmInformationModal').modal('show');
+                    });
+                });
+
+                $('#addAtmValidationForm').validate({
+                    rules: {
+                        atm_type: {
+                            required: true
+                        },
+                        pin_code: {
+                            required: function (element) {
+                                return $('#atm_type_add_atm').val() === 'ATM'; // Pin code required only if ATM type is 'ATM'
+                            }
+                        }
+                    },
+                    messages: {
+                        atm_type: {
+                            required: "ATM Type is required"  // Custom error message for existing ATM numbers
+                        }
+                    },
+                    errorElement: 'span',
+                    errorPlacement: function(error, element) {
+                        error.addClass('invalid-feedback');
+                        element.closest('.form-group').append(error);
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element, errorClass, validClass) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    submitHandler: function(form) {
+                        var hasRows = FetchingDatatableBody.children('tr').length > 0;
+                        if (hasRows) {
+                            Swal.fire({
+                                title: 'Confirmation',
+                                text: 'Are you sure you want to save this?',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonColor: "#007BFF",
+                                cancelButtonColor: "#6C757D",
+                                confirmButtonText: "Yes, Save it!"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    const currentPage = dataTable.table.page();
+                                    $.ajax({
+                                        url: form.action,
+                                        type: form.method,
+                                        data: $(form).serialize(),
+                                        success: function(response) {
+
+                                            if (typeof response === 'string') {
+                                                var res = JSON.parse(response);
+                                            } else {
+                                                var res = response; // If it's already an object
+                                            }
+
+                                            if (res.status === 'success') {
+                                                CloseAtmInformationModal();
+
+                                                Swal.fire({
+                                                    title: 'Successfully Added!',
+                                                    text: 'ATM / PB is successfully added!',
+                                                    icon: 'success',
+                                                    showCancelButton: false,
+                                                    showConfirmButton: true,
+                                                    confirmButtonText: 'OK',
+                                                    preConfirm: () => {
+                                                        return new Promise(( resolve
+                                                        ) => {
+                                                            Swal.fire({
+                                                                title: 'Please Wait...',
+                                                                allowOutsideClick: false,
+                                                                allowEscapeKey: false,
+                                                                showConfirmButton: false,
+                                                                showCancelButton: false,
+                                                                didOpen: () => {
+                                                                    Swal.showLoading();
+                                                                    // here the reload of datatable
+                                                                    dataTable.table.ajax.reload( () =>
+                                                                    {
+                                                                        Swal.close();
+                                                                        $(form)[0].reset();
+                                                                        dataTable.table.page(currentPage).draw( false );
+                                                                    },
+                                                                    false );
+                                                                }
+                                                            })
+                                                        });
+                                                    }
+                                                });
+                                            } else if (res.status === 'error') {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: res.message,
+                                                    icon: 'error',
+                                                });
+                                            } else {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: 'Error Occurred Please Try Again',
+                                                    icon: 'error',
+                                                });
+                                            }
+                                        },
+                                        error: function(xhr, status, error) {
+                                            var errorMessage =
+                                                'An error occurred. Please try again later.';
+                                            if (xhr.responseJSON && xhr.responseJSON
+                                                .error) {
+                                                errorMessage = xhr.responseJSON.error;
+                                            }
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: errorMessage,
+                                                icon: 'error',
+                                            });
+                                        }
+                                    })
+                                }
+                            })
+                        } else {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Empty Record!',
+                                text: 'Table is empty, add row to proceed!',
+                            });
+                        }
+                    }
+                });
+
+                function CloseAtmInformationModal() {
+                    $('#AddAtmInformationModal').modal('hide');
+                    $('#FetchingDatatable tbody').empty();
+                }
+            // Add More ATM / PB Transaction
+
             $(document).on('click', '.view_pin_code', function(e) {
                 e.preventDefault(); // Prevent the default anchor behavior
 
@@ -689,197 +980,192 @@
                 });
             });
 
-            $('#createValidateForm').validate({
-                rules: {
-                    'atm_type[]': {
-                        required: true
-                    },
-                    'atm_number[]': {
-                        required: true,
-                    },
-                    'atm_balance[]': {
-                        required: true
-                    },
-                    'bank_name[]': {
-                        required: true
-                    },
-                    'pin_code[]': {
-                        required: {
-                            depends: function(element) {
-                                // Check if the closest parent div .atm-details contains the value 'ATM' in the select
-                                return $(element).closest('.atm-details').find('select[name="atm_type[]"]').val() === 'ATM';
-                            }
+            // Create Client
+                $('#createClientModal').on('shown.bs.modal', function () {
+                    $('#branch_id').select2({ dropdownParent: $('#createClientModal'), });
+                    $('#pension_account_type').select2({  dropdownParent: $('#createClientModal') });
+                    $('#bank_id').select2({  dropdownParent: $('#createClientModal') });
+                });
+
+                $('#createValidateForm').validate({
+                    rules: {
+                        'atm_type[]': {
+                            required: true
                         },
-                        minlength: 4,
-                        maxlength: 8,
-                        digits: true
-                    }
-                },
-                messages: {
-                    'atm_number[]': {
-                        required: "ATM number is required",
-                        remote: "ATM number already exists"  // Custom error message for existing ATM numbers
+                        'atm_number[]': {
+                            required: true,
+                        },
+                        'atm_balance[]': {
+                            required: true
+                        },
+                        'bank_name[]': {
+                            required: true
+                        },
+                        'pin_code[]': {
+                            required: {
+                                depends: function(element) {
+                                    // Check if the closest parent div .atm-details contains the value 'ATM' in the select
+                                    return $(element).closest('.atm-details').find('select[name="atm_type[]"]').val() === 'ATM';
+                                }
+                            },
+                            minlength: 4,
+                            maxlength: 8,
+                            digits: true
+                        }
                     },
-                    'pin_code[]': {
-                        required: "PIN code is required when ATM is selected.",
-                        minlength: "Please enter at least 4 digits",
-                        maxlength: "Please enter no more than 8 digits",
-                        digits: "Only numbers are allowed"
-                    }
-                },
-                errorElement: 'span',
-                errorPlacement: function(error, element) {
-                    error.addClass('invalid-feedback');
-                    element.closest('.form-group').append(error);
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).removeClass('is-invalid');
-                },
-                submitHandler: function(form) {
-                    var hasRows = FetchingDatatableBody.children('tr').length > 0;
-                    if (hasRows) {
-                        Swal.fire({
-                            title: 'Confirmation',
-                            text: 'Are you sure you want to save this?',
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonColor: "#007BFF",
-                            cancelButtonColor: "#6C757D",
-                            confirmButtonText: "Yes, Save it!"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                const currentPage = dataTable.table.page();
-                                $.ajax({
-                                    url: form.action,
-                                    type: form.method,
-                                    data: $(form).serialize(),
-                                    success: function(response) {
+                    messages: {
+                        'atm_number[]': {
+                            required: "ATM number is required",
+                            remote: "ATM number already exists"  // Custom error message for existing ATM numbers
+                        },
+                        'pin_code[]': {
+                            required: "PIN code is required when ATM is selected.",
+                            minlength: "Please enter at least 4 digits",
+                            maxlength: "Please enter no more than 8 digits",
+                            digits: "Only numbers are allowed"
+                        }
+                    },
+                    errorElement: 'span',
+                    errorPlacement: function(error, element) {
+                        error.addClass('invalid-feedback');
+                        element.closest('.form-group').append(error);
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element, errorClass, validClass) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    submitHandler: function(form) {
+                        var hasRows = FetchingDatatableBody.children('tr').length > 0;
+                        if (hasRows) {
+                            Swal.fire({
+                                title: 'Confirmation',
+                                text: 'Are you sure you want to save this?',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonColor: "#007BFF",
+                                cancelButtonColor: "#6C757D",
+                                confirmButtonText: "Yes, Save it!"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    const currentPage = dataTable.table.page();
+                                    $.ajax({
+                                        url: form.action,
+                                        type: form.method,
+                                        data: $(form).serialize(),
+                                        success: function(response) {
 
-                                        if (typeof response === 'string') {
-                                            var res = JSON.parse(response);
-                                        } else {
-                                            var res = response; // If it's already an object
-                                        }
+                                            if (typeof response === 'string') {
+                                                var res = JSON.parse(response);
+                                            } else {
+                                                var res = response; // If it's already an object
+                                            }
 
-                                        if (res.status === 'success')
-                                        {
-                                            closeCreateClientModal();
-                                            Swal.fire({
-                                                title: 'Successfully Added!',
-                                                text: 'Branch is successfully added!',
-                                                icon: 'success',
-                                                showCancelButton: false,
-                                                showConfirmButton: true,
-                                                confirmButtonText: 'OK',
-                                                preConfirm: () => {
-                                                    return new Promise(( resolve
-                                                    ) => {
-                                                        Swal.fire({
-                                                            title: 'Please Wait...',
-                                                            allowOutsideClick: false,
-                                                            allowEscapeKey: false,
-                                                            showConfirmButton: false,
-                                                            showCancelButton: false,
-                                                            didOpen: () => {
-                                                                Swal.showLoading();
-                                                                // here the reload of datatable
-                                                                dataTable.table.ajax.reload( () =>
-                                                                {
-                                                                    Swal.close();
-                                                                    $(form)[0].reset();
-                                                                    dataTable.table.page(currentPage).draw( false );
-                                                                },
-                                                                false );
-                                                            }
-                                                        })
-                                                    });
-                                                }
-                                            });
-                                        }
-                                        else if (res.status === 'error')
-                                        {
+                                            if (res.status === 'success') {
+                                                closeCreateClientModal();
+                                                Swal.fire({
+                                                    title: 'Successfully Added!',
+                                                    text: 'Client is successfully added!',
+                                                    icon: 'success',
+                                                    showCancelButton: false,
+                                                    showConfirmButton: true,
+                                                    confirmButtonText: 'OK',
+                                                    preConfirm: () => {
+                                                        return new Promise(( resolve
+                                                        ) => {
+                                                            Swal.fire({
+                                                                title: 'Please Wait...',
+                                                                allowOutsideClick: false,
+                                                                allowEscapeKey: false,
+                                                                showConfirmButton: false,
+                                                                showCancelButton: false,
+                                                                didOpen: () => {
+                                                                    Swal.showLoading();
+                                                                    // here the reload of datatable
+                                                                    dataTable.table.ajax.reload( () =>
+                                                                    {
+                                                                        Swal.close();
+                                                                        $(form)[0].reset();
+                                                                        dataTable.table.page(currentPage).draw( false );
+                                                                    },
+                                                                    false );
+                                                                }
+                                                            })
+                                                        });
+                                                    }
+                                                });
+                                            } else if (res.status === 'error') {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: res.message,
+                                                    icon: 'error',
+                                                });
+                                            } else {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: 'Error Occurred Please Try Again',
+                                                    icon: 'error',
+                                                });
+                                            }
+                                        },
+                                        error: function(xhr, status, error) {
+                                            var errorMessage =
+                                                'An error occurred. Please try again later.';
+                                            if (xhr.responseJSON && xhr.responseJSON
+                                                .error) {
+                                                errorMessage = xhr.responseJSON.error;
+                                            }
                                             Swal.fire({
                                                 title: 'Error!',
-                                                text: res.message,
+                                                text: errorMessage,
                                                 icon: 'error',
                                             });
                                         }
-                                        else
-                                        {
-                                            Swal.fire({
-                                                title: 'Error!',
-                                                text: 'Error Occurred Please Try Again',
-                                                icon: 'error',
-                                            });
-                                        }
-                                    },
-                                    error: function(xhr, status, error) {
-                                        var errorMessage =
-                                            'An error occurred. Please try again later.';
-                                        if (xhr.responseJSON && xhr.responseJSON
-                                            .error) {
-                                            errorMessage = xhr.responseJSON.error;
-                                        }
-                                        Swal.fire({
-                                            title: 'Error!',
-                                            text: errorMessage,
-                                            icon: 'error',
-                                        });
-                                    }
-                                })
-                            }
-                        })
-                    } else {
-
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Empty Record!',
-                            text: 'Table is empty, add row to proceed!',
-                        });
-                    }
-                }
-            });
-
-            $('#pension_type').on('change', function() {
-                var selected_pension_types = $(this).val();
-
-                // Make the AJAX GET request
-                $.ajax({
-                    url: '/pension/types/fetch',
-                    type: 'GET',
-                    data: {
-                        selected_pension_types: selected_pension_types
-                    },
-                    success: function(response) {
-                        var options = '<option value="" selected disabled>Pension Types</option>';
-                        $.each(response, function(index, item) {
-                            options += `<option value="${item.pension_name}">${item.pension_name}</option>`;
-                        });
-                        $('#pension_account_type').prop('disabled', false); // Remove disabled attribute
-                        $('#pension_account_type').html(options); // Set the dropdown options
-                    },
-                    error: function(xhr, status, error) {
-                        // Handle any errors
-                        console.error('AJAX Error:', status, error);
+                                    })
+                                }
+                            })
+                        } else {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Empty Record!',
+                                text: 'Table is empty, add row to proceed!',
+                            });
+                        }
                     }
                 });
-            });
 
-            $('#createClientModal').on('shown.bs.modal', function () {
-                $('#branch_id').select2({ dropdownParent: $('#createClientModal'), });
-                $('#pension_account_type').select2({  dropdownParent: $('#createClientModal') });
-                $('#bank_id').select2({  dropdownParent: $('#createClientModal') });
-            });
+                $('#pension_type').on('change', function() {
+                    var selected_pension_types = $(this).val();
 
-            function closeCreateClientModal() {
-                $('#createClientModal').modal('hide');
-                $('#FetchingDatatable tbody').empty();
-            }
+                    // Make the AJAX GET request
+                    $.ajax({
+                        url: '/pension/types/fetch',
+                        type: 'GET',
+                        data: {
+                            selected_pension_types: selected_pension_types
+                        },
+                        success: function(response) {
+                            var options = '<option value="" selected disabled>Pension Types</option>';
+                            $.each(response, function(index, item) {
+                                options += `<option value="${item.pension_name}">${item.pension_name}</option>`;
+                            });
+                            $('#pension_account_type').prop('disabled', false); // Remove disabled attribute
+                            $('#pension_account_type').html(options); // Set the dropdown options
+                        },
+                        error: function(xhr, status, error) {
+                            // Handle any errors
+                            console.error('AJAX Error:', status, error);
+                        }
+                    });
+                });
+
+                function closeCreateClientModal() {
+                    $('#createClientModal').modal('hide');
+                    $('#FetchingDatatable tbody').empty();
+                }
+            // Create Client
         });
-
 
         $(document).ready(function () {
             var maxRows = 5; // Maximum number of rows
@@ -1056,25 +1342,33 @@
                                 }).then((result) => {
                                     if (result.isConfirmed) {
                                         // Prompt the user with Yes/No confirmation
-                                        Swal.fire({
-                                            title: 'Proceed to create client?',
-                                            text: 'Do you want to create a new client?',
-                                            icon: 'question',
-                                            showCancelButton: true,
-                                            confirmButtonText: 'Yes',
-                                            cancelButtonText: 'No'
-                                        }).then((confirmation) => {
-                                            if (confirmation.isConfirmed) {
-                                                // Display the "Create Client" button
-                                                $('#AddClientButton').show();
+                                                                           // Display the "Create Client" button
+                                            $('#AddClientButton').show();
 
-                                                // Set the validated pension number in the modal's input field
-                                                $('#pension_number_get').val($('#pension_number').val());
+                                            // Set the validated pension number in the modal's input field
+                                            $('#pension_number_get').val($('#pension_number').val());
 
-                                                // Open the create client modal
-                                                $('#createClientModal').modal('show');
-                                            }
-                                        });
+                                            // Open the create client modal
+                                            $('#createClientModal').modal('show');
+                                        // Swal.fire({
+                                        //     title: 'Proceed to create client?',
+                                        //     text: 'Do you want to create a new client?',
+                                        //     icon: 'question',
+                                        //     showCancelButton: true,
+                                        //     confirmButtonText: 'Yes',
+                                        //     cancelButtonText: 'No'
+                                        // }).then((confirmation) => {
+                                        //     if (confirmation.isConfirmed) {
+                                        //         // Display the "Create Client" button
+                                        //         $('#AddClientButton').show();
+
+                                        //         // Set the validated pension number in the modal's input field
+                                        //         $('#pension_number_get').val($('#pension_number').val());
+
+                                        //         // Open the create client modal
+                                        //         $('#createClientModal').modal('show');
+                                        //     }
+                                        // });
                                     }
                                 });
                             }
@@ -1103,19 +1397,19 @@
         });
 
         // Global Used Script in the Page
-            $(document).ready(function () {
-                $('.balanceCurrency').inputmask({
-                    'alias': 'currency',
-                    allowMinus: false,
-                    'prefix': "₱ ",
-                    max: 999999999999.99,
-                });
-
-                $('.pension_number_mask').inputmask('99-9999999-99', {
-                    placeholder: "",  // Placeholder for the input
-                    removeMaskOnSubmit: true  // Removes the mask when submitting the form
-                });
+        $(document).ready(function () {
+            $('.balanceCurrency').inputmask({
+                'alias': 'currency',
+                allowMinus: false,
+                'prefix': "₱ ",
+                max: 999999999999.99,
             });
+
+            $('.pension_number_mask').inputmask('99-9999999-99', {
+                placeholder: "",  // Placeholder for the input
+                removeMaskOnSubmit: true  // Removes the mask when submitting the form
+            });
+        });
         // Global Used Script in the Page
     </script>
 
