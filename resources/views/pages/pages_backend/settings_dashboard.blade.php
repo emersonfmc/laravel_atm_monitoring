@@ -248,111 +248,111 @@
             setInterval(fetchCounts, 30000); // 5000 milliseconds = 5 seconds
         });
 
-        $(document).ready(function () {
-            const dataTable = new ServerSideDataTable('#FetchingDatatable');
-            var url = '{!! route('settings.system.logs.data') !!}';
+        // $(document).ready(function () {
+        //     const dataTable = new ServerSideDataTable('#FetchingDatatable');
+        //     var url = '{!! route('settings.system.logs.data') !!}';
 
-            const columns = [
-                {
-                    data: 'id',
-                    name: 'id',
-                    render: function(data, type, row, meta) {
-                        return `<span>${data}</span>`;
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    render: function(data, type, row, meta) {
-                        let spanClass = {
-                            'Create': 'bg-primary',
-                            'Update': 'bg-warning',
-                            'Delete': 'bg-danger'
-                        }[row.action] || 'bg-secondary';
+        //     const columns = [
+        //         {
+        //             data: 'id',
+        //             name: 'id',
+        //             render: function(data, type, row, meta) {
+        //                 return `<span>${data}</span>`;
+        //             },
+        //             orderable: true,
+        //             searchable: true,
+        //         },
+        //         {
+        //             data: 'action',
+        //             name: 'action',
+        //             render: function(data, type, row, meta) {
+        //                 let spanClass = {
+        //                     'Create': 'bg-primary',
+        //                     'Update': 'bg-warning',
+        //                     'Delete': 'bg-danger'
+        //                 }[row.action] || 'bg-secondary';
 
-                        return `<span class="badge ${spanClass}">${row.action}</span>`;
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: null,
-                    render: function(data, type, row, meta) {
-                        const maxLength = 50; // Limit description to 50 characters
-                        let truncatedDescription = row.description.length > maxLength
-                            ? row.description.substring(0, maxLength) + '...'
-                            : row.description;
+        //                 return `<span class="badge ${spanClass}">${row.action}</span>`;
+        //             },
+        //             orderable: true,
+        //             searchable: true,
+        //         },
+        //         {
+        //             data: null,
+        //             render: function(data, type, row, meta) {
+        //                 const maxLength = 50; // Limit description to 50 characters
+        //                 let truncatedDescription = row.description.length > maxLength
+        //                     ? row.description.substring(0, maxLength) + '...'
+        //                     : row.description;
 
-                        return `<span class="fw-bold text-primary h6">${row.title}</span><br>
-                                <span class="text-muted">${truncatedDescription}</span>`;
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'employee_id',
-                    name: 'employee.name',
-                    render: function(data, type, row, meta) {
-                        return row.employee ? `<span>${row.employee.name}</span>` : '';
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'differForHumans',
-                    name: 'differForHumans',
-                    render: function(data, type, row, meta) {
-                        return `<span>${data}</span>`;
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'created_at',
-                    name: 'created_at',
-                    render: function(data, type, row) {
-                        return new Date(data).toLocaleDateString('en-US', {
-                            month: 'long',
-                            day: 'numeric',
-                            year: 'numeric'
-                        });
-                    }
-                },
-                {
-                    data: null,
-                    render: function(data, type, row) {
-                        return new Date(row.created_at).toLocaleTimeString('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                            hour12: true
-                        });
-                    },
-                    orderable: true,
-                    searchable: true
-                },
-                {
-                    data: 'ip_address',
-                    name: 'ip_address',
-                    render: function(data, type, row, meta) {
-                        return `<span>${data}</span>`;
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-            ];
+        //                 return `<span class="fw-bold text-primary h6">${row.title}</span><br>
+        //                         <span class="text-muted">${truncatedDescription}</span>`;
+        //             },
+        //             orderable: true,
+        //             searchable: true,
+        //         },
+        //         {
+        //             data: 'employee_id',
+        //             name: 'employee.name',
+        //             render: function(data, type, row, meta) {
+        //                 return row.employee ? `<span>${row.employee.name}</span>` : '';
+        //             },
+        //             orderable: true,
+        //             searchable: true,
+        //         },
+        //         {
+        //             data: 'differForHumans',
+        //             name: 'differForHumans',
+        //             render: function(data, type, row, meta) {
+        //                 return `<span>${data}</span>`;
+        //             },
+        //             orderable: true,
+        //             searchable: true,
+        //         },
+        //         {
+        //             data: 'created_at',
+        //             name: 'created_at',
+        //             render: function(data, type, row) {
+        //                 return new Date(data).toLocaleDateString('en-US', {
+        //                     month: 'long',
+        //                     day: 'numeric',
+        //                     year: 'numeric'
+        //                 });
+        //             }
+        //         },
+        //         {
+        //             data: null,
+        //             render: function(data, type, row) {
+        //                 return new Date(row.created_at).toLocaleTimeString('en-US', {
+        //                     hour: 'numeric',
+        //                     minute: '2-digit',
+        //                     hour12: true
+        //                 });
+        //             },
+        //             orderable: true,
+        //             searchable: true
+        //         },
+        //         {
+        //             data: 'ip_address',
+        //             name: 'ip_address',
+        //             render: function(data, type, row, meta) {
+        //                 return `<span>${data}</span>`;
+        //             },
+        //             orderable: true,
+        //             searchable: true,
+        //         },
+        //     ];
 
-            // Initialize DataTable with initial order by ID in descending order
-            dataTable.initialize(url, columns, {
-                order: [[0, 'desc']] // Assumes the ID column is the first column (index 0)
-            });
+        //     // Initialize DataTable with initial order by ID in descending order
+        //     dataTable.initialize(url, columns, {
+        //         order: [[0, 'desc']] // Assumes the ID column is the first column (index 0)
+        //     });
 
-            // Auto-refresh table every 10 seconds
-            setInterval(function () {
-                $('#FetchingDatatable').DataTable().ajax.reload(null, false); // Retains order
-            }, 10000); // 10 seconds
-        });
+        //     // Auto-refresh table every 10 seconds
+        //     setInterval(function () {
+        //         $('#FetchingDatatable').DataTable().ajax.reload(null, false); // Retains order
+        //     }, 10000); // 10 seconds
+        // });
     </script>
 
 

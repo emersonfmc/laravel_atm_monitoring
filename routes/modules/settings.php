@@ -10,7 +10,9 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'settings'], functio
     Route::controller(SettingsController::class)->group(function () {
         Route::get('/settings_dashboard', 'settings_dashboard')->name('settings.dashboard.page');
         Route::get('/settings/monitoring/dashboard/data', 'settings_monitoring_dashboard_data')->name('settings.monitoring.dashboard.data');
-        Route::get('/settings/system/logs/data', 'settings_system_logs_data')->name('settings.system.logs.data');
+
+        Route::get('system/logs/page', 'settings_system_logs_page')->name('settings.system.logs.page');
+        Route::get('system/logs/data', 'settings_system_logs_data')->name('settings.system.logs.data');
 
 
         Route::get('/districts', 'districts_page')->name('settings.district.page');

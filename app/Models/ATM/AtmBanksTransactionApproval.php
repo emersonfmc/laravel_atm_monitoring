@@ -1,7 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\ATM;
 
+use App\Models\User;
+use App\Models\DataUserGroup;
+use App\Models\DataTransactionAction;
+
+use App\Models\ATM\AtmTransactionApprovalsBalanceLogs;
+use App\Models\ATM\AtmBanksTransaction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

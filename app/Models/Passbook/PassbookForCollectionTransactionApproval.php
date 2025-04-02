@@ -1,6 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Passbook;
+
+use App\Models\DataUserGroup;
+use App\Models\DataTransactionAction;
+use App\Models\User;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;

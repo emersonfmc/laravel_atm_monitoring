@@ -57,8 +57,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/system/announcement/create', 'system_annoucement_create')->name('system.announcement.create');
         Route::post('/system/announcement/update', 'system_annoucement_update')->name('system.announcement.update');
 
-        Route::get('/system/logs/page', 'system_logs_pages')->name('system.logs.pages');
-        Route::get('/system/logs/data', 'system_logs_data')->name('system.logs.data');
+        // Route::get('/system/logs/page', 'system_logs_pages')->name('system.logs.pages');
+        // Route::get('/system/logs/data', 'system_logs_data')->name('system.logs.data');
     });
 });
 
