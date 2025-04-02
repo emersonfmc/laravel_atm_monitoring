@@ -31,11 +31,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(AtmHeadOfficeController::class)->group(function () {
-        Route::get('/HeadOfficePage', 'HeadOfficePage')->name('HeadOfficePage');
+        Route::get('/head-office/page', 'HeadOfficePage')->name('HeadOfficePage');
         Route::get('/HeadOfficeData', 'HeadOfficeData')->name('HeadOfficeData');
         Route::get('/SafekeepPage', 'SafekeepPage')->name('SafekeepPage');
         Route::get('/SafekeepData', 'SafekeepData')->name('SafekeepData');
-        Route::get('/ReleasedPage', 'ReleasedPage')->name('ReleasedPage');
+        Route::get('/released/page', 'ReleasedPage')->name('ReleasedPage');
         Route::get('/ReleasedData', 'ReleasedData')->name('ReleasedData');
         Route::post('/PassbookForCollectionSetup', 'PassbookForCollectionSetup')->name('PassbookForCollectionSetup');
     });
@@ -43,18 +43,21 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(AtmBranchOfficeController::class)->group(function () {
-        Route::get('/BranchOfficePage', 'BranchOfficePage')->name('BranchOfficePage');
+        Route::get('/branch-office/page', 'BranchOfficePage')->name('BranchOfficePage');
         Route::get('/BranchOfficeData', 'BranchOfficeData')->name('BranchOfficeData');
-        Route::get('/CancelledLoanPage', 'CancelledLoanPage')->name('CancelledLoanPage');
+        Route::get('/cancelled-loan/page', 'CancelledLoanPage')->name('CancelledLoanPage');
         Route::get('/CancelledLoanData', 'CancelledLoanData')->name('CancelledLoanData');
     });
 });
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(AtmTransactionController::class)->group(function () {
-        Route::get('/TransactionPage', 'TransactionPage')->name('TransactionPage');
+        Route::get('/transaction/page', 'TransactionPage')->name('TransactionPage');
         Route::get('/TransactionData', 'TransactionData')->name('TransactionData');
         Route::get('/TransactionGet', 'TransactionGet')->name('TransactionGet');
+
+        Route::post('/transaction/pullout/create', 'TransactionPulloutCreate')->name('transaction.pullout.create');
+
         Route::post('/TransactionCreate', 'TransactionCreate')->name('TransactionCreate');
         Route::post('/TransactionAddAtm', 'TransactionAddAtm')->name('TransactionAddAtm');
         Route::post('/TransactionTransferBranch', 'TransactionTransferBranch')->name('TransactionTransferBranch');

@@ -12,7 +12,7 @@
             <div class="card">
                 <div class="card-body">
 
-                    <form action="{{ route('pension.number.validate') }}" method="POST" id="validatePensionNumber" class="d-flex">
+                    <form action="{{ route('clients.data') }}" method="GET" id="validatePensionNumber" class="d-flex">
                         @csrf
                         <div class="form-group">
                             <label class="fw-bold h6">Validate SSS / GSIS : <span class="fs-6 text-danger">( Ex. SSS 00-0000000-0 / GSIS 00-0000000-00 )</span></label>
@@ -76,6 +76,7 @@
                                 <tr>
                                     <th>Action</th>
                                     <th>Clients</th>
+                                    <th>Branch</th>
                                     <th>Pension No. / Type</th>
                                     <th>Transaction Number</th>
                                     <th>Card No.</th>
@@ -545,30 +546,23 @@
                     searchable: false,
                 },
                 {
-                    "data": function(row, type, set) {
-                        const fullName = (row.last_name ? row.last_name : '') + ', ' +
-                                        (row.first_name ? row.first_name : '') + ' ' +
-                                        (row.middle_name ? row.middle_name : '') + ' ' +
-                                        (row.suffix ? row.suffix : '');
-
-                        // Format the created_at field if it exists
-                        const createdAtFormatted = row.created_at ? new Date(row.created_at).toLocaleString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        }) : '';
-
-                        // Check for branch location
-                        const branchLocation = row.branch ? row.branch.branch_location : 'N/A';
-
-                        return `<span class="fw-bold" style="font-size : 14px;">${fullName}</span><br>
-                                <span class="text-primary">${branchLocation}</span><br>
-                                <span style="font-size:12px;">${createdAtFormatted}</span>`;
-                    }
+                    data: 'full_name',
+                    render: function(data, type, row) {
+                        return `<span>${row.full_name ?? ''}</span>`;
+                    },
+                    orderable: true,
+                    searchable: true,
+                },
+                {
+                    data: 'branch_location',
+                    render: function(data, type, row) {
+                        return `<span>${row.branch_location ?? ''}</span>`;
+                    },
+                    orderable: true,
+                    searchable: true,
                 },
                 {
                     data: 'pension_number', // Correct field name
-                    name: 'pension_number', // Ensure it matches the database column
                     render: function(data, type, row, meta) {
                         return `<span class="fw-bold text-primary h6 pension_number_mask_display">${row.pension_number}</span><br>
                                 <span class="fw-bold text-success">${row.pension_type}</span>`;
@@ -577,138 +571,64 @@
                     searchable: true,
                 },
                 {
-                    data: null, // No direct data for ATM sequences; will be created from response
-                    render: function(data, type, row) {
-                        // Check if atm_client_banks exists and is an array
-                        if (data.atm_client_banks && Array.isArray(data.atm_client_banks)) {
-                            // Initialize an empty string for PincODE
-                            let AtmTransactionNumber = '';
-
-                            // Use each to loop through the sequences
-                            $.each(data.atm_client_banks, function(index, rows) {
-                                AtmTransactionNumber += `<span class="fw-bold h6">${rows.transaction_number}</span><br>`;
-                            });
-
-                            return AtmTransactionNumber; // Return the concatenated PIN display
-                        }
-                        return ''; // Return empty string if no bank names
-                    }
+                    data: 'transaction_number', // Correct field name
+                    render: function(data, type, row, meta) {
+                        return `<span>${row.transaction_number}</span>`;
+                    },
+                    orderable: true,
+                    searchable: true,
                 },
                 {
-                    data: null, // No direct data for ATM sequences; will be created from response
-                    render: function(data, type, row) {
-                        // Check if atm_client_banks exists and is an array
-                        if (data.atm_client_banks && Array.isArray(data.atm_client_banks)) {
-                            // Initialize an empty string for bank details
-                            let bankDetails = '';
-
-                            // Use each to loop through the sequences
-                            $.each(data.atm_client_banks, function(index, rows) {
-                                // Always display the bank_account_no
-                                bankDetails += `<span class="fw-bold h6" style="color : #4B9B43;">${rows.bank_account_no}</span>`;
-
-                                // Check if replacement_count is greater than 0
-                                if (rows.replacement_count > 0) {
-                                    bankDetails += ` / <span class="fw-bold h6 text-danger">${rows.replacement_count}</span>`;
-                                }
-
-                                // Add a line break after each entry
-                                bankDetails += `<br>`;
-                            });
-
-                            return bankDetails; // Return the concatenated bank details
-                        }
-                        return ''; // Return empty string if no bank details
-                    }
+                    data: 'bank_account_no', // Correct field name
+                    render: function(data, type, row, meta) {
+                        return `<span>${row.bank_account_no}</span>`;
+                    },
+                    orderable: true,
+                    searchable: true,
                 },
                 {
-                    data: null, // No direct data for ATM sequences; will be created from response
-                    render: function(data, type, row) {
-                        // Check if atm_client_banks exists and is an array
-                        if (data.atm_client_banks && Array.isArray(data.atm_client_banks)) {
-                            // Initialize an empty string for group names
-                            let bankNames = '';
-
-                            // Use each to loop through the sequences
-                            $.each(data.atm_client_banks, function(index, rows) {
-                                bankNames += `<span class="fw-bold h6">${rows.bank_name}</span><br>`;
-                            });
-
-                            return bankNames; // Return the concatenated bank names
-                        }
-                        return ''; // Return empty string if no bank names
-                    }
+                    data: 'bank_name', // Correct field name
+                    render: function(data, type, row, meta) {
+                        return `<span>${row.bank_name}</span>`;
+                    },
+                    orderable: true,
+                    searchable: true,
                 },
                 {
-                    data: null, // No direct data for ATM sequences; will be created from response
-                    render: function(data, type, row) {
-                        // Check if atm_client_banks exists and is an array
-                        if (data.atm_client_banks && Array.isArray(data.atm_client_banks)) {
-                            // Initialize an empty string for PincODE
-                            let PincODE = '';
+                    data: 'pin_code_details', // Correct field name
+                    render: function(data, type, row, meta) {
+                        return `<span>${row.pin_code_details}</span>`;
+                    },
+                    orderable: true,
+                    searchable: true,
+                },
 
-                            // Use each to loop through the sequences
-                            $.each(data.atm_client_banks, function(index, rows) {
-                                PincODE += `<a href="#" class="badge bg-danger view_pin_code"
-                                                data-pin="${rows.pin_no}"
-                                                data-bank_account_no="${rows.bank_account_no}">Encrypted
-                                            </a><br>`;
-                            });
-
-                            return PincODE; // Return the concatenated PIN display
+                {
+                    data: 'atm_type', // Correct field name
+                    render: function(data, type, row, meta) {
+                        // Determine class based on atm_type
+                        if (row.atm_type === 'ATM') {
+                            className = 'fw-bold h6 text-primary';
+                        } else if (row.atm_type === 'Passbook') {
+                            className = 'fw-bold h6 text-danger';
+                        } else if (row.atm_type === 'Sim Card') {
+                            className = 'fw-bold h6 text-info';
+                        } else {
+                            className = 'fw-bold h6'; // Default class if no match
                         }
-                        return ''; // Return empty string if no bank names
-                    }
+                        return `<span class="${className}">${row.atm_type}</span><br>`;
+                    },
+                    orderable: true,
+                    searchable: true,
                 },
                 {
-                    data: null, // No direct data for ATM sequences; will be created from response
-                    render: function(data, type, row) {
-                        // Check if atm_client_banks exists and is an array
-                        if (data.atm_client_banks && Array.isArray(data.atm_client_banks)) {
-                            // Initialize an empty string for bank types
-                            let bankTypes = '';
-
-                            // Use each to loop through the sequences
-                            $.each(data.atm_client_banks, function(index, rows) {
-                                let className;
-
-                                // Determine class based on atm_type
-                                if (rows.atm_type === 'ATM') {
-                                    className = 'fw-bold h6 text-primary';
-                                } else if (rows.atm_type === 'Passbook') {
-                                    className = 'fw-bold h6 text-danger';
-                                } else if (rows.atm_type === 'Sim Card') {
-                                    className = 'fw-bold h6 text-info';
-                                } else {
-                                    className = 'fw-bold h6'; // Default class if no match
-                                }
-
-                                bankTypes += `<span class="${className}">${rows.atm_type}</span><br>`;
-                            });
-
-                            return bankTypes; // Return the concatenated bank names
-                        }
-                        return ''; // Return empty string if no bank names
-                    }
+                    data: 'atm_status', // Correct field name
+                    render: function(data, type, row, meta) {
+                        return `<span>${row.atm_status}</span>`;
+                    },
+                    orderable: true,
+                    searchable: true,
                 },
-                {
-                    data: null, // No direct data for ATM sequences; will be created from response
-                    render: function(data, type, row) {
-                        // Check if atm_client_banks exists and is an array
-                        if (data.atm_client_banks && Array.isArray(data.atm_client_banks)) {
-                            // Initialize an empty string for PincODE
-                            let AtmStatus = '';
-
-                            // Use each to loop through the sequences
-                            $.each(data.atm_client_banks, function(index, rows) {
-                                AtmStatus += `<span class="fw-bold h6">${rows.atm_status}</span><br>`;
-                            });
-
-                            return AtmStatus; // Return the concatenated PIN display
-                        }
-                        return ''; // Return empty string if no bank names
-                    }
-                }
             ];
             dataTable.initialize(url, columns, {
                 drawCallback: function() {
@@ -716,6 +636,63 @@
                     $('.pension_number_mask_display').inputmask('99-9999999-99', {
                         placeholder: "",
                         removeMaskOnSubmit: true
+                    });
+                }
+            });
+
+            $('#validatePensionNumber').validate({
+                rules: {
+                    pension_number: { required: true },  // Rule for pension_number field
+                },
+                errorElement: 'span',
+                errorPlacement: function(error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                },
+                submitHandler: function(form) {
+                    $.ajax({
+                        url: form.action,
+                        type: form.method,
+                        data: $(form).serialize(),
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: 'Success!',
+                                    text: response.success,
+                                    icon: 'success',
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        $('#AddClientButton').show();
+                                        $('#pension_number_get').val($('#pension_number').val());
+                                        $('#createClientModal').modal('show');
+                                    }
+                                });
+                            }
+                            else if (response.error) {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: response.error,
+                                    icon: 'error',
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            var errorMessage = 'An error occurred. Please try again later.';
+                            if (xhr.responseJSON && xhr.responseJSON.error) {
+                                errorMessage = xhr.responseJSON.error;
+                            }
+                            Swal.fire({
+                                title: 'Error!',
+                                text: errorMessage,
+                                icon: 'error',
+                            });
+                        }
                     });
                 }
             });
@@ -1310,92 +1287,6 @@
                 });
             }
         });
-
-        // Validating Existing Pension Number
-        $(document).ready(function () {
-            $('#validatePensionNumber').validate({
-                rules: {
-                    pension_number: { required: true },  // Rule for pension_number field
-                },
-                errorElement: 'span',
-                errorPlacement: function(error, element) {
-                    error.addClass('invalid-feedback');
-                    element.closest('.form-group').append(error);
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).removeClass('is-invalid');
-                },
-                submitHandler: function(form) {
-                    $.ajax({
-                        url: form.action,
-                        type: form.method,
-                        data: $(form).serialize(),
-                        success: function(response) {
-                            if (response.success) {
-                                Swal.fire({
-                                    title: 'Success!',
-                                    text: response.success,
-                                    icon: 'success',
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        // Prompt the user with Yes/No confirmation
-                                                                           // Display the "Create Client" button
-                                            $('#AddClientButton').show();
-
-                                            // Set the validated pension number in the modal's input field
-                                            $('#pension_number_get').val($('#pension_number').val());
-
-                                            // Open the create client modal
-                                            $('#createClientModal').modal('show');
-                                        // Swal.fire({
-                                        //     title: 'Proceed to create client?',
-                                        //     text: 'Do you want to create a new client?',
-                                        //     icon: 'question',
-                                        //     showCancelButton: true,
-                                        //     confirmButtonText: 'Yes',
-                                        //     cancelButtonText: 'No'
-                                        // }).then((confirmation) => {
-                                        //     if (confirmation.isConfirmed) {
-                                        //         // Display the "Create Client" button
-                                        //         $('#AddClientButton').show();
-
-                                        //         // Set the validated pension number in the modal's input field
-                                        //         $('#pension_number_get').val($('#pension_number').val());
-
-                                        //         // Open the create client modal
-                                        //         $('#createClientModal').modal('show');
-                                        //     }
-                                        // });
-                                    }
-                                });
-                            }
-                            else if (response.error) {
-                                Swal.fire({
-                                    title: 'Error!',
-                                    text: response.error,
-                                    icon: 'error',
-                                });
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            var errorMessage = 'An error occurred. Please try again later.';
-                            if (xhr.responseJSON && xhr.responseJSON.error) {
-                                errorMessage = xhr.responseJSON.error;
-                            }
-                            Swal.fire({
-                                title: 'Error!',
-                                text: errorMessage,
-                                icon: 'error',
-                            });
-                        }
-                    });
-                }
-            });
-        });
-
         // Global Used Script in the Page
         $(document).ready(function () {
             $('.balanceCurrency').inputmask({

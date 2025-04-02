@@ -1,6 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Passbook;
+
+use App\Models\User;
+use App\Models\Branch;
+use App\Models\DataTransactionAction;
+use App\Models\ATM\AtmClientBanks;
+use App\Models\Passbook\PassbookForCollectionTransactionApproval;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;

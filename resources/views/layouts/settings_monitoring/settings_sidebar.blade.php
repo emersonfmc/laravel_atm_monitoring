@@ -106,7 +106,7 @@
                 </li>
 
                 <li>
-                    <a href="#}" class="waves-effect">
+                    <a href="#" class="waves-effect">
                         <i class="fas fa-print fs-5 text-success"></i>
                         <span key="sub-documents">Documents</span>
                     </a>
@@ -127,7 +127,7 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('system.logs.pages') }}" class="waves-effect">
+                    <a href="{{ route('settings.system.logs.page') }}" class="waves-effect">
                         <i class="fa fa-history text-info"></i>
                         <span key="sub-maintenance">System Logs</span>
                     </a>

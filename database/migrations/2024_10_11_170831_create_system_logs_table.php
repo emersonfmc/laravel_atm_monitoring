@@ -15,10 +15,11 @@ return new class extends Migration
     {
         Schema::create('system_logs', function (Blueprint $table) {
             $table->id();
-            $table->enum('system',['CFS','ATM Monitoring'])->nullable();
+            $table->enum('module',['ATM / PB Monitoring','ATM Monitoring','PB Monitoring','Document Monitoring','Inventory'])->nullable();
             $table->enum('action',['Create','Update','Delete'])->nullable();
             $table->string('title')->nullable();
             $table->string('description')->nullable();
+            $table->json('description_logs')->nullable();
             $table->string('employee_id')->nullable();
             $table->ipAddress('ip_address');
             $table->unsignedBigInteger('company_id');

@@ -8,15 +8,19 @@ use App\Models\DataArea;
 use App\Models\DataDistrict;
 use App\Models\DataBankLists;
 use App\Models\DataUserGroup;
-use App\Models\AtmClientBanks;
 use App\Models\ClientInformation;
-use App\Models\AtmBanksTransaction;
+
+use App\Models\ATM\AtmBanksTransaction;
+use App\Models\ATM\AtmClientBanks;
+use App\Models\ATM\AtmBanksTransactionApproval;
+
 use App\Http\Controllers\Controller;
+use App\Models\DataTransactionAction;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Models\DataTransactionAction;
+
 use Yajra\DataTables\Facades\DataTables;
-use App\Models\AtmBanksTransactionApproval;
 
 class DashboardController extends Controller
 {
@@ -139,8 +143,6 @@ class DashboardController extends Controller
     {
         $userGroup = Auth::user()->UserGroup->group_name;
         $branch_id = Auth::user()->branch_id;
-
-
 
         // Start building the query with conditional branch, transaction, and status filters
         $query = AtmBanksTransaction::with([

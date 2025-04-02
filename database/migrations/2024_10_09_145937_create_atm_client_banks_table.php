@@ -15,8 +15,14 @@ return new class extends Migration
     {
         Schema::create('atm_client_banks', function (Blueprint $table) {
             $table->id();
+
             $table->unsignedBigInteger('client_information_id')->nullable();
             $table->unsignedBigInteger('branch_id')->nullable();
+
+            $table->string('pension_number')->nullable();
+            $table->string('pension_type')->nullable();
+            $table->enum('account_type', ['SSS', 'GSIS'])->nullable();
+
             $table->string('transaction_number')->nullable();
 
             $table->enum('atm_type',['ATM','Passbook','Sim Card'])->nullable();

@@ -3,18 +3,22 @@
 namespace App\Http\Controllers\ATM;
 
 use Yajra\DataTables\Facades\DataTables;
+
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+
 use App\Http\Controllers\Controller;
+
 use App\Models\Branch;
-use App\Models\SystemLogs;
-use App\Models\AtmClientBanks;
-use App\Models\MaintenancePage;
+use App\Models\System\SystemLogs;
+use App\Models\System\MaintenancePage;
 use App\Models\DataTransactionAction;
 use App\Models\DataTransactionSequence;
-use App\Models\PassbookForCollectionTransaction;
-use App\Models\PassbookForCollectionTransactionApproval;
+
+use App\Models\ATM\AtmClientBanks;
+use App\Models\Passbook\PassbookForCollectionTransaction;
+use App\Models\Passbook\PassbookForCollectionTransactionApproval;
 
 class PassbookCollectionController extends Controller
 {

@@ -83,6 +83,7 @@
                                 <tr>
                                     <th>Action</th>
                                     <th>Transaction / Pending By</th>
+                                    <th>Date Requested</th>
                                     <th>Transaction Number</th>
                                     <th>Client</th>
                                     <th>Pension No. / Type</th>
@@ -545,13 +546,6 @@
 
             const dataTable = new ServerSideDataTable('#FetchingDatatable');
             var url = '{!! route('TransactionData') !!}';
-            const buttons = [{
-                text: 'Delete',
-                action: function(e, dt, node, config) {
-                    // Add your custom button action here
-                    alert('Custom button clicked!');
-                }
-            }];
             const columns = [
                 {
                     data: 'action',
@@ -559,19 +553,31 @@
                     render: function(data, type, row, meta) {
                         return data;
                     },
-                    orderable: true,
-                    searchable: true,
+                    orderable: false,
+                    searchable: false,
                 },
                 {
                     data: 'pending_to',
                     name: 'pending_to',
                     render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6 text-primary">' + data + '</span>';
+                        return data;
                     },
                     orderable: true,
-                    searchable: true,
+                    searchable: true
                 },
-                // Reference No
+                {
+                    data: 'created_at',
+                    name: 'created_at',
+                    render: function(data, type, row) {
+                        return new Date(data).toLocaleDateString('en-US', {
+                            month: 'long',
+                            day: 'numeric',
+                            year: 'numeric'
+                        });
+                    },
+                    orderable: true,
+                    searchable: true
+                },
                 {
                     data: 'transaction_number',
                     name: 'transaction_number',
@@ -579,25 +585,16 @@
                         return '<span class="fw-bold h6">' + data + '</span>';
                     },
                     orderable: true,
-                    searchable: true,
+                    searchable: true
                 },
                 {
-                    data: 'client_banks_id',
-                    name: 'client_banks_id',
+                    data: 'full_name',
+                    name: 'full_name',
                     render: function(data, type, row, meta) {
-                        let branchLocation = '';
-                        let clientName = `${row.full_name}`;
-
-                        // Get branch location
-                        if (row.branch && row.branch.branch_location) {
-                            branchLocation = row.branch.branch_location;
-                        }
-
-                        // Return client name and branch location separated by <br>
-                        return `<span>${clientName}</span><br><span class="text-primary">${branchLocation}</span>`;
+                        return '<span class="fw-bold h6">' + data + '</span>';
                     },
                     orderable: true,
-                    searchable: true,
+                    searchable: true
                 },
                 {
                     data: 'pension_details',
@@ -605,32 +602,18 @@
                     render: function(data, type, row, meta) {
                         return '<span>' + data + '</span>';
                     },
-                    orderable: true,
-                    searchable: true,
+                    orderable: false,
+                    searchable: false
                 },
                 {
-                    data: 'bank_account_no',
-                    name: 'bank_account_no',
+                    data: 'bank_details',
+                    name: 'bank_details',
                     render: function(data, type, row, meta) {
-                        // Initialize the variable for replacement count
-                        let replacementCountDisplay = '';
-                        if (row.atm_client_banks && row.atm_client_banks.bank_name) {
-                            BankName = row.atm_client_banks.bank_name;
-                        }
-                        // Check if replacement_count is greater than 0
-                        if (row.replacement_count > 0) {
-                        replacementCountDisplay = `<span class="text-danger fw-bold h6"> / ${row.replacement_count}</span>`;
-                        }
-
-                        return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span>
-                                ${replacementCountDisplay}<br>
-                                <span>${BankName}</span>`;
-
+                        return '<span>' + data + '</span>';
                     },
                     orderable: true,
-                    searchable: true,
+                    searchable: true
                 },
-
                 {
                     data: 'atm_type',
                     name: 'atm_type',
@@ -662,39 +645,18 @@
                                 <span class="fw-bold h6">${BankStatus}</span>`;
                     },
                     orderable: true,
-                    searchable: true,
+                    searchable: true
                 },
-
                 {
-                    data: 'client_banks_id',
-                    name: '',
-                    render: function(data, type, row) {
-                        let PinCode = '';
-                        let BankAccountNo = '';
-
-                        // Check if atm_type is not "ATM" and pin_no exists
-                        if (row.atm_client_banks && row.atm_client_banks.pin_no && row.atm_type == 'ATM') {
-                            PinCode = row.atm_client_banks.pin_no;
-                            BankAccountNo = row.atm_client_banks.bank_account_no;
-
-                            // Return the eye icon with the data attributes
-                            return `<a href="#" class="text-info fs-4 view_pin_code"
-                                        data-pin="${PinCode}"
-                                        data-bank_account_no="${BankAccountNo}">
-                                        <i class="fas fa-eye"></i>
-                                    </a><br>`;
-                        }
-
-                        // If conditions are not met, return an empty string
-                        return 'No Pin Code Detected';
+                    data: 'pin_code_details',
+                    render: function(data, type, row, meta) {
+                        return '<span>' + data + '</span>';
                     },
                     orderable: true,
                     searchable: true,
                 },
-
                 {
-                    data: 'client_banks_id',
-                    name: '',
+                    data: null,
                     render: function(data, type, row, meta) {
                         let CollectionDate = ''; // Define CollectionDate outside the if block with a default value
 
@@ -707,7 +669,6 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
                     data: 'status',
                     name: 'status',
@@ -738,11 +699,11 @@
                         return `<span class="${badgeClass}">${statusClass}</span>`;
                     },
                     orderable: true,
-                    searchable: true,
+                    searchable: true
                 },
-
             ];
-            dataTable.initialize(url, columns);
+
+            dataTable.initialize(url, columns, { ordering: true, order: [[4, 'desc']] });
 
             // Filtering of Transaction
                 var branchId = @json($branch_id);
