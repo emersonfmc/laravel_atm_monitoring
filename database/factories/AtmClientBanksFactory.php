@@ -2,7 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\AtmClientBanks;
+use App\Models\ATM\AtmClientBanks;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AtmClientBanksFactory extends Factory
@@ -19,17 +20,29 @@ class AtmClientBanksFactory extends Factory
 
         return [
             'client_information_id' => null, // This will be filled in by ClientInformationFactory
+
+            'branch_id' => $this->faker->randomElement([4, 5, 6, 8]), // Select branch_id from 4, 5, 6, or 8
+            'pension_number' => $this->faker->unique()->numerify('###########'), // Generate 11-digit pension number
+            'account_type' => $this->faker->randomElement(['SSS', 'GSIS']), // Select from predefined pension types
+
+            // Select pension_name from data_pension_types_lists where types matches the account_type
+            'pension_type' => function (array $attributes) {
+                return DB::table('data_pension_types_lists')
+                    ->where('types', $attributes['account_type']) // Filter by account_type
+                    ->inRandomOrder()
+                    ->value('pension_name');
+            },
+
             'atm_type' => $atmType,
             'bank_name' => $this->faker->randomElement(['BDO', 'BPI', 'RCBC']),
             'bank_account_no' => $this->faker->unique()->numerify('################'),
             'pin_no' => $this->faker->unique()->numerify('########'),
             'atm_status' => $this->faker->randomElement(['new']),
             'expiration_date' => date('Y-m-d', mktime(0, 0, 0, rand(1, 12), 1, 2030)),
-            'collection_date' => $this->faker->randomElement(['1st', '8th', '16th', '1st and 8th', '1st and 16th']),
+            'collection_date' => DB::table('data_collection_dates')->inRandomOrder()->value('collection_date'),
             'cash_box_no' => null,
             'safekeep_cash_box_no' => null,
             'location' => 'Head Office',
-            'branch_id' => null, // This will be set to the client's branch_id in ClientInformationFactory
             'status' => '1',
             'created_at' => "{$randomYear}-{$randomMonth}-{$randomDay} 00:00:00",
         ];

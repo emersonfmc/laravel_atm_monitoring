@@ -3,26 +3,26 @@
 namespace App\Http\Controllers;
 
 use Log;
-use App\Models\SystemLogs;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use App\Models\SystemAnnouncements;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+
+use App\Models\System\SystemLogs;
+use App\Models\System\SystemAnnouncements;
+use App\Http\Controllers\Controller;
 use Yajra\DataTables\Facades\DataTables;
 
 class SystemController extends Controller
 {
-    public function system_annoucement_pages()
-    {
+    public function system_annoucement_pages(){
         $user = Auth::user();
         $user_types = $user->user_types;
 
         return view('pages.pages_backend.settings.annoucements_pages', compact('user_types'));
     }
 
-    public function system_annoucement_data()
-    {
+    public function system_annoucement_data(){
         $systemAnnouncements = SystemAnnouncements::with('Employee')
             ->orderBy('updated_at', 'desc') // Explicitly set order here
             ->get();
@@ -32,35 +32,30 @@ class SystemController extends Controller
         ->make(true);
     }
 
-    public function system_annoucement_get($id)
-    {
+    public function system_annoucement_get($id){
         $SystemAnnouncements = SystemAnnouncements::with('Employee')->findOrFail($id);
         return response()->json($SystemAnnouncements);
     }
 
-    public function system_annoucement_specific($id)
-    {
+    public function system_annoucement_specific($id){
         $SystemAnnouncements = SystemAnnouncements::with('Employee')->findOrFail($id);
         return view('pages.pages_backend.settings.annoucements_display', compact('SystemAnnouncements'));
     }
 
-    public function system_annoucement_fetch()
-    {
+    public function system_annoucement_fetch(){
         $user = Auth::user();
         $user_types = $user->user_types;
 
         return view('pages.pages_backend.settings.announcements_fetch', compact('user_types'));
     }
 
-    public function system_annoucement_fetch_data()
-    {
+    public function system_annoucement_fetch_data(){
         $SystemAnnouncements = SystemAnnouncements::with('Employee')->get();
         return response()->json($SystemAnnouncements);
     }
 
 
-    public function system_annoucement_create(Request $request)
-    {
+    public function system_annoucement_create(Request $request){
         // Determine the prefix based on the type
         if ($request->type == 'New Features') {
             $FirstID = 'NF';
@@ -117,8 +112,7 @@ class SystemController extends Controller
         ]);
     }
 
-    public function system_annoucement_update(Request $request)
-    {
+    public function system_annoucement_update(Request $request){
         $SystemAnnouncements = SystemAnnouncements::findOrFail($request->item_id);
         $SystemAnnouncements->update([  // Update the instance instead of using the class method
             'type' => $request->type,
@@ -148,8 +142,7 @@ class SystemController extends Controller
         ]);
     }
 
-    public function system_annoucement_display()
-    {
+    public function system_annoucement_display(){
         $systemAnnouncements = SystemAnnouncements::with('employee')
             ->orderBy('date_end', 'asc')
             ->limit(5)
@@ -159,24 +152,20 @@ class SystemController extends Controller
 
     }
 
-    public function system_annoucement_counts()
-    {
+    public function system_annoucement_counts(){
         $today = now()->toDateString();
         $SystemAnnouncements = SystemAnnouncements::where('date_end', '>=', $today)->count();
         return response()->json($SystemAnnouncements);
     }
 
-
-    public function system_logs_pages()
-    {
+    public function system_logs_pages(){
         $user = Auth::user();
         $user_types = $user->user_types;
 
         return view('pages.pages_backend.settings.settings_system_logs', compact('user_types'));
     }
 
-    public function system_logs_data()
-    {
+    public function system_logs_data(){
         $systemLogs = SystemLogs::with('Employee')
             ->orderBy('created_at', 'desc') // Explicitly set order here
             ->get()

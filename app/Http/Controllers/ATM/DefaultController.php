@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers\ATM;
 
+use Illuminate\Http\Request;
+
 use App\Models\User;
 use Mpdf\Mpdf;
 use Mpdf\QrCode\QrCode;
 use Mpdf\QrCode\Output;
-use Illuminate\Http\Request;
-use App\Models\AtmClientBanks;
+
+use App\Models\ATM\AtmClientBanks;
 use App\Models\ClientInformation;
-use App\Http\Controllers\Controller;
 use App\Models\DataPensionTypesLists;
 
+use App\Http\Controllers\Controller;
 class DefaultController extends Controller
 {
     public function PensionTypesFetch(Request $request)
@@ -46,7 +48,7 @@ class DefaultController extends Controller
         // Fetch the ClientInformation along with its AtmClientBanks that have no ongoing transactions
         $ClientInfo = ClientInformation::with(['AtmClientBanks' => function ($query) {
                 $query->whereDoesntHave('AtmBanksTransaction', function ($query) {
-                    $query->where('status', 'ON GOING');
+                    $query->where('status', 'ON GOING')->where('oc_transaction','NO');
                 });
             }, 'Branch'])
             ->where('id', $client_id)

@@ -2,29 +2,31 @@
 
 namespace App\Http\Controllers\Settings;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+
+use App\Models\System\SystemLogs;
+use App\Models\System\MaintenancePage;
+
 use App\Models\User;
 use App\Models\Branch;
 use App\Models\Company;
 use App\Models\DataArea;
-use App\Models\SystemLogs;
 use App\Models\DataDistrict;
-use Illuminate\Http\Request;
 use App\Models\DataBankLists;
 use App\Models\DataUserGroup;
-use Illuminate\Support\Carbon;
 use App\Models\DataDepartments;
-use App\Models\MaintenancePage;
 use App\Models\DataReleaseOption;
 use App\Models\DataCollectionDate;
-use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
-use App\Models\AtmTransactionAction;
-use Illuminate\Support\Facades\Auth;
 
 use App\Models\DataPensionTypesLists;
 use App\Models\DataTransactionAction;
 use App\Models\AtmTransactionSequence;
 use App\Models\DataTransactionSequence;
+
+use App\Http\Controllers\Controller;
 use Yajra\DataTables\Facades\DataTables;
 
 class SettingsController extends Controller
@@ -49,37 +51,47 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function settings_system_logs_data()
-    {
-        // Fetch only 5 records ordered by id in descending order
-        $systemLogs = SystemLogs::with('Employee')
-            ->orderBy('id', 'desc')
-            ->take(5); // Limit to 5 records
+    public function settings_system_logs_page(){
+        return view('pages.pages_backend.settings.settings_system_logs');
+    }
 
-        return DataTables::of($systemLogs)
-            ->setRowId('id')
-            ->addColumn('differForHumans', function ($log) {
+    public function settings_system_logs_data(){
+        $systemLogs = SystemLogs::with('Employee')
+            ->orderBy('id', 'desc') // Explicitly set order here
+            ->get()
+            ->map(function ($log) {
                 $now = Carbon::now();
                 $diffInMinutes = $log->created_at->diffInMinutes($now);
-                $days = intdiv($diffInMinutes, 1440);
+                $days = intdiv($diffInMinutes, 1440); // 1440 minutes in a day
                 $remainingMinutes = $diffInMinutes % 1440;
                 $hours = intdiv($remainingMinutes, 60);
                 $minutes = $remainingMinutes % 60;
 
                 if ($days > 0) {
-                    return $days . ' day' . ($days > 1 ? 's' : '') . ' and ' . $hours . ' hr' . ($hours > 1 ? 's' : '') . ' ago';
+                    $log->differForHumans = $days . ' day' . ($days > 1 ? 's' : '') .
+                        ' and ' . $hours . ' hr' . ($hours > 1 ? 's' : '') . ' ago';
                 } elseif ($hours > 0) {
-                    return $hours . ' hr' . ($hours > 1 ? 's' : '') . ' and ' . $minutes . ' min' . ($minutes > 1 ? 's' : '') . ' ago';
+                    $log->differForHumans = $hours . ' hr' . ($hours > 1 ? 's' : '') .
+                        ' and ' . $minutes . ' min' . ($minutes > 1 ? 's' : '') . ' ago';
                 } else {
-                    return $minutes . ' min' . ($minutes > 1 ? 's' : '') . ' ago';
+                    $log->differForHumans = $minutes . ' min' . ($minutes > 1 ? 's' : '') . ' ago';
                 }
+
+                return $log;
+            });
+
+        return DataTables::of($systemLogs)
+            ->setRowId('id')
+            ->addColumn('differForHumans', function ($row) {
+                // Ensure the 'differForHumans' field exists
+                return $row->differForHumans;
             })
-            ->orderColumn('id', 'id $1') // Allows DataTables to control ordering
-            ->rawColumns(['differForHumans'])
+            ->addColumn('user_logs', function ($row) {
+                return optional($row->Employee)->name ?? '';
+            })
+            ->rawColumns(['differForHumans','user_logs'])
             ->make(true);
     }
-
-
 
     public function settings_dashboard(){
         return view('pages.pages_backend.settings_dashboard');

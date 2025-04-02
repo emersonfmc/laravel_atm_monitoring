@@ -40,7 +40,8 @@
                                     <th>Created Date</th>
                                     <th>Birthdate</th>
                                     {{-- <th>Box</th> --}}
-                                    <th>Card No. / Bank / Coll Date</th>
+                                    <th>Card No. / Bank</th>
+                                    <th>Coll Date</th>
                                     <th>PIN Code</th>
                                     <th>Status</th>
                                     <th>QR</th>
@@ -74,10 +75,12 @@
                             <input type="hidden" name="atm_id" id="release_atm_id">
                             <input type="hidden" name="action_name" value="Released">
                             <input type="hidden" name="transaction_action_id" value="3">
+                            <input type="hidden" name="aprb_no" id="release_aprb_no">
+
                             <div class="col-6">
                                 <div class="form-group">
                                     <div id="release_fullname" class="fw-bold h4"></div>
-                                    <span id="release_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="release_pension_account_type" class="fw-bold h5"></span>
+                                    <span id="release_pension_number_display" class="ms-3 text-primary fw-bold h5"></span> / <span id="release_pension_type" class="fw-bold h5"></span>
                                 </div>
                                 <hr>
                                 <div class="row mb-3">
@@ -188,10 +191,12 @@
                             <input type="hidden" name="reason_for_pull_out" value="8">
                             <input type="hidden" name="action_name" value="Released With Balance">
                             <input type="hidden" name="transaction_action_id" value="3">
+                            <input type="hidden" name="aprb_no" id="release_balance_aprb_no">
+
                             <div class="col-6">
                                 <div class="form-group">
                                     <div id="release_balance_fullname" class="fw-bold h4"></div>
-                                    <span id="release_balance_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="release_balance_pension_account_type" class="fw-bold h5"></span>
+                                    <span id="release_balance_pension_number_display" class="ms-3 text-primary fw-bold h5"></span> / <span id="release_balance_pension_type" class="fw-bold h5"></span>
                                 </div>
                                 <hr>
                                 <div class="row mb-3">
@@ -292,7 +297,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <div id="borrow_fullname" class="fw-bold h4"></div>
-                                    <span id="borrow_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="borrow_pension_account_type" class="fw-bold h5"></span>
+                                    <span id="borrow_pension_number_display" class="ms-3 text-primary fw-bold h5"></span> / <span id="borrow_pension_type" class="fw-bold h5"></span>
                                 </div>
                                 <hr>
                                 <div class="row mb-3">
@@ -344,9 +349,9 @@
                                     </div>
                                     <div class="col">
                                         <label class="fw-bold h6 mb-0 text-primary">
-                                            Has this become a replacement ATM? If yes, please select the checkbox
+                                            Has this become a replacement ATM / PB? If yes, please select the checkbox
                                         </label> <br>
-                                        <span class="text-danger">( Napalitan ba ang ATM na ito? Kung Oo paki check lamang ang Checkbox )</span>
+                                        <span class="text-danger">( Napalitan ba ang ATM / PB na ito? kung oo paki check lamang ang checkbox )</span>
                                     </div>
                                 </div>
                                 <hr>
@@ -380,7 +385,7 @@
                                             </div>
                                             <div class="col">
                                                 <label class="fw-bold h6 mb-0">
-                                                    Is this a Replacement ATM with the same Bank Number? <br>Check if Yes Select Checkbox.
+                                                    Is this a replacement with the same card no.? <br>check if yes select checkbox.
                                                 </label>
                                             </div>
                                         </div>
@@ -406,8 +411,8 @@
                                         </div>
 
                                         <div class="col-6 form-group mb-3 atm_number_field">
-                                            <label class="fw-bold h6">New ATM / Passbook Number</label>
-                                            <input type="text" class="atm_card_input_mask form-control" name="new_atm_number" placeholder="ATM Number" required>
+                                            <label class="fw-bold h6">Card Number</label>
+                                            <input type="text" class="atm_card_input_mask form-control" name="new_atm_number" placeholder="Card Number" required>
                                         </div>
 
                                         <div class="col-6 form-group mb-3 atm_bank_list">
@@ -478,7 +483,7 @@
                             <div class="col-6">
                                 <div class="form-group">
                                     <div id="replacement_fullname" class="fw-bold h4"></div>
-                                    <span id="replacement_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="replacement_pension_account_type" class="fw-bold h5"></span>
+                                    <span id="replacement_pension_number_display" class="ms-3 text-primary fw-bold h5"></span> / <span id="replacement_pension_type" class="fw-bold h5"></span>
                                 </div>
                                 <hr>
                                 <div class="row mb-3">
@@ -542,7 +547,7 @@
                                             </div>
                                             <div class="col">
                                                 <label class="fw-bold h6 mb-0">
-                                                    Is this a Replacement ATM with the same Bank Number? <br>Check if Yes Select Checkbox.
+                                                    Is this a Replacement ATM with the same Card No.? <br>Check if Yes Select Checkbox.
                                                 </label>
                                             </div>
                                         </div>
@@ -568,8 +573,8 @@
                                         </div>
 
                                         <div class="col-6 form-group mb-3 atm_number_field">
-                                            <label class="fw-bold h6">New ATM / Passbook Number</label>
-                                            <input type="text" class="atm_card_input_mask form-control" name="new_atm_number" placeholder="ATM Number" required>
+                                            <label class="fw-bold h6">Card No.</label>
+                                            <input type="text" class="atm_card_input_mask form-control" name="new_atm_number" placeholder="Card Number" required>
                                         </div>
 
                                         <div class="col-6 form-group mb-3 atm_bank_list">
@@ -972,7 +977,7 @@
                     searchable: true,
                 },
                 {
-                    data: null,
+                    data: 'full_name',
                     render: function(data, type, row, meta) {
                         return '<span>' + row.full_name + '</span>'; // Check if company exists
                     },
@@ -989,7 +994,7 @@
                     searchable: true,
                 },
                 {
-                    data: null,
+                    data: 'pension_details',
                     render: function(data, type, row, meta) {
                         return '<span>' + row.pension_details + '</span>'; // Check if company exists
                     },
@@ -997,22 +1002,20 @@
                     searchable: true,
                 },
                 {
-                    data: 'client_information_id',
-                    name: 'client_information.created_at',
+                    data: 'created_at',
+                    name: 'created_at',
                     render: function(data, type, row, meta) {
-                        if (row.client_information) {
-                            const createdAt = row.client_information.created_at ? new Date(row.client_information.created_at) : null;
-                            const formattedDate = createdAt ? createdAt.toLocaleDateString('en-US',
-                                {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                })
-                                : '';
+                        const createdAt = row.created_at ? new Date(row.created_at) : null;
+                        const formattedDate = createdAt ? createdAt.toLocaleDateString('en-US',
+                            {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                            })
+                            : '';
 
-                            return `<span class="text-muted">${formattedDate}</span>`;
-                        }
-                        return '';
+                        return `<span class="text-muted">${formattedDate}</span>`;
+
                     },
                     orderable: true,
                     searchable: true,
@@ -1026,7 +1029,7 @@
                             const formattedBirthDate = BirthDate ? BirthDate.toLocaleDateString('en-US',
                                 {
                                     year: 'numeric',
-                                    month: 'long',
+                                    month: 'short',
                                     day: 'numeric'
                                 })
                                 : '';
@@ -1038,37 +1041,26 @@
                     orderable: true,
                     searchable: true,
                 },
-                // {
-                //     data: 'cash_box_no',
-                //     name: 'cash_box_no',
-                //     render: function(data, type, row, meta) {
-                //         return data ? `<span>${data}</span>` : '';
-                //     },
-                //     orderable: true,
-                //     searchable: true,
-                // },
                 {
-                    data: 'bank_account_no',
-                    name: 'bank_account_no',
+                    data: 'bank_details',
+                    name: 'bank_details',
                     render: function(data, type, row, meta) {
-                        // Initialize the variable for replacement count
-                        let replacementCountDisplay = '';
-
-                        // Check if replacement_count is greater than 0
-                        if (row.replacement_count > 0) {
-                        replacementCountDisplay = `<span class="text-danger fw-bold h6"> / ${row.replacement_count}</span>`;
-                        }
-
-                        return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span>
-                                ${replacementCountDisplay}<br>
-                                <span>${row.bank_name ?? ''}</span><br>
-                                <span class="fw-bold text-primary">${row.collection_date ?? ''}</span>`;
+                        return `<span>${row.bank_details}</span>`;
 
                     },
                     orderable: true,
                     searchable: true,
                 },
+                {
+                    data: 'collection_date',
+                    name: 'collection_date',
+                    render: function(data, type, row, meta) {
+                        return `<span>${row.collection_date}</span>`;
 
+                    },
+                    orderable: true,
+                    searchable: true,
+                },
                 {
                     data: 'pin_code_details',
                     name: 'pin_code_details',
@@ -1079,31 +1071,10 @@
                     searchable: true,
                 },
                 {
-                    data: 'atm_status',
-                    name: 'atm_status',
+                    data: 'bank_status',
+                    name: 'bank_status',
                     render: function(data, type, row, meta) {
-                        let BankStatus = ''; // Define BankStatus outside the if block with a default value
-                        let atmTypeClass = ''; // Variable to hold the class based on atm_type
-
-                        BankStatus = row.atm_status;
-
-                        // Determine the text color based on atm_type
-                        switch (row.atm_type) {
-                            case 'ATM':
-                                atmTypeClass = 'text-primary';
-                                break;
-                            case 'Passbook':
-                                atmTypeClass = 'text-danger';
-                                break;
-                            case 'Sim Card':
-                                atmTypeClass = 'text-info';
-                                break;
-                            default:
-                                atmTypeClass = 'text-secondary'; // Default color if none match
-                        }
-
-                        return `<span class="${atmTypeClass}">${row.atm_type}</span><br>
-                                <span class="fw-bold h6">${BankStatus}</span>`;
+                        return data ? `<span>${data}</span>` : '';
                     },
                     orderable: true,
                     searchable: true,
@@ -1124,6 +1095,9 @@
                 $('#FetchingDatatable').on('click', '.release_transaction', function(e) {
                     e.preventDefault();
                     var new_atm_id = $(this).data('id');
+                    var release_aprb_no = $(this).data('aprb_no');
+
+                    $('#release_aprb_no').val(release_aprb_no ?? '');
 
                     $.ajax({
                         url: "/AtmClientFetch",
@@ -1139,14 +1113,13 @@
 
                             $('#release_branch_id').val(data.branch_id ?? '').trigger('change');
 
-                            $('#release_pension_number_display').text(data.client_information.pension_number ?? '');
+                            $('#release_pension_number_display').text(data.pension_number ?? '');
                             $('#release_pension_number_display').inputmask("99-9999999-99");
 
-                            $('#release_pension_number').val(data.client_information.pension_number);
-                            $('#release_pension_account_type').text(data.client_information.pension_account_type);
-                            $('#release_pension_type').val(data.client_information.pension_type);
+                            $('#release_pension_number').val(data.pension_number ?? '');
+                            $('#release_pension_type').text(data.pension_type ?? '');
                             $('#release_birth_date').val(formattedBirthDate);
-                            $('#release_branch_location').val(data.branch.branch_location);
+                            $('#release_branch_location').val(data.branch.branch_location ? data.branch.branch_location : '');
 
                             $('#release_atm_id').val(data.id);
                             $('#release_bank_account_no').val(data.bank_account_no ?? '');
@@ -1214,12 +1187,12 @@
                             return;
                         }
 
-                        // Validate file size (4 MB = 4 * 1024 * 1024 bytes)
-                        const maxSize = 4 * 1024 * 1024;
+                        // Validate file size (5 MB = 5 * 1024 * 1024 bytes)
+                        const maxSize = 5 * 1024 * 1024;
                         if (file.size > maxSize) {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'File size exceeds 4 MB',
+                                title: 'File size exceeds 5 MB',
                                 text: 'Please choose a smaller file.'
                             });
                             event.target.value = ''; // Clear the input
@@ -1228,7 +1201,7 @@
                         }
 
                         // Show loading indicator if compression is needed
-                        const maxAllowedSize = 2 * 1024 * 1024;
+                        const maxAllowedSize = 2 * 1024 * 1024; // Limit for compression
                         let finalFile = file;
 
                         if (file.size > maxAllowedSize) {
@@ -1270,7 +1243,7 @@
                         // Display the preview of the uploaded image
                         const reader = new FileReader();
                         reader.onload = function (e) {
-                            preview.src = e.target.result;
+                            preview.src = e.target.result; // Set preview image source
                         };
                         reader.readAsDataURL(finalFile);
                     });
@@ -1404,6 +1377,9 @@
                 $('#FetchingDatatable').on('click', '.release_balance_transaction', function(e) {
                     e.preventDefault();
                     var new_atm_id = $(this).data('id');
+                    var release_aprb_no = $(this).data('aprb_no');
+
+                    $('#release_balance_aprb_no').val(release_aprb_no ?? '');
 
                     $.ajax({
                         url: "/AtmClientFetch",
@@ -1419,14 +1395,13 @@
 
                             $('#release_balance_branch_id').val(data.branch_id ?? '').trigger('change');
 
-                            $('#release_balance_pension_number_display').text(data.client_information.pension_number ?? '');
+                            $('#release_balance_pension_number_display').text(data.pension_number ?? '');
                             $('#release_balance_pension_number_display').inputmask("99-9999999-99");
 
-                            $('#release_balance_pension_number').val(data.client_information.pension_number);
-                            $('#release_balance_pension_account_type').text(data.client_information.pension_account_type);
-                            $('#release_balance_pension_type').val(data.client_information.pension_type);
+                            $('#release_balance_pension_number').val(data.pension_number ?? '');
+                            $('#release_balance_pension_type').text(data.pension_type ?? '');
                             $('#release_balance_birth_date').val(formattedBirthDate);
-                            $('#release_balance_branch_location').val(data.branch.branch_location);
+                            $('#release_balance_branch_location').val(data.branch.branch_location ?? '');
 
                             $('#release_balance_atm_id').val(data.id);
                             $('#release_balance_bank_account_no').val(data.bank_account_no ?? '');
@@ -1454,12 +1429,11 @@
                         $('#FetchingDatatable tbody').empty();
                     }
 
-                    // Validate and Compress Image
                     document.getElementById('imageReleaseBalanceUpload').addEventListener('change', async function (event) {
                         const file = event.target.files[0];
                         const preview = document.getElementById('image_release_balance_preview');
 
-                        // Reset the preview image if no file is selected
+                        // Reset preview if no file is selected
                         if (!file) {
                             preview.src = "{{ asset('images/no_image.jpg') }}";
                             return;
@@ -1478,65 +1452,63 @@
                             return;
                         }
 
-                        // Validate file size (4 MB = 4 * 1024 * 1024 bytes)
-                        const maxSize = 4 * 1024 * 1024;
-                        if (file.size > maxSize) {
+                        // Show compression loading indicator
+                        Swal.fire({
+                            title: 'Compressing image...',
+                            text: 'Please wait while the image is being optimized.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        try {
+                            const options = {
+                                maxSizeMB: 1, // Higher limit to allow initial compression
+                                maxWidthOrHeight: 1920, // Maintain aspect ratio
+                                useWebWorker: true,
+                                maxIteration: 10,
+                                initialQuality: 0.8
+                            };
+
+                            let compressedFile = await imageCompression(file, options);
+
+                            // Further compress if the file size is still above 200KB
+                            while (compressedFile.size > 200 * 1024) {
+                                compressedFile = await imageCompression(compressedFile, {
+                                    maxSizeMB: compressedFile.size / 1024 / 1024 / 2, // Reduce size further
+                                    initialQuality: 0.7 // Reduce quality slightly
+                                });
+                            }
+
+                            console.log('Final compressed file size:', (compressedFile.size / 1024).toFixed(2), 'KB');
+
+                            // Close the loading indicator
+                            Swal.close();
+
+                            // Display preview
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                preview.src = e.target.result;
+                            };
+                            reader.readAsDataURL(compressedFile);
+
+                            // Create a new File object to replace the original input
+                            const newFile = new File([compressedFile], file.name, { type: file.type });
+
+                            // Create a DataTransfer object to update the input field
+                            const dataTransfer = new DataTransfer();
+                            dataTransfer.items.add(newFile);
+                            document.getElementById('imageReleaseBalanceUpload').files = dataTransfer.files;
+
+                        } catch (error) {
+                            Swal.close();
                             Swal.fire({
                                 icon: 'error',
-                                title: 'File size exceeds 4 MB',
-                                text: 'Please choose a smaller file.'
+                                title: 'Compression error',
+                                text: 'An error occurred during image compression. Please try again.'
                             });
-                            event.target.value = ''; // Clear the input
-                            preview.src = "{{ asset('images/no_image.jpg') }}"; // Reset preview
-                            return;
                         }
-
-                        // Show loading indicator if compression is needed
-                        const maxAllowedSize = 2 * 1024 * 1024;
-                        let finalFile = file;
-
-                        if (file.size > maxAllowedSize) {
-                            // Show the SweetAlert loading indicator
-                            Swal.fire({
-                                title: 'Compressing image...',
-                                text: 'Please wait while the image is being compressed.',
-                                allowOutsideClick: false,
-                                didOpen: () => {
-                                    Swal.showLoading();
-                                }
-                            });
-
-                            try {
-                                const options = {
-                                    maxSizeMB: 2, // Maximum size in MB
-                                    maxWidthOrHeight: 1920, // Maintain aspect ratio
-                                    useWebWorker: true
-                                };
-                                finalFile = await imageCompression(file, options);
-                                console.log('Compressed file size:', finalFile.size);
-
-                                // Close the loading indicator
-                                Swal.close();
-                            } catch (error) {
-                                console.error('Image compression failed:', error);
-
-                                // Close the loading indicator and show error
-                                Swal.close();
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Compression error',
-                                    text: 'An error occurred during image compression. Please try again.'
-                                });
-                                return;
-                            }
-                        }
-
-                        // Display the preview of the uploaded image
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            preview.src = e.target.result;
-                        };
-                        reader.readAsDataURL(finalFile);
                     });
 
                     $('#releasingBalanceValidateForm').validate({
@@ -1686,14 +1658,14 @@
 
                             $('#borrow_branch_id').val(data.branch_id ?? '').trigger('change');
 
-                            $('#borrow_pension_number_display').text(data.client_information.pension_number ?? '');
+                            $('#borrow_pension_number_display').text(data.pension_number ?? '');
                             $('#borrow_pension_number_display').inputmask("99-9999999-99");
 
-                            $('#borrow_pension_number').val(data.client_information.pension_number);
-                            $('#borrow_pension_account_type').text(data.client_information.pension_account_type);
-                            $('#borrow_pension_type').val(data.client_information.pension_type);
-                            $('#borrow_birth_date').val(formattedBirthDate);
-                            $('#borrow_branch_location').val(data.branch.branch_location);
+                            $('#borrow_pension_number').val(data.pension_number ?? '');
+                            $('#borrow_pension_account_type').text(data.account_type ?? '');
+                            $('#borrow_pension_type').text(data.pension_type ?? '');
+                            $('#borrow_birth_date').val(formattedBirthDate ?? '');
+                            $('#borrow_branch_location').val(data.branch.branch_location ?? '');
 
                             $('#borrow_atm_id').val(data.id);
                             $('#borrow_bank_account_no').val(data.bank_account_no ?? '');
@@ -1916,12 +1888,12 @@
 
                             $('#replacement_branch_id').val(data.branch_id ?? '').trigger('change');
 
-                            $('#replacement_pension_number_display').text(data.client_information.pension_number ?? '');
+                            $('#replacement_pension_number_display').text(data.pension_number ?? '');
                             $('#replacement_pension_number_display').inputmask("99-9999999-99");
 
-                            $('#replacement_pension_number').val(data.client_information.pension_number);
-                            $('#replacement_pension_account_type').text(data.client_information.pension_account_type);
-                            $('#replacement_pension_type').val(data.client_information.pension_type);
+                            $('#replacement_pension_number').val(data.pension_number);
+                            $('#replacement_pension_account_type').text(data.account_type);
+                            $('#replacement_pension_type').val(data.pension_type);
                             $('#replacement_birth_date').val(formattedBirthDate);
                             $('#replacement_branch_location').val(data.branch.branch_location);
 
@@ -2161,7 +2133,7 @@
                         const file = event.target.files[0];
                         const preview = document.getElementById('image_release_cancelled_loan_preview');
 
-                        // Reset the preview image if no file is selected
+                        // Reset preview if no file is selected
                         if (!file) {
                             preview.src = "{{ asset('images/no_image.jpg') }}";
                             return;
@@ -2180,65 +2152,63 @@
                             return;
                         }
 
-                        // Validate file size (4 MB = 4 * 1024 * 1024 bytes)
-                        const maxSize = 4 * 1024 * 1024;
-                        if (file.size > maxSize) {
+                        // Show compression loading indicator
+                        Swal.fire({
+                            title: 'Compressing image...',
+                            text: 'Please wait while the image is being optimized.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        try {
+                            const options = {
+                                maxSizeMB: 1, // Higher limit to allow initial compression
+                                maxWidthOrHeight: 1920, // Maintain aspect ratio
+                                useWebWorker: true,
+                                maxIteration: 10,
+                                initialQuality: 0.8
+                            };
+
+                            let compressedFile = await imageCompression(file, options);
+
+                            // Further compress if the file size is still above 200KB
+                            while (compressedFile.size > 200 * 1024) {
+                                compressedFile = await imageCompression(compressedFile, {
+                                    maxSizeMB: compressedFile.size / 1024 / 1024 / 2, // Reduce size further
+                                    initialQuality: 0.7 // Reduce quality slightly
+                                });
+                            }
+
+                            console.log('Final compressed file size:', (compressedFile.size / 1024).toFixed(2), 'KB');
+
+                            // Close the loading indicator
+                            Swal.close();
+
+                            // Display preview
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                preview.src = e.target.result;
+                            };
+                            reader.readAsDataURL(compressedFile);
+
+                            // Create a new File object to replace the original input
+                            const newFile = new File([compressedFile], file.name, { type: file.type });
+
+                            // Create a DataTransfer object to update the input field
+                            const dataTransfer = new DataTransfer();
+                            dataTransfer.items.add(newFile);
+                            document.getElementById('ProofReleaseCancelledLoan').files = dataTransfer.files;
+
+                        } catch (error) {
+                            Swal.close();
                             Swal.fire({
                                 icon: 'error',
-                                title: 'File size exceeds 4 MB',
-                                text: 'Please choose a smaller file.'
+                                title: 'Compression error',
+                                text: 'An error occurred during image compression. Please try again.'
                             });
-                            event.target.value = ''; // Clear the input
-                            preview.src = "{{ asset('images/no_image.jpg') }}"; // Reset preview
-                            return;
                         }
-
-                        // Show loading indicator if compression is needed
-                        const maxAllowedSize = 2 * 1024 * 1024;
-                        let finalFile = file;
-
-                        if (file.size > maxAllowedSize) {
-                            // Show the SweetAlert loading indicator
-                            Swal.fire({
-                                title: 'Compressing image...',
-                                text: 'Please wait while the image is being compressed.',
-                                allowOutsideClick: false,
-                                didOpen: () => {
-                                    Swal.showLoading();
-                                }
-                            });
-
-                            try {
-                                const options = {
-                                    maxSizeMB: 2, // Maximum size in MB
-                                    maxWidthOrHeight: 1920, // Maintain aspect ratio
-                                    useWebWorker: true
-                                };
-                                finalFile = await imageCompression(file, options);
-                                console.log('Compressed file size:', finalFile.size);
-
-                                // Close the loading indicator
-                                Swal.close();
-                            } catch (error) {
-                                console.error('Image compression failed:', error);
-
-                                // Close the loading indicator and show error
-                                Swal.close();
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Compression error',
-                                    text: 'An error occurred during image compression. Please try again.'
-                                });
-                                return;
-                            }
-                        }
-
-                        // Display the preview of the uploaded image
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            preview.src = e.target.result;
-                        };
-                        reader.readAsDataURL(finalFile);
                     });
 
                     $('#cancelledLoanValidateForm').validate({
