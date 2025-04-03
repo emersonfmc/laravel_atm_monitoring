@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\System;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class AtmReleasedRiderImage extends Model
+class MaintenancePage extends Model
 {
     use HasFactory, SoftDeletes;
 

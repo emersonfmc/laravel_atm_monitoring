@@ -3,6 +3,12 @@
 @section('css')
     <!-- DataTables -->
     <link href="{{ URL::asset('assets/libs/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+
+    <style>
+        td.text-left {
+            text-align: left !important;
+        }
+    </style>
 @endsection
 
 @section('settings')
@@ -35,12 +41,15 @@
                         <table id="FetchingDatatable" class="table table-border dt-responsive wrap table-design" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                             <thead class="table-light">
                                 <tr>
+                                    <th>No</th>
                                     <th>Action</th>
-                                    <th>Title & Description</th>
+                                    <th>Module</th>
+                                    <th>Title</th>
+                                    <th style="text-align: left !important; width: 20%;">Description New</th>
+                                    <th style="text-align: left !important; width: 20%;">Description Old</th>
                                     <th>User</th>
                                     <th>Time Elapsed</th>
                                     <th>Date</th>
-                                    <th>Time</th>
                                     <th>IP Address</th>
                                 </tr>
                             </thead>
@@ -59,8 +68,17 @@
     <script>
         $(document).ready(function () {
             const dataTable = new ServerSideDataTable('#FetchingDatatable');
-            var url = '{!! route('system.logs.data') !!}';
+            var url = '{!! route('settings.system.logs.data') !!}';
             const columns = [
+                {
+                    data: 'id',
+                    name: 'id',
+                    render: function(data, type, row, meta) {
+                        return '<span>' + data + '</span>';
+                    },
+                    orderable: true,
+                    searchable: true,
+                },
                 {
                     data: 'action',
                     name: 'action',
@@ -87,26 +105,84 @@
                 {
                     data: null,
                     render: function(data, type, row, meta) {
-                        // Set the maximum length for the description
-                        const maxLength = 50; // Example: limit to 50 characters
-
-                        // Truncate the description if it exceeds the maximum length
-                        let truncatedDescription = row.description;
-                        if (row.description.length > maxLength) {
-                            truncatedDescription = row.description.substring(0, maxLength) + '...';
-                        }
-
-                        return `<span class="fw-bold text-primary h6">${row.title}</span><br>
-                                <span class="text-muted">${truncatedDescription}</span>`;
+                        return `<span>${row.module ?? ''}</span>`;
                     },
                     orderable: true,
                     searchable: true,
                 },
                 {
-                    data: 'employee_id',
-                    name: 'employee.name',
+                    data: null,
                     render: function(data, type, row, meta) {
-                        return row.employee ? '<span>' + row.employee.name + '</span>' : '';
+                        return `<span class="fw-bold text-primary">${row.title}</span>`;
+                    },
+                    orderable: true,
+                    searchable: true,
+                },
+                {
+                    data: "description_logs",
+                    className: "text-left",
+                    render: function(data, type, row, meta) {
+                        let details;
+
+                        // Ensure JSON is parsed properly
+                        try {
+                            details = typeof data === "string" ? JSON.parse(data) : data;
+                        } catch (e) {
+                            console.error("Invalid JSON:", data);
+                            return "<em>Invalid data</em>";
+                        }
+
+                        let newDetails = details?.new_details ?? {};
+
+                        if (typeof newDetails === "object" && Object.keys(newDetails).length > 0) {
+                            return Object.entries(newDetails).map(([key, value]) => {
+                                // If value is an object with a single key "", extract the value
+                                if (typeof value === "object" && value !== null) {
+                                    let extractedValue = Object.values(value)[0] ?? "<em> </em>";
+                                    return `<strong>${key.replace(/_/g, " ")} : </strong> ${extractedValue}`;
+                                }
+                                return `<strong>${key.replace(/_/g, " ")} : </strong> ${value ?? "<em> </em>"}`;
+                            }).join("<br>");
+                        }
+
+                        return "<em>No old details</em>";
+                    }
+                },
+                {
+                    data: "description_logs",
+                    className: "text-left",
+                    render: function(data, type, row, meta) {
+                        let details;
+
+                        // Ensure JSON is parsed properly
+                        try {
+                            details = typeof data === "string" ? JSON.parse(data) : data;
+                        } catch (e) {
+                            console.error("Invalid JSON:", data);
+                            return "<em>Invalid data</em>";
+                        }
+
+                        let oldDetails = details?.old_details ?? {};
+
+                        if (typeof oldDetails === "object" && Object.keys(oldDetails).length > 0) {
+                            return Object.entries(oldDetails).map(([key, value]) => {
+                                // If value is an object with a single key "", extract the value
+                                if (typeof value === "object" && value !== null) {
+                                    let extractedValue = Object.values(value)[0] ?? "<em> </em>";
+                                    return `<strong>${key.replace(/_/g, " ")} : </strong> ${extractedValue}`;
+                                }
+                                return `<strong>${key.replace(/_/g, " ")} : </strong> ${value ?? "<em> </em>"}`;
+                            }).join("<br>");
+                        }
+
+                        return "";
+                    }
+                },
+
+                {
+                    data: 'user_logs',
+                    render: function(data, type, row, meta) {
+                        return `<span>${row.user_logs ?? ''}</span>`
                     },
                     orderable: true,
                     searchable: true,
@@ -124,21 +200,20 @@
                     data: 'created_at',
                     name: 'created_at',
                     render: function(data, type, row) {
-                        return new Date(data).toLocaleDateString('en-US', {
-                            month: 'long',
-                            day: 'numeric',
-                            year: 'numeric'
+                        let dateObj = new Date(data);
+                        let datePart = dateObj.toLocaleDateString('en-US', {
+                            month: 'short',  // "Sep"
+                            day: 'numeric',  // "20"
+                            year: 'numeric'  // "2024"
                         });
-                    }
-                },
-                {
-                    data: null,
-                    render: function(data, type, row) {
-                        return new Date(row.created_at).toLocaleTimeString('en-US', {
+
+                        let timePart = dateObj.toLocaleTimeString('en-US', {
                             hour: 'numeric',
                             minute: '2-digit',
                             hour12: true
                         });
+
+                        return `${datePart} <br> ${timePart}`;
                     },
                     orderable: true,
                     searchable: true

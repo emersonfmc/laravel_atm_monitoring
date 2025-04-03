@@ -33,7 +33,7 @@ return new class extends Migration
             $table->string('oc_request_number')->nullable()->comment('This is for creation of Outside Collection Multiple');
             $table->enum('oc_transaction',['YES','NO'])->default('NO')->comment('If the transaction is Outside Collection it will be YES and NO if not');
             $table->string('oc_request_type')->nullable()->comment('Null if not outside collection, 1 going to bank and 2 returning to HO and 3 For Completed');
-            $table->unsignedBigInteger('as_tracking_id')->comment('If the transaction is having a open pending to Area Supervisor');
+            $table->unsignedBigInteger('as_tracking_id')->nullable()->comment('If the transaction is having a open pending to Area Supervisor');
             // $table->unsignedBigInteger('released_client_images_id')->nullable();
 
             $table->foreign('client_banks_id')->references('id')->on('atm_client_banks')->onDelete('set null')->onUpdate('cascade');

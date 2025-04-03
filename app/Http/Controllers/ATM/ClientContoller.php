@@ -3,31 +3,30 @@
 namespace App\Http\Controllers\ATM;
 use App\Models\Branch;
 
-use App\Models\SystemLogs;
+use App\Models\System\SystemLogs;
+use App\Models\System\MaintenancePage;
+use App\Models\DataTransactionSequence;
 
 use Illuminate\Http\Request;
-use App\Models\DataBankLists;
-use App\Models\AtmClientBanks;
-
 use Illuminate\Support\Carbon;
-use App\Models\MaintenancePage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\ClientInformation;
 use App\Models\DataCollectionDate;
-use Illuminate\Support\Facades\DB;
-use App\Models\AtmBanksTransaction;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Models\AtmTransactionSequence;
-use App\Models\DataTransactionSequence;
-use Yajra\DataTables\Facades\DataTables;
-use App\Models\AtmTransactionBalanceLogs;
-use App\Models\AtmBanksTransactionApproval;
+use App\Models\DataBankLists;
 
+use App\Models\ATM\AtmClientBanks;
+use App\Models\ATM\AtmBanksTransaction;
+use App\Models\ATM\AtmTransactionBalanceLogs;
+use App\Models\ATM\AtmBanksTransactionApproval;
+
+use Yajra\DataTables\Facades\DataTables;
+use App\Http\Controllers\Controller;
 class ClientContoller extends Controller
 {
-    public function client_page()
-    {
+    public function client_page(){
         $userGroup = Auth::user()->UserGroup->group_name;
         $branch_id = Auth::user()->branch_id;
         $branches = Branch::where('status', 'Active')->get();
@@ -48,21 +47,43 @@ class ClientContoller extends Controller
         }
     }
 
-    public function client_data()
-    {
+    public function client_data(Request $request){
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
+        $userDepartment = Auth::user()->department;
 
         // Start the query with the necessary relationships
-        $query = ClientInformation::with('Branch', 'AtmClientBanks')->latest('updated_at');
+        $query = AtmClientBanks::with('Branch', 'ClientInformation')
+            ->latest('updated_at');
 
-        // Check if the user has a valid branch_id
-        if ($userBranchId !== null && $userBranchId !== 0) {
-            // Filter by branch_id if it's set and valid
-            $query->where('branch_id', $userBranchId);
+        if ($request->filled('pension_number')) {
+            // Sanitize pension number (remove non-numeric characters)
+            $pension_number_get = preg_replace('/[^0-9]/', '', $request->pension_number);
+
+            // Find existing pension number (even if in another branch)
+            $existingPension = AtmClientBanks::where('pension_number', $pension_number_get)->first();
+
+            if ($existingPension) {
+                if (!$userBranchId) {
+                    return response()->json(['error' => 'Pension number already exists.']);
+                }
+
+                // Check if pension number belongs to the same branch
+                if ($existingPension->branch_id == $userBranchId) {
+                    return response()->json(['error' => 'Pension number already exists in the same branch.']);
+                } else {
+                    // Instead of returning early, apply the filter and send the response with `201`
+                    $query->where('pension_number', $pension_number_get);
+                    return response()->json([
+                        'success' => 'Pension number already exists in another branch.',
+                        'pension_number' => $pension_number_get // Send back for DataTable filtering
+                    ], 201);
+                }
+            }
+            return response()->json(['success' => 'Pension number is valid.'], 200);
         }
 
-        // Get the filtered data
+        // Get filtered data based on pension_number (if provided)
         $branchData = $query->get();
 
         // Return the data as DataTables response
@@ -85,14 +106,65 @@ class ClientContoller extends Controller
                 }
                 return $action; // Return all the accumulated buttons
             })
-            ->rawColumns(['action'])
+            ->addColumn('pin_code_details', function ($row) use ($userGroup, $userDepartment){
+                // Define the user groups that need access
+                $authorizedUserGroups = ['Developer', 'Admin', 'Everfirst Admin',
+                    'Collection Receiving Clerk', 'Collection Head',
+                    'Collection Staff', 'Collection Staff / Releasing',
+                    'Collection Custodian', 'Collection Supervisor', 'Checker'];
+
+                if (in_array($userGroup, $authorizedUserGroups) || $userDepartment == 'Collection') {
+                    if ($row->atm_type == 'ATM') {
+                        if ($row->pin_no != NULL) {
+                            $pin_code_details =
+                                '<a href="#" class="text-info fs-4 view_pin_code"
+                                    data-pin="' . $row->pin_no . '"
+                                    data-transaction_number="' . $row->transaction_number . '"
+                                    data-bank_account_no="' . $row->bank_account_no . '">
+                                    <i class="fas fa-eye"></i>
+                                </a>';
+                        } else {
+                            $pin_code_details = 'No Pin Code';
+                        }
+                    } else {
+                        $pin_code_details = 'No Pin Code';
+                    }
+                } else {
+                    $pin_code_details = '********';
+                }
+
+                return $pin_code_details;
+            })
+            ->addColumn('full_name', function ($row) {
+                // Check if the relationships and fields exist
+                $clientInfo = $row->ClientInformation ?? null;
+
+                if ($clientInfo) {
+                    $lastName = $clientInfo->last_name ?? '';
+                    $firstName = $clientInfo->first_name ?? '';
+                    $middleName = $clientInfo->middle_name ? ' ' . $clientInfo->middle_name . '.' : ' '; // Add period if middle_name exists
+                    $suffix = $clientInfo->suffix ? ' ' . $clientInfo->suffix . '.' : ' '; // Add period if suffix exists
+
+                    // Combine the parts into the full name
+                    $fullName = "{$lastName}, {$firstName}{$middleName}{$suffix}";
+                } else {
+                    // Fallback if client information is missing
+                    $fullName = 'N/A';
+                }
+
+                return $fullName;
+            })
+            ->addColumn('branch_location', function($row) use ($userGroup) {
+                $branch_location = $row->Branch->branch_location;
+                return $branch_location; // Return all the accumulated buttons
+            })
+            ->rawColumns(['action','full_name','pin_code_details','branch_location'])
             ->make(true);
     }
 
-    public function clientCreate(Request $request)
-    {
+    public function clientCreate(Request $request){
 
-            $existingPensionNumber = ClientInformation::where('pension_number', $request->pension_number)
+            $existingPensionNumber = AtmClientBanks::where('pension_number', $request->pension_number)
                         ->where('pension_type', $request->pension_type)
                         ->exists();
 
@@ -166,10 +238,6 @@ class ClientContoller extends Controller
                 $pension_number = str_replace('-', '', $request->pension_number);
 
                 $ClientInformation = ClientInformation::create([
-                    'pension_number' => $pension_number ?? NULL,
-                    'branch_id' => $branch_id ?? NULL,
-                    'pension_type' => $request->pension_type ?? NULL,
-                    'account_type' => $request->account_type ?? NULL,
                     'first_name' => $request->first_name ?? NULL,
                     'middle_name' => $request->middle_name ?? NULL,
                     'last_name' => $request->last_name ?? NULL,
@@ -198,6 +266,9 @@ class ClientContoller extends Controller
                         // dd($TransactionNumber);
 
                         $AtmClientBanks = AtmClientBanks::create([
+                            'pension_number' => $pension_number ?? NULL,
+                            'pension_type' => $request->pension_type ?? NULL,
+                            'account_type' => $request->account_type ?? NULL,
                             'client_information_id' => $ClientInformation->id,
                             'transaction_number' => $TransactionNumber,
                             'branch_id' => $branch_id ?? NULL,
@@ -273,14 +344,12 @@ class ClientContoller extends Controller
         ]);
     }
 
-    public function clientGet($id)
-    {
+    public function clientGet($id){
         $ClientInformation = ClientInformation::with('Branch','AtmClientBanks')->findOrFail($id);
         return response()->json($ClientInformation);
     }
 
-    public function PensionNumberValidate(Request $request)
-    {
+    public function PensionNumberValidate(Request $request){
         // Remove any non-numeric characters (like hyphens) from the pension number
         $pension_number_get = preg_replace('/[^0-9]/', '', $request->pension_number);
 
@@ -288,7 +357,7 @@ class ClientContoller extends Controller
         $user_branch_id =  Auth::user()->branch_id;
 
         // Query to find if the pension number exists in the client information
-        $clientInfo = ClientInformation::with('Branch')
+        $clientInfo = AtmClientBanks::with('Branch')
                         ->where('pension_number', $pension_number_get)
                         ->first();
 
@@ -311,8 +380,7 @@ class ClientContoller extends Controller
         return response()->json(['success' => 'Pension number is valid.'], 200);
     }
 
-    public function addMoreAtm(Request $request)
-    {
+    public function addMoreAtm(Request $request){
         $information_id  = $request->information_id;
 
         // Fetch Data From AtmClientBanks

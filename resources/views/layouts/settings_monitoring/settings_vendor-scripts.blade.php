@@ -64,7 +64,7 @@
 <script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js') }}"></script>
 
 {{-- <script src="{{ URL::asset('/assets/js/pages/ecommerce-select2.init.js') }}"></script> --}}
-<script src="{{ URL::asset('/assets/js/pages/add_script.js') }}"></script>
+<script src="{{ URL::asset('assets/js/pages/add_script.js') }}"></script>
 
 <script src="{{ URL::asset('assets/libs/compress/compress.min.js') }}"></script>
 <script src="{{ URL::asset('assets/libs/instascan/instascan.min.js') }}"></script>

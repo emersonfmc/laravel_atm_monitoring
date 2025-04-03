@@ -90,6 +90,11 @@
             showMaskOnFocus: true,   // Show the mask when the field is focused
             rightAlign: false       // Align the input to the left
         });
+
+        $('.pension_number_mask').inputmask('99-9999999-99', {
+            placeholder: "",  // Placeholder for the input
+            removeMaskOnSubmit: true  // Removes the mask when submitting the form
+        });
     });
 </script>
 
