@@ -45,13 +45,12 @@ class ServerSideDataTable {
         $(this.tableSelector)
             .on("length.dt", function (e, settings, len) {
                 Swal.fire({
-                    title: "Please Wait...",
-                    text: "Please wait for a moment",
+                    title: 'Loading Please Wait',
+                    html: "<div class='d-flex justify-content-center align-items-center' style='height:60px;'><div class='loader'></div></div>",
                     allowEscapeKey: false,
                     allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    },
+                    showConfirmButton: false,
+                    width: "350px" // Adjust width as needed
                 });
             })
             .on("draw.dt", function () {
