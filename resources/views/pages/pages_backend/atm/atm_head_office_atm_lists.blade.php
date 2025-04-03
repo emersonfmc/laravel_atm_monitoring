@@ -525,7 +525,7 @@
         <div class="modal-dialog modal-dialog-centered" style="max-width: 60%;" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-uppercase">Edit Client / ATM Transaction</h5>
+                    <h5 class="modal-title fw-bold text-uppercase">Edit Client & Card Information</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="{{ route('TransactionEditClient') }}" method="POST" id="TransactionEditClientValidateForm">
@@ -664,15 +664,13 @@
                                             </div>
                                         </div>
 
-                                        {{-- <div class="row" id="replaceBankAccountNo" style="display:block;"> --}}
-
                                         <div class="row mb-2 replaceBankAccountNo align-items-center">
                                             <label class="col-4 fw-bold">Card No.</label>
                                             <div class="form-group col-8">
-                                                <input type="text" name="atm_number" class="atm_card_input_mask form-control" id="edit_bank_account_no" placeholder="ATM / Passbook / Sim No." required>
+                                                <input type="text" name="atm_number" class="atm_card_input_mask form-control"
+                                                       id="edit_bank_account_no" placeholder="ATM / Passbook / Sim No." required>
                                             </div>
                                         </div>
-                                        {{-- <div class="row mb-2" id="replaceBankName" style="display:block;"> --}}
 
                                         <div class="row mb-2 replaceBankName align-items-center">
                                             <label class="col-4 fw-bold">Banks</label>
@@ -714,17 +712,14 @@
 
                                       <div class="form-group mb-2 row align-items-center">
                                         <label class="col-form-label col-4 fw-bold">Cash Box No.</label>
-                                        <div class="col-8">
-                                          <input type="number" name="cash_box_no" id="edit_cash_box_no" class="form-control" placeholder="Cash Box No.">
-                                        </div>
+                                            <div class="col-8">
+                                            <input type="number" name="cash_box_no" id="edit_cash_box_no" class="form-control" placeholder="Cash Box No.">
+                                            </div>
                                       </div>
                                     </div>
                                     <hr class="mt-2 mb-2">
                                   </div>
-
                             </div>
-
-
                         </div>
                     </div>
                     <div class="modal-footer">

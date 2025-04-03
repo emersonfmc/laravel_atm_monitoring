@@ -252,7 +252,7 @@ class AtmTransactionController extends Controller
         $release_reason       = $request->release_reason ?? NULL;
         $borrow_reason        = $request->borrow_reason ?? NULL;
         $remarks              = $request->remarks ?? NULL;
-        $balances = $request->balance === null ? 0 : floatval(preg_replace('/[^\d]/', '', $request->balance));
+        $balance = $request->balance === null ? 0 : floatval(preg_replace('/[^\d]/', '', $request->balance));
 
         $AtmClientBanks = AtmClientBanks::with('ClientInformation','Branch')->findOrFail($atm_id);
         $AtmClientBanks->update([ 'updated_at' => Carbon::now(), ]);
@@ -263,6 +263,7 @@ class AtmTransactionController extends Controller
         $PensionNumber = $AtmClientBanks->pension_number;
         $TransactionNumber = $AtmClientBanks->transaction_number;
         $ClientInformationId = $AtmClientBanks->client_information_id;
+        $OldBranchLocation = $AtmClientBanks->Branch->branch_location ?? '';
         $branch_id = $AtmClientBanks->branch_id;
 
         // Prevention of Duplication
@@ -368,7 +369,7 @@ class AtmTransactionController extends Controller
 
                         // System Logs
                             SystemLogs::create([
-                                'module' => 'ATM Monitoring',
+                                'module' => 'ATM / PB Monitoring',
                                 'action' => 'Create',
                                 'title' => 'Create Transaction',
                                 'description_logs' => [ // Convert array to JSON
@@ -377,6 +378,7 @@ class AtmTransactionController extends Controller
                                         'Transaction Number' => $FetchTransactionNumber ?? '',
                                         'Client Details' => $ClientDetails,
                                         'Card No' => $FetchBankAccountNumber ?? '',
+                                        'Branch' => $OldBranchLocation,
                                         'Release Reason' => $release_reason,
                                         'Remarks' => $remarks,
                                         'Balance' => '0',
@@ -554,13 +556,12 @@ class AtmTransactionController extends Controller
                             // Creation of Transaction for The Replaced ATM
 
                             // Old has Returned by Bank
-                                if($replacementTypes == '12')
-                                {
+                                if($replacementTypes == '12') {
                                     $AtmReturnOldClientBanks = AtmClientBanks::findOrFail($atm_id);
                                     $AtmReturnOldClientBanks->update([
                                         'atm_status' => 'old',
-                                        'status' => '6',
-                                        'transaction_number' => $TransactionNumber.'-RO',
+                                        'status' => '1',
+                                        'transaction_number' => $TransactionNumber,
                                         'updated_at' => Carbon::now(),
                                     ]);
 
@@ -568,7 +569,7 @@ class AtmTransactionController extends Controller
                                         'client_banks_id' => $AtmReturnOldClientBanks->id,
                                         'transaction_actions_id' => 12,
                                         'request_by_employee_id' => Auth::user()->employee_id,
-                                        'transaction_number' => $TransactionNumber.'-RO',
+                                        'transaction_number' => $TransactionNumber,
                                         'atm_type' => $BankType ?? NULL,
                                         'bank_account_no' => $BankAccountNo ?? NULL,
                                         'branch_id' => $branch_id,
@@ -581,8 +582,7 @@ class AtmTransactionController extends Controller
 
                                     $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', 12)->orderBy('sequence_no')->get();
 
-                                    foreach ($DataTransactionSequence as $transactionSequence)
-                                    {
+                                    foreach ($DataTransactionSequence as $transactionSequence) {
                                         // Set the status based on the sequence number
                                         $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
@@ -612,9 +612,8 @@ class AtmTransactionController extends Controller
                         }
                 }
                 // Returning Of Borrowed ATM / Passbook
-                else
-                {
-                    $reason = "Returning of Borrowed $BankType";
+                else {
+                    $reason = "Returning of Borrowed " .$BankType;
 
                     $AtmBanksTransaction = AtmBanksTransaction::create([
                         'client_banks_id' => $atm_id,
@@ -666,7 +665,7 @@ class AtmTransactionController extends Controller
 
                     // Create System Logs used for Auditing of Logs
                     SystemLogs::create([
-                        'module' => 'ATM Monitoring',
+                        'module' => 'ATM / PB Monitoring',
                         'action' => 'Create',
                         'title' => 'Create Transaction'. $reason,
                         'description' => 'Creation of New Transaction'.' : ' . $TransactionNumber .' | '.$reason,
@@ -743,14 +742,15 @@ class AtmTransactionController extends Controller
                     );
 
                     SystemLogs::create([
-                        'module' => 'ATM Monitoring',
+                        'module' => 'ATM / PB Monitoring',
                         'action' => 'Create',
                         'title' => 'Create Transaction',
                         'description_logs' => [ // Convert array to JSON
                             'new_details' => [
                                 'Transaction' => $reason ?? '',
                                 'Transaction Number' => $TransactionNumber ?? '',
-                                'Client Details' => $ClientDetails,
+                                'Client Details' => 'test',
+                                'Branch' => 'test',
                                 'Card No' => $BankAccountNo ?? '',
                                 'Remarks' => $remarks,
                             ],
@@ -813,6 +813,15 @@ class AtmTransactionController extends Controller
                     }
                 // Sequence Approval
 
+                AtmTransactionBalanceLogs::create([
+                    'banks_transactions_id' => $AtmBanksTransaction->id,
+                    'check_by_employee_id' => Auth::user()->employee_id,
+                    'balance' => $balance,
+                    'remarks' => $remarks,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
+
                 // System Logs
                     $ClientDetails = trim(
                         ($AtmClientBanks->ClientInformation->last_name ?? '') . ' ' .
@@ -822,15 +831,17 @@ class AtmTransactionController extends Controller
                     );
 
                     SystemLogs::create([
-                        'module' => 'ATM Monitoring',
+                        'module' => 'ATM / PB Monitoring',
                         'action' => 'Create',
                         'title' => 'Create Transaction',
                         'description_logs' => [ // Convert array to JSON
                             'new_details' => [
                                 'Transaction' => $reason ?? '',
                                 'Transaction Number' => $TransactionNumber ?? '',
+                                'Branch' => $OldBranchLocation ?? '',
                                 'Client Details' => $ClientDetails,
                                 'Card No' => $BankAccountNo ?? '',
+                                'Balance' => $request->balance ?? '0',
                                 'Remarks' => $remarks,
                             ],
                         ],
@@ -1105,7 +1116,7 @@ class AtmTransactionController extends Controller
 
                             // System Logs For Returning of Old
                                 SystemLogs::create([
-                                    'module' => 'ATM Monitoring',
+                                    'module' => 'ATM / PB Monitoring',
                                     'action' => 'Create',
                                     'title' => 'Create Transaction',
                                     'description_logs' => [
@@ -1138,7 +1149,7 @@ class AtmTransactionController extends Controller
 
                     // System Logs
                         SystemLogs::create([
-                            'module' => 'ATM Monitoring',
+                            'module' => 'ATM / PB Monitoring',
                             'action' => 'Update',
                             'title' => 'Update ' . $new_atm_type . ' Transaction',
                             'description_logs' => [
@@ -1229,7 +1240,7 @@ class AtmTransactionController extends Controller
 
                 // System Logs
                     SystemLogs::create([
-                        'module' => 'ATM Monitoring',
+                        'module' => 'ATM / PB Monitoring',
                         'action' => 'Create',
                         'title' => 'Create Transaction',
                         'description_logs' => [
@@ -1405,7 +1416,7 @@ class AtmTransactionController extends Controller
 
                         // System Logs
                             SystemLogs::create([
-                                'module' => 'ATM Monitoring',
+                                'module' => 'ATM / PB Monitoring',
                                 'action' => 'Create',
                                 'title' => 'Create Transaction',
                                 'description_logs' => [
@@ -1538,7 +1549,7 @@ class AtmTransactionController extends Controller
 
                         // System Logs
                             SystemLogs::create([
-                                'module' => 'ATM Monitoring',
+                                'module' => 'ATM / PB Monitoring',
                                 'action' => 'Create',
                                 'title' => 'Create Transaction',
                                 'description_logs' => [
@@ -1624,7 +1635,7 @@ class AtmTransactionController extends Controller
 
                 // System Logs
                     SystemLogs::create([
-                        'module' => 'ATM Monitoring',
+                        'module' => 'ATM / PB Monitoring',
                         'action' => 'Create',
                         'title' => 'Create Transaction',
                         'description_logs' => [
@@ -1824,7 +1835,7 @@ class AtmTransactionController extends Controller
                     );
 
                     SystemLogs::create([
-                        'module' => 'ATM Monitoring',
+                        'module' => 'ATM / PB Monitoring',
                         'action' => 'Create',
                         'title' => 'Create Add ATM Transaction',
                         'description_logs' => [ // Convert array to JSON
@@ -2165,7 +2176,7 @@ class AtmTransactionController extends Controller
                 );
 
                 SystemLogs::create([
-                    'module' => 'ATM Monitoring',
+                    'module' => 'ATM / PB Monitoring',
                     'action' => 'Update',
                     'title' => 'Transfer Client to Other Branch',
                     'description_logs' => [ // Convert array to JSON
@@ -2279,7 +2290,7 @@ class AtmTransactionController extends Controller
                     );
 
                     SystemLogs::create([
-                        'module' => 'ATM Monitoring',
+                        'module' => 'ATM / PB Monitoring',
                         'action' => 'Update',
                         'title' => 'Edit Client and Card Information',
                         'description_logs' => [ // Convert array to JSON
@@ -2416,7 +2427,7 @@ class AtmTransactionController extends Controller
 
         // Log the transaction update in the system logs
         SystemLogs::create([
-            'module' => 'ATM Monitoring',
+            'module' => 'ATM / PB Monitoring',
             'action' => 'Update',
             'title' => 'Update Transaction',
             'description' => $TransactionNumber . ' | ' . $DataTransactionAction->name,
@@ -2433,8 +2444,7 @@ class AtmTransactionController extends Controller
         ]);
     }
 
-    public function TransactionCancelled(Request $request)
-    {
+    public function TransactionCancelled(Request $request){
         $transaction_id = $request->transaction_id ?? NULL;
         $remarks = $request->remarks ?? NULL;
 
@@ -2461,7 +2471,7 @@ class AtmTransactionController extends Controller
 
         // Log the transaction update in the system logs
         SystemLogs::create([
-            'module' => 'ATM Monitoring',
+            'module' => 'ATM / PB Monitoring',
             'action' => 'Update',
             'title' => 'Cancelled Transaction',
             'description' => $TransactionNumber . ' | ' . $DataTransactionAction->name . ' | ' . $remarks,
@@ -2599,7 +2609,7 @@ class AtmTransactionController extends Controller
 
                         // System Logs
                             SystemLogs::create([
-                                'module' => 'ATM Monitoring',
+                                'module' => 'ATM / PB Monitoring',
                                 'action' => 'Create',
                                 'title' => 'Create Transaction',
                                 'description_logs' => [ // Convert array to JSON
@@ -2685,7 +2695,7 @@ class AtmTransactionController extends Controller
                     );
 
                     SystemLogs::create([
-                        'module' => 'ATM Monitoring',
+                        'module' => 'ATM / PB Monitoring',
                         'action' => 'Create',
                         'title' => 'Create Transaction',
                         'description_logs' => [ // Convert array to JSON
