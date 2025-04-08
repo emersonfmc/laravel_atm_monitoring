@@ -11,7 +11,6 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-
                     <div class="row">
                         <div class="col-md-8 text-start">
                             <h4 class="card-title">Branch Office ATM Lists</h4>
@@ -19,11 +18,37 @@
                                 A Centralized Record of all ATMs managed by the branch office
                             </p>
                         </div>
-                        {{-- <div class="col-md-4 text-end">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAreaModal"><i
-                                class="fas fa-plus-circle me-1"></i> Create Area</button>
-                        </div> --}}
+                        <div class="col-md-4 text-end">
+
+                        </div>
                     </div>
+                    <hr>
+                        @if(in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin','Collection Receiving Clerk']))
+                            <form id="filterForm">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group mb-3">
+                                            <label class="fw-bold h6">Branch</label>
+                                            <select name="branch_id" id="branch_id_select" class="form-select select2" required>
+                                                <option value="0">Select Branches</option>
+                                                @foreach($Branches as $branch)
+                                                    <option value="{{ $branch->id }}" {{ $branch->id == $branch_id ? 'selected' : '' }}>
+                                                        {{ $branch->branch_location }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2" style="margin-top: 25px;">
+                                        <div class="form-group">
+                                            <button type="submit" class="btn btn-primary">Filter</button>
+                                            <button type="button" class="btn btn-success">Generate Reports</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        @endif
                     <hr>
 
 
@@ -33,7 +58,7 @@
                                 <tr>
                                     <th>Action</th>
                                     <th>Transaction / Pending By</th>
-                                    <th>Reference No</th>
+                                    <th>Transaction No</th>
                                     <th>Client</th>
                                     <th>Branch</th>
                                     <th>Pension No</th>
@@ -69,7 +94,11 @@
                 </div>
 
                 <div class="modal-body">
-                    <form action="{{ route('TransactionReleaseCreate') }}" method="POST" id="releasingValidateForm" enctype="multipart/form-data">
+                    <form action="{{ route('TransactionReleaseCreate') }}"
+                          method="POST"
+                          id="releasingValidateForm"
+                          enctype="multipart/form-data">
+
                         @csrf
                         <div class="row">
                             <input type="hidden" name="atm_id" id="release_atm_id">
@@ -97,7 +126,7 @@
 
                                 <div class="row mb-3">
                                     <div class="form-group col-6">
-                                        <label class="fw-bold h6">Bank Account Number</label>
+                                        <label class="fw-bold h6">Card Number</label>
                                         <input type="text" class="form-control" id="release_bank_account_no" readonly>
                                     </div>
                                     <div class="form-group col-6">
@@ -184,7 +213,10 @@
                 </div>
 
                 <div class="modal-body">
-                    <form action="{{ route('TransactionReleaseCreate') }}" method="POST" id="releasingBalanceValidateForm" enctype="multipart/form-data">
+                    <form action="{{ route('TransactionReleaseCreate') }}" method="POST"
+                          id="releasingBalanceValidateForm"
+                          enctype="multipart/form-data">
+
                         @csrf
                         <div class="row">
                             <input type="hidden" name="atm_id" id="release_balance_atm_id">
@@ -213,7 +245,7 @@
 
                                 <div class="row mb-3">
                                     <div class="form-group col-6">
-                                        <label class="fw-bold h6">Bank Account Number</label>
+                                        <label class="fw-bold h6">Card Number</label>
                                         <input type="text" class="form-control" id="release_balance_bank_account_no" readonly>
                                     </div>
                                     <div class="form-group col-6">
@@ -284,12 +316,12 @@
         <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold text-uppercase">Returning of Borrow Transaction</h5>
+                    <h5 class="modal-title fw-bold text-uppercase">Returning of Borrowed Transaction</h5>
                     <button type="button" class="btn-close closeCreateModal" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
-                    <form action="{{ route('TransactionCreate') }}" method="POST" id="borrowValidateForm">
+                    <form action="{{ route('transaction.return.borrow.create') }}" method="POST" id="borrowValidateForm">
                         @csrf
                         <div class="row">
                             <input type="hidden" name="atm_id" id="borrow_atm_id">
@@ -314,7 +346,7 @@
 
                                 <div class="row mb-3">
                                     <div class="form-group col-6">
-                                        <label class="fw-bold h6">Bank Account Number</label>
+                                        <label class="fw-bold h6">Card Number</label>
                                         <input type="text" class="form-control" id="borrow_bank_account_no" readonly>
                                     </div>
                                     <div class="form-group col-6">
@@ -432,7 +464,7 @@
 
                                         <div class="col-6 form-group mb-3">
                                             <label class="fw-bold h6">Status</label>
-                                            <select name="new_atm_status" id="new_atm_status" class="form-select" required>
+                                            <select name="new_atm_status" id="new_atm_status_borrow" class="form-select" required>
                                                 <option value="new" selected>New</option>
                                                 <option value="old">Old</option>
                                             </select>
@@ -483,7 +515,8 @@
                             <div class="col-6">
                                 <div class="form-group">
                                     <div id="replacement_fullname" class="fw-bold h4"></div>
-                                    <span id="replacement_pension_number_display" class="ms-3 text-primary fw-bold h5"></span> / <span id="replacement_pension_type" class="fw-bold h5"></span>
+                                    <span id="replacement_pension_number_display" class="ms-3 text-primary fw-bold h5"></span> /
+                                    <span id="replacement_pension_type" class="fw-bold h5"></span>
                                 </div>
                                 <hr>
                                 <div class="row mb-3">
@@ -500,7 +533,7 @@
 
                                 <div class="row mb-3">
                                     <div class="form-group col-6">
-                                        <label class="fw-bold h6">Bank Account Number</label>
+                                        <label class="fw-bold h6">Card Number</label>
                                         <input type="text" class="form-control" id="replacement_bank_account_no" readonly>
                                     </div>
                                     <div class="form-group col-6">
@@ -534,7 +567,7 @@
                                         <option value="" selected disabled>Select Reason For Replacement</option>
                                         <option value="4">Old Did not Return by Bank w/ Replacement</option>
                                         <option value="12">Old Has Returned w/ Replacement</option>
-                                        <option value="21">ATM Did Not Replaced by Bank</option>
+                                        <option value="21">Did Not Replaced by Bank</option>
                                     </select>
                                 </div>
 
@@ -547,7 +580,7 @@
                                             </div>
                                             <div class="col">
                                                 <label class="fw-bold h6 mb-0">
-                                                    Is this a Replacement ATM with the same Card No.? <br>Check if Yes Select Checkbox.
+                                                    Is this a replacement ATM / PB with the same card no.? <br>check if yes select checkbox.
                                                 </label>
                                             </div>
                                         </div>
@@ -594,7 +627,7 @@
 
                                         <div class="col-6 form-group mb-3">
                                             <label class="fw-bold h6">Status</label>
-                                            <select name="new_atm_status" id="new_atm_status" class="form-select" required>
+                                            <select name="new_atm_status" id="new_atm_status_replacement" class="form-select" required>
                                                 <option value="new" selected>New</option>
                                                 <option value="old">Old</option>
                                             </select>
@@ -620,12 +653,12 @@
                                 <span id="NotReplaced" style="display: none;">
                                     <div class="form-group mb-3">
                                         <label class="fw-bold h6">Balance</label>
-                                        <input type="text" name="new_balance" class="balance_input_mask form-control" placeholder="Balance" required>
+                                        <input type="text" name="balance" class="balance_input_mask form-control" placeholder="Balance" required>
                                     </div>
 
                                     <div class="form-group mb-3">
                                         <label class="fw-bold h6">Remarks</label>
-                                        <input type="text" name="new_remarks" class="form-control" placeholder="Remarks" minlength="0" maxlength="50">
+                                        <input type="text" name="remarks" class="form-control" placeholder="Remarks" minlength="0" maxlength="50">
                                     </div>
                                 </span>
                             </div>
@@ -664,7 +697,7 @@
                                 <input type="hidden" name="atm_id" id="cancelled_loan_atm_id">
                                 <div class="form-group">
                                     <div id="cancelled_loan_fullname" class="fw-bold h4"></div>
-                                    <span id="cancelled_loan_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="cancelled_loan_pension_account_type" class="fw-bold h5"></span>
+                                    <span id="cancelled_loan_pension_number_display" class="ms-3 text-primary fw-bold h5"></span> / <span id="cancelled_loan_pension_type" class="fw-bold h5"></span>
                                 </div>
                                 <hr>
                                 <div class="row mb-3">
@@ -681,7 +714,7 @@
 
                                 <div class="row mb-3">
                                     <div class="form-group col-6">
-                                        <label class="fw-bold h6">Bank Account Number</label>
+                                        <label class="fw-bold h6">Card Number</label>
                                         <input type="text" class="form-control" id="cancelled_loan_bank_account_no" readonly>
                                     </div>
                                     <div class="form-group col-6">
@@ -748,7 +781,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="choose_slot_print_qr_modal" tabindex="-1" aria-labelledby="exampleModalLabel" data-bs-backdrop='static' aria-hidden="true" data-keyboard="false">
+    <div class="modal fade" id="ChooseSlotQRCodeModal" tabindex="-1" aria-labelledby="exampleModalLabel" data-bs-backdrop='static' aria-hidden="true" data-keyboard="false">
         <div class="modal-dialog modal-xl">
           <div class="modal-content">
             <div class="modal-header">
@@ -801,7 +834,7 @@
                             <div class="col-12">
                                 <div class="form-group">
                                     <div id="add_atm_fullname" class="fw-bold h4"></div>
-                                    <span id="add_atm_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="add_atm_pension_account_type" class="fw-bold h5"></span>
+                                    <span id="add_atm_pension_number_display" class="ms-3 text-primary fw-bold h5"></span> / <span id="add_atm_pension_type" class="fw-bold h5"></span>
                                 </div>
                                 <hr>
                                 <div class="row mb-3">
@@ -816,7 +849,7 @@
                                     </div>
 
                                     <div class="form-group col-3">
-                                        <label class="fw-bold h6">Bank Account Number</label>
+                                        <label class="fw-bold h6">Card Number</label>
                                         <input type="text" class="form-control" id="add_atm_bank_account_no" readonly>
                                     </div>
                                     <div class="form-group col-3">
@@ -834,17 +867,50 @@
                                         <label class="fw-bold h6">Expiration Date</label>
                                         <input type="text" class="form-control" id="add_atm_expiration_date" readonly>
                                     </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group mb-2">
+                                        <label class="fw-bold h6">Pension Number</label>
+                                        <span id="SamePensionNumberSelected" style="display: none;">
+                                            <input type="text" class="form-control pension_number_mask"
+                                                name="pension_number"
+                                                id="add_atm_pension_number_value"
+                                                placeholder="Pension Number">
+                                        </span>
+                                        <div class="form-check mt-1">
+                                            <input class="form-check-input" type="checkbox" id="same_pension_number" checked>
+                                            <label class="text-danger" for="same_pension_number" style="font-size: 10px;">
+                                                check if same pension no. used
+                                            </label>
+                                        </div>
+                                        <input type="hidden" name="pension_no_select" id="pension_no_select" value="yes">
+                                    </div>
+                                </div>
 
-                                    <div class="form-group col-3">
-                                        <label class="fw-bold h6">Collection Date</label>
-                                        <select name="collection_date" id="add_atm_collection_date" class="form-select select2">
-                                            @foreach ($DataCollectionDate as $collection)
-                                                <option value="{{ $collection->collection_date }}">{{ $collection->collection_date }}</option>
-                                            @endforeach
+                                <div class="col-md-3">
+                                    <div class="form-group mb-2">
+                                        <label class="fw-bold h6">Account Type</label>
+                                        <select name="account_type" id="add_atm_account_type" class="form-select" required>
+                                            <option value="SSS">SSS</option>
+                                            <option value="GSIS">GSIS</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="add_atm_pension_type_value">
+
+                                <div class="col-md-3">
+                                    <div class="form-group mb-2">
+                                        <label class="fw-bold h6">Pension Type</label>
+                                        <select name="pension_type" id="add_atm_pension_account_type_dropdown" class="form-select select2" required>
+                                            <option value="">Pension Account Type</option>
                                         </select>
                                     </div>
                                 </div>
                             </div>
+
                             <div class="col-12">
                                 <div class="row mt-2">
                                     <hr>
@@ -854,73 +920,82 @@
 
                                     <hr>
                                     <div class="col-md-6">
-                                    <div class="form-group mb-2 row align-items-center">
-                                        <label class="col-form-label col-sm-4 fw-bold">Type</label>
-                                        <div class="col-sm-5">
-                                        <select name="atm_type" id="atm_type_add_atm" class="form-select" required>
-                                            <option value="" selected disabled>Type</option>
-                                            <option value="ATM">ATM</option>
-                                            <option value="Passbook">Passbook</option>
-                                            <option value="Sim Card">Sim Card</option>
-                                        </select>
+                                        <div class="form-group mb-2 row align-items-center">
+                                            <label class="col-form-label col-sm-4 fw-bold">Type</label>
+                                            <div class="col-sm-5">
+                                                <select name="atm_type" id="atm_type_add_atm" class="form-select" required>
+                                                    <option value="" selected disabled>Type</option>
+                                                    <option value="ATM">ATM</option>
+                                                    <option value="Passbook">Passbook</option>
+                                                    <option value="Sim Card">Sim Card</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <select name="atm_status" id="atm_status" class="form-select" required>
+                                                <option value="">ATM Status</option>
+                                                <option value="New" selected>New</option>
+                                                <option value="Old">Old</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                        <div class="col-sm-3">
-                                            <select name="atm_status" id="atm_status" class="form-select" required>
-                                            <option value="">ATM Status</option>
-                                            <option value="New" selected>New</option>
-                                            <option value="Old">Old</option>
-                                            </select>
-                                        </div>
-                                    </div>
 
-                                    <div class="form-group mb-2 row align-items-center">
-                                        <label class="col-form-label col-4 fw-bold">ATM / Passbook / Sim No.</label>
-                                        <div class="col-8">
-                                        <input type="text" name="atm_number" class="atm_card_input_mask form-control" placeholder="ATM / Passbook / Sim No." required>
+                                        <div class="form-group mb-2 row align-items-center">
+                                            <label class="col-form-label col-4 fw-bold">Card No.</label>
+                                            <div class="col-8">
+                                                <input type="text" name="atm_number" class="atm_card_input_mask form-control" placeholder="Card No." required>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-group mb-2 row align-items-center">
-                                        <label class="col-form-label col-4 fw-bold">Balance</label>
-                                        <div class="col-8">
-                                            <input type="text" name="atm_balance" class="balance_input_mask form-control" placeholder="Balance" required>
+                                        <div class="form-group mb-2 row align-items-center">
+                                            <label class="col-form-label col-4 fw-bold">Balance</label>
+                                            <div class="col-8">
+                                                <input type="text" name="atm_balance" class="balance_input_mask form-control" placeholder="Balance" required>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-group mb-2 row align-items-center">
-                                        <label class="font-size col-form-label col-4 fw-bold">Banks</label>
-                                        <div class="col-8">
-                                        <div class="form-group">
-                                            <select name="bank_name" id="add_atm_bank_names" class="form-select select2" required>
-                                                @foreach ($DataBankLists as $bank)
-                                                    <option value="{{ $bank->bank_name }}">{{ $bank->bank_name }}</option>
-                                                @endforeach
-                                            </select>
+                                        <div class="form-group mb-2 row align-items-center">
+                                            <label class="font-size col-form-label col-4 fw-bold">Banks</label>
+                                            <div class="col-8">
+                                                <div class="form-group">
+                                                    <select name="bank_name" id="add_atm_bank_names" class="form-select select2" required>
+                                                        @foreach ($DataBankLists as $bank)
+                                                            <option value="{{ $bank->bank_name }}">{{ $bank->bank_name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    </div>
                                     </div>
                                     <div class="col-md-6">
-                                    <div class="form-group mb-2 row align-items-center">
-                                        <label class="col-form-label col-4 fw-bold">Pin Code</label>
-                                        <div class="col-8">
-                                        <input type="number" name="pin_code" class="form-control" placeholder="PIN Code">
+                                        <div class="form-group mb-2 row align-items-center">
+                                            <label class="col-form-label col-4 fw-bold">Pin Code</label>
+                                            <div class="col-8">
+                                                <input type="number" name="pin_code" class="form-control" placeholder="PIN Code">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-group mb-2 row align-items-center">
-                                        <label class="col-form-label col-4 fw-bold">Expiration Date</label>
-                                        <div class="col-8">
-                                        <input type="month" name="expiration_date" class="form-control">
+                                        <div class="form-group mb-2 row align-items-center">
+                                            <label class="col-form-label col-4 fw-bold">Expiration Date</label>
+                                            <div class="col-8">
+                                                <input type="month" name="expiration_date" class="form-control">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-group mb-2 row align-items-center">
-                                        <label class="col-form-label col-4 fw-bold">Remarks</label>
-                                        <div class="col-8">
-                                        <input type="text" name="remarks" class="form-control" placeholder="Remarks" minlength="0" maxlength="100">
+                                        <div class="form-group mb-2 row align-items-center">
+                                            <label class="col-form-label col-4 fw-bold">Remarks</label>
+                                            <div class="col-8">
+                                                <input type="text" name="remarks" class="form-control" placeholder="Remarks" minlength="0" maxlength="100">
+                                            </div>
                                         </div>
-                                    </div>
+                                        <div class="form-group mb-2 row align-items-center">
+                                            <label class="col-form-label col-4 fw-bold">Collection Date</label>
+                                            <div class="col-8">
+                                                <select name="collection_date" id="add_atm_collection_date" class="form-select select2">
+                                                    @foreach ($DataCollectionDate as $collection)
+                                                        <option value="{{ $collection->collection_date }}">{{ $collection->collection_date }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
                                     <hr class="mt-2 mb-2">
                                 </div>
-
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -935,98 +1010,75 @@
 
     <script>
         $(document).ready(function () {
-            var FetchingDatatableBody = $('#FetchingDatatable tbody');
+            // Displaying of Transaction
+                var FetchingDatatableBody = $('#FetchingDatatable tbody');
 
-            const dataTable = new ServerSideDataTable('#FetchingDatatable');
-            var url = '{!! route('BranchOfficeData') !!}';
-            const buttons = [{
-                text: 'Delete',
-                action: function(e, dt, node, config) {
-                    // Add your custom button action here
-                    alert('Custom button clicked!');
-                }
-            }];
-            const columns = [
-                {
-                    data: null,
-                    name: 'action', // This matches the name you used in your server-side code
-                    render: function(data, type, row) {
-                        return row.action; // Use the action rendered from the server
+                const dataTable = new ServerSideDataTable('#FetchingDatatable');
+                var url = '{!! route('BranchOfficeData') !!}';
+                const buttons = [{
+                    text: 'Delete',
+                    action: function(e, dt, node, config) {
+                        // Add your custom button action here
+                        alert('Custom button clicked!');
+                    }
+                }];
+                const columns = [
+                    {
+                        data: 'action',
+                        render: function(data, type, row) {
+                            return row.action; // Use the action rendered from the server
+                        },
+                        orderable: false,
+                        searchable: false,
                     },
-                    orderable: false,
-                    searchable: false,
-                },
-                // Transaction Type and Pending By
-                {
-                    data: 'pending_to',
-                    name: 'pending_to',
-                    render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6 text-primary">' + row.pending_to + '</span>';
+                    // Transaction Type and Pending By
+                    {
+                        data: 'pending_to',
+                        render: function(data, type, row, meta) {
+                            return '<span class="fw-bold h6 text-primary">' + row.pending_to + '</span>';
+                        },
+                        orderable: true,
+                        searchable: true,
                     },
-                    orderable: true,
-                    searchable: true,
-                },
-                // Reference No
-                {
-                    data: 'transaction_number',
-                    name: 'transaction_number',
-                    render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6">' + data + '</span>';
+                    // Transaction No
+                    {
+                        data: 'transaction_number',
+                        render: function(data, type, row, meta) {
+                            return '<span class="fw-bold h6">' + data + '</span>';
+                        },
+                        orderable: true,
+                        searchable: true,
                     },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'full_name',
-                    render: function(data, type, row, meta) {
-                        return '<span>' + row.full_name + '</span>'; // Check if company exists
+                    {
+                        data: 'full_name',
+                        render: function(data, type, row, meta) {
+                            return '<span>' + row.full_name + '</span>'; // Check if company exists
+                        },
+                        orderable: true,
+                        searchable: true,
                     },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'branch_id',
-                    name: 'branch.branch_location',
-                    render: function(data, type, row, meta) {
-                        return row.branch ? '<span>' + row.branch.branch_location + '</span>' : ''; // Check if company exists
+                    {
+                        data: 'branch_id',
+                        name: 'branch.branch_location',
+                        render: function(data, type, row, meta) {
+                            return row.branch ? '<span>' + row.branch.branch_location + '</span>' : ''; // Check if company exists
+                        },
+                        orderable: true,
+                        searchable: true,
                     },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'pension_details',
-                    render: function(data, type, row, meta) {
-                        return '<span>' + row.pension_details + '</span>'; // Check if company exists
+                    {
+                        data: 'pension_details',
+                        render: function(data, type, row, meta) {
+                            return '<span>' + row.pension_details + '</span>'; // Check if company exists
+                        },
+                        orderable: true,
+                        searchable: true,
                     },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'created_at',
-                    name: 'created_at',
-                    render: function(data, type, row, meta) {
-                        const createdAt = row.created_at ? new Date(row.created_at) : null;
-                        const formattedDate = createdAt ? createdAt.toLocaleDateString('en-US',
-                            {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                            })
-                            : '';
-
-                        return `<span class="text-muted">${formattedDate}</span>`;
-
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'client_information_id',
-                    name: 'client_information.birth_date',
-                    render: function(data, type, row, meta) {
-                        if (row.client_information) {
-                            const BirthDate = row.client_information.birth_date ? new Date(row.client_information.birth_date) : null;
-                            const formattedBirthDate = BirthDate ? BirthDate.toLocaleDateString('en-US',
+                    {
+                        data: 'created_at',
+                        render: function(data, type, row, meta) {
+                            const createdAt = row.created_at ? new Date(row.created_at) : null;
+                            const formattedDate = createdAt ? createdAt.toLocaleDateString('en-US',
                                 {
                                     year: 'numeric',
                                     month: 'short',
@@ -1034,62 +1086,103 @@
                                 })
                                 : '';
 
-                            return `<span class="text-muted">${formattedBirthDate}</span>`;
+                            return `<span class="text-muted">${formattedDate}</span>`;
+
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'client_information_id',
+                        name: 'client_information.birth_date',
+                        render: function(data, type, row, meta) {
+                            if (row.client_information) {
+                                const BirthDate = row.client_information.birth_date ? new Date(row.client_information.birth_date) : null;
+                                const formattedBirthDate = BirthDate ? BirthDate.toLocaleDateString('en-US',
+                                    {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric'
+                                    })
+                                    : '';
+
+                                return `<span class="text-muted">${formattedBirthDate}</span>`;
+                            }
+                            return '';
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'bank_details',
+                        render: function(data, type, row, meta) {
+                            return `<span>${row.bank_details}</span>`;
+
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'collection_date',
+                        render: function(data, type, row, meta) {
+                            return `<span>${row.collection_date}</span>`;
+
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'pin_code_details',
+                        render: function(data, type, row, meta) {
+                            return data ? `<span>${data}</span>` : '';
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'bank_status',
+                        render: function(data, type, row, meta) {
+                            return data ? `<span>${data}</span>` : '';
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'qr_code',
+                        render: function(data, type, row, meta) {
+                            return '<span>' + data + '</span>';
+                        },
+                        orderable: true,
+                        searchable: true,
+                    }
+                ];
+                dataTable.initialize(url, columns);
+
+                // Filtering of Transaction
+                    var branchId = @json($branch_id);
+                    var userHasBranchId = {!! Auth::user()->branch_id ? 'true' : 'false' !!};
+
+                    if (userHasBranchId) {
+                        $('#branch_id_select').val(branchId).prop('disabled', true);
+                    }
+
+                    $('#filterForm').submit(function(e) {
+                        e.preventDefault();
+                        var selectedBranch = $('#branch_id_select').val();
+
+                        // Get the base URL for filtering
+                        var targetUrl = '{!! route('BranchOfficeData') !!}';
+
+                        // Add branch_id as a query parameter if user doesn't have a fixed branch and has selected a branch
+                        if (!userHasBranchId && selectedBranch) {
+                            targetUrl += '?branch_id=' + selectedBranch;
                         }
-                        return '';
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'bank_details',
-                    name: 'bank_details',
-                    render: function(data, type, row, meta) {
-                        return `<span>${row.bank_details}</span>`;
 
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'collection_date',
-                    name: 'collection_date',
-                    render: function(data, type, row, meta) {
-                        return `<span>${row.collection_date}</span>`;
-
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'pin_code_details',
-                    name: 'pin_code_details',
-                    render: function(data, type, row, meta) {
-                        return data ? `<span>${data}</span>` : '';
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'bank_status',
-                    name: 'bank_status',
-                    render: function(data, type, row, meta) {
-                        return data ? `<span>${data}</span>` : '';
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'qr_code',
-                    name: 'qr_code',
-                    render: function(data, type, row, meta) {
-                        return '<span>' + data + '</span>';
-                    },
-                    orderable: true,
-                    searchable: true,
-                }
-            ];
-            dataTable.initialize(url, columns);
+                        // Update the DataTable with the filtered data
+                        dataTable.table.ajax.url(targetUrl).load();
+                    });
+                // Filtering of Transaction
+            // Displaying of Transaction
 
             // Releasing Transaction
                 $('#FetchingDatatable').on('click', '.release_transaction', function(e) {
@@ -1168,7 +1261,7 @@
                         const file = event.target.files[0];
                         const preview = document.getElementById('image_release_preview');
 
-                        // Reset the preview image if no file is selected
+                        // Reset preview if no file is selected
                         if (!file) {
                             preview.src = "{{ asset('images/no_image.jpg') }}";
                             return;
@@ -1187,65 +1280,63 @@
                             return;
                         }
 
-                        // Validate file size (5 MB = 5 * 1024 * 1024 bytes)
-                        const maxSize = 5 * 1024 * 1024;
-                        if (file.size > maxSize) {
+                        // Show compression loading indicator
+                        Swal.fire({
+                            title: 'Compressing image...',
+                            text: 'Please wait while the image is being optimized.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        try {
+                            const options = {
+                                maxSizeMB: 1, // Higher limit to allow initial compression
+                                maxWidthOrHeight: 1920, // Maintain aspect ratio
+                                useWebWorker: true,
+                                maxIteration: 10,
+                                initialQuality: 0.8
+                            };
+
+                            let compressedFile = await imageCompression(file, options);
+
+                            // Further compress if the file size is still above 200KB
+                            while (compressedFile.size > 200 * 1024) {
+                                compressedFile = await imageCompression(compressedFile, {
+                                    maxSizeMB: compressedFile.size / 1024 / 1024 / 2, // Reduce size further
+                                    initialQuality: 0.7 // Reduce quality slightly
+                                });
+                            }
+
+                            console.log('Final compressed file size:', (compressedFile.size / 1024).toFixed(2), 'KB');
+
+                            // Close the loading indicator
+                            Swal.close();
+
+                            // Display preview
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                preview.src = e.target.result;
+                            };
+                            reader.readAsDataURL(compressedFile);
+
+                            // Create a new File object to replace the original input
+                            const newFile = new File([compressedFile], file.name, { type: file.type });
+
+                            // Create a DataTransfer object to update the input field
+                            const dataTransfer = new DataTransfer();
+                            dataTransfer.items.add(newFile);
+                            document.getElementById('imageReleaseUpload').files = dataTransfer.files;
+
+                        } catch (error) {
+                            Swal.close();
                             Swal.fire({
                                 icon: 'error',
-                                title: 'File size exceeds 5 MB',
-                                text: 'Please choose a smaller file.'
+                                title: 'Compression error',
+                                text: 'An error occurred during image compression. Please try again.'
                             });
-                            event.target.value = ''; // Clear the input
-                            preview.src = "{{ asset('images/no_image.jpg') }}"; // Reset preview
-                            return;
                         }
-
-                        // Show loading indicator if compression is needed
-                        const maxAllowedSize = 2 * 1024 * 1024; // Limit for compression
-                        let finalFile = file;
-
-                        if (file.size > maxAllowedSize) {
-                            // Show the SweetAlert loading indicator
-                            Swal.fire({
-                                title: 'Compressing image...',
-                                text: 'Please wait while the image is being compressed.',
-                                allowOutsideClick: false,
-                                didOpen: () => {
-                                    Swal.showLoading();
-                                }
-                            });
-
-                            try {
-                                const options = {
-                                    maxSizeMB: 2, // Maximum size in MB
-                                    maxWidthOrHeight: 1920, // Maintain aspect ratio
-                                    useWebWorker: true
-                                };
-                                finalFile = await imageCompression(file, options);
-                                console.log('Compressed file size:', finalFile.size);
-
-                                // Close the loading indicator
-                                Swal.close();
-                            } catch (error) {
-                                console.error('Image compression failed:', error);
-
-                                // Close the loading indicator and show error
-                                Swal.close();
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Compression error',
-                                    text: 'An error occurred during image compression. Please try again.'
-                                });
-                                return;
-                            }
-                        }
-
-                        // Display the preview of the uploaded image
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            preview.src = e.target.result; // Set preview image source
-                        };
-                        reader.readAsDataURL(finalFile);
                     });
 
                     $('#releasingValidateForm').validate({
@@ -1285,15 +1376,13 @@
                                             contentType: false,
                                             processData: false,
                                             success: function(response) {
-
                                                 if (typeof response === 'string') {
                                                     var res = JSON.parse(response);
                                                 } else {
                                                     var res = response; // If it's already an object
                                                 }
 
-                                                if (res.status === 'success')
-                                                {
+                                                if (res.status === 'success') {
                                                     closeReleasingTransactionModal();
                                                     Swal.fire({
                                                         title: 'Successfully Created!',
@@ -1318,8 +1407,8 @@
                                                                         {
                                                                             Swal.close();
                                                                             $(form)[0].reset();
-                                                                            // dataTable.table.page(currentPage).draw( false );
-                                                                            window.location.href = '{{ route("ReleasedPage") }}';
+                                                                            dataTable.table.page(currentPage).draw( false );
+                                                                            // window.location.href = '{{ route("ReleasedPage") }}';
                                                                         },
                                                                         false );
                                                                     }
@@ -1327,17 +1416,13 @@
                                                             });
                                                         }
                                                     });
-                                                }
-                                                else if (res.status === 'error')
-                                                {
+                                                } else if (res.status === 'error') {
                                                     Swal.fire({
                                                         title: 'Error!',
                                                         text: res.message,
                                                         icon: 'error',
                                                     });
-                                                }
-                                                else
-                                                {
+                                                } else {
                                                     Swal.fire({
                                                         title: 'Error!',
                                                         text: 'Error Occurred Please Try Again',
@@ -1362,7 +1447,6 @@
                                     }
                                 })
                             } else {
-
                                 Swal.fire({
                                     icon: 'warning',
                                     title: 'Empty Record!',
@@ -1555,8 +1639,7 @@
                                                     var res = response; // If it's already an object
                                                 }
 
-                                                if (res.status === 'success')
-                                                {
+                                                if (res.status === 'success') {
                                                     closeReleasingWithBalanceTransactionModal();
                                                     Swal.fire({
                                                         title: 'Successfully Created!',
@@ -1589,17 +1672,13 @@
                                                             });
                                                         }
                                                     });
-                                                }
-                                                else if (res.status === 'error')
-                                                {
+                                                } else if (res.status === 'error') {
                                                     Swal.fire({
                                                         title: 'Error!',
                                                         text: res.message,
                                                         icon: 'error',
                                                     });
-                                                }
-                                                else
-                                                {
+                                                } else {
                                                     Swal.fire({
                                                         title: 'Error!',
                                                         text: 'Error Occurred Please Try Again',
@@ -1624,7 +1703,6 @@
                                     }
                                 })
                             } else {
-
                                 Swal.fire({
                                     icon: 'warning',
                                     title: 'Empty Record!',
@@ -1891,11 +1969,11 @@
                             $('#replacement_pension_number_display').text(data.pension_number ?? '');
                             $('#replacement_pension_number_display').inputmask("99-9999999-99");
 
-                            $('#replacement_pension_number').val(data.pension_number);
-                            $('#replacement_pension_account_type').text(data.account_type);
-                            $('#replacement_pension_type').val(data.pension_type);
+                            $('#replacement_pension_number').val(data.pension_number ?? '');
+                            $('#replacement_pension_account_type').text(data.account_type ?? '');
+                            $('#replacement_pension_type').text(data.pension_type ?? '');
                             $('#replacement_birth_date').val(formattedBirthDate);
-                            $('#replacement_branch_location').val(data.branch.branch_location);
+                            $('#replacement_branch_location').val(data.branch.branch_location ?? '');
 
                             $('#replacement_atm_id').val(data.id);
                             $('#replacement_bank_account_no').val(data.bank_account_no ?? '');
@@ -2093,12 +2171,12 @@
 
                             $('#cancelled_loan_branch_id').val(data.branch_id ?? '').trigger('change');
 
-                            $('#cancelled_loan_pension_number_display').text(data.client_information.pension_number ?? '');
+                            $('#cancelled_loan_pension_number_display').text(data.pension_number ?? '');
                             $('#cancelled_loan_pension_number_display').inputmask("99-9999999-99");
 
-                            $('#cancelled_loan_pension_number').val(data.client_information.pension_number);
-                            $('#cancelled_loan_pension_account_type').text(data.client_information.pension_account_type);
-                            $('#cancelled_loan_pension_type').val(data.client_information.pension_type);
+                            $('#cancelled_loan_pension_number').val(data.pension_number);
+                            $('#cancelled_loan_account_type').text(data.account_type ?? '');
+                            $('#cancelled_loan_pension_type').text(data.pension_type ?? '');
                             $('#cancelled_loan_birth_date').val(formattedBirthDate);
                             $('#cancelled_loan_branch_location').val(data.branch.branch_location);
 
@@ -2281,8 +2359,7 @@
                                                                         {
                                                                             Swal.close();
                                                                             $(form)[0].reset();
-                                                                            // dataTable.table.page(currentPage).draw( false );
-                                                                            window.location.href = '{{ route("ReleasedPage") }}';
+                                                                            dataTable.table.page(currentPage).draw( false );
                                                                         },
                                                                         false );
                                                                     }
@@ -2354,7 +2431,7 @@
                             // Open the QR code in a new tab
                             console.log(transaction_number);
                             $("#reference_number_slot").val(transaction_number);
-                            $('#choose_slot_print_qr_modal').modal('show');
+                            $('#ChooseSlotQRCodeModal').modal('show');
                         }
                     });
                 });
@@ -2374,7 +2451,8 @@
             // Generating of QR Code
 
             // Add ATM Transaction
-                    $('#addAtmTransactionModal').on('shown.bs.modal', function () {
+                $('#addAtmTransactionModal').on('shown.bs.modal', function () {
+                    $('#add_atm_pension_account_type_dropdown').select2({  dropdownParent: $('#addAtmTransactionModal') });
                     $('#add_atm_bank_names').select2({ dropdownParent: $('#addAtmTransactionModal'), });
                     $('#add_atm_collection_date').select2({ dropdownParent: $('#addAtmTransactionModal'), });
                 });
@@ -2395,13 +2473,15 @@
                                                         +(data.client_information.middle_name ?? '') +' '
                                                         + (data.client_information.suffix ?? ''));
 
-                            $('#add_atm_pension_number_display').text(data.client_information.pension_number ?? '');
+                            $('#add_atm_pension_number_display').text(data.pension_number ?? '');
                             $('#add_atm_pension_number_display').inputmask("99-9999999-99");
-
-                            $('#add_atm_pension_number').val(data.client_information.pension_number);
-                            $('#add_atm_pension_account_type').text(data.client_information.pension_account_type);
-                            $('#add_atm_pension_type').val(data.client_information.pension_type);
+                            $('#add_atm_pension_number_value').val(data.pension_number ?? '');
+                            $('#add_atm_pension_number').val(data.pension_number ?? '');
+                            $('#add_atm_pension_account_type').text(data.account_type ?? '');
+                            $('#add_atm_pension_type').text(data.pension_type ?? '');
+                            $('#add_atm_account_type').val(data.account_type ?? '').trigger('change');
                             $('#add_atm_birth_date').val(formattedBirthDate);
+                            $('#add_atm_pension_type_value').val(data.pension_type ?? '');
                             $('#add_atm_branch_location').val(data.branch.branch_location);
 
                             $('#add_atm_atm_id').val(data.id);
@@ -2560,16 +2640,63 @@
                         }
                     }
                 });
+
+                $('#add_atm_account_type').on('change', function() {
+                    var selected_pension_types = $(this).val();
+
+                    setTimeout(function() {
+                        var PreviousPensionType = $('#add_atm_pension_type_value').val(); // Get the latest area ID value after a brief delay
+
+                        // Make the AJAX GET request for areas
+                        $.ajax({
+                            url: '/pension/types/fetch',
+                            type: 'GET',
+                            data: {
+                                selected_pension_types: selected_pension_types
+                            },
+                            success: function(response) {
+                                var options = '<option value="" selected disabled>Pension Types</option>';
+
+                                // Build options for each area
+                                $.each(response, function(index, item) {
+                                    // Check if this area matches the previous one and mark it as selected
+                                    var selected = (item.pension_name == PreviousPensionType) ? 'selected' : '';
+                                    options += `<option value="${item.pension_name}" ${selected}>${item.pension_name}</option>`;
+                                });
+
+                                $('#add_atm_pension_account_type_dropdown').html(options); // Update the dropdown with the new options
+
+                                // Automatically trigger the area change to load branches
+                                if (PreviousPensionType) {
+                                    $('#add_atm_pension_account_type_dropdown').val(PreviousPensionType).trigger('change'); // Set previous area as selected and trigger change event
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('AJAX Error:', status, error);
+                            }
+                        });
+                    }, 100); // Small delay to ensure area ID is updated
+                });
+
+                $('#same_pension_number').on('change', function() {
+                    if ($(this).is(':checked')) {
+                        $('#pension_no_select').val('yes'); // Hide the entire span (label + input)
+                        $('#SamePensionNumberSelected').hide(); // Hide the entire span (label + input)
+                    } else {
+                        $('#SamePensionNumberSelected').show(); // Show the span back
+                        $('#pension_no_select').val('no');
+                    }
+                });
             // Add ATM Transaction
         });
 
         $(document).on('click', '.view_pin_code', function(e) {
             e.preventDefault(); // Prevent the default anchor behavior
 
-            const pinCode = $(this).data('pin'); // Get the PIN code from the data attribute
-            const bankAccountNo = $(this).data('bank_account_no'); // Get the bank account number
+            const pinCode = $(this).data('pin');
+            const bankAccountNo = $(this).data('bank_account_no');
+            const atmId = $(this).data('atm_id');
 
-            // SweetAlert confirmation
             Swal.fire({
                 icon: "question",
                 title: 'Do you want to view the PIN code?',
@@ -2578,19 +2705,52 @@
                 cancelButtonText: 'No'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // If confirmed, show another SweetAlert with the PIN code and bank account number
-                    Swal.fire({
-                        title: 'PIN Code Details',
-                        html: `<br>
-                            <span class="fw-bold h3 text-dark">${pinCode}</span><br><br>
-                            <span class="fw-bold h4 text-primary">${bankAccountNo}</span><br>
-                        `,
-                        icon: 'info',
-                        confirmButtonText: 'Okay'
+                    let csrfToken = $('meta[name="csrf-token"]').attr('content');
+                    $.ajax({
+                        url: "{{ route('system.pin-code.logs') }}",
+                        type: "POST",
+                        data: {
+                            atm_id: atmId,
+                            location: 'Branch',
+                            _token: csrfToken
+                        },
+                        success: function(response) {
+                            if (typeof response === 'string') {
+                                var res = JSON.parse(response);
+                            } else {
+                                var res = response; // If it's already an object
+                            }
+
+                            if (res.status === 'success') {
+                                Swal.fire({
+                                    title: 'PIN Code Details',
+                                    html: `<br>
+                                        <span class="fw-bold h3 text-dark">${pinCode}</span><br><br>
+                                        <span class="fw-bold h4 text-primary">${bankAccountNo}</span><br>`,
+                                    icon: 'info',
+                                    confirmButtonText: 'Okay'
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Unable to Display PIN code details. Please try again.'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Something went wrong!',
+                                text: 'Unable to log or fetch PIN code. Please try again.'
+                            });
+                            console.error('AJAX Error:', xhr.responseText);
+                        }
                     });
                 }
             });
         });
+
     </script>
 
 @endsection

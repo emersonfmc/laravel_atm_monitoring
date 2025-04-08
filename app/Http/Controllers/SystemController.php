@@ -6,12 +6,13 @@ use Log;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
-
 use App\Models\System\SystemLogs;
-use App\Models\System\SystemAnnouncements;
+
+use App\Models\ATM\AtmClientBanks;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
+use App\Models\System\SystemAnnouncements;
 
 class SystemController extends Controller
 {
@@ -198,6 +199,55 @@ class SystemController extends Controller
             })
             ->rawColumns(['differForHumans'])
             ->make(true);
+    }
+
+    public function system_logs_create_pin_code(Request $request){
+        $atm_id = $request->atm_id;
+        $location = $request->location;
+
+        $AtmClientBanks = AtmClientBanks::with('ClientInformation', 'Branch')->findOrFail($atm_id);
+
+        $BankAccountNo = $AtmClientBanks->bank_account_no;
+        $BankName = $AtmClientBanks->bank_name;
+        $BankType = $AtmClientBanks->atm_type;
+        $TransactionNumber = $AtmClientBanks->transaction_number;
+        $BranchDetails = $AtmClientBanks->Branch->branch_location ?? '';
+        $PinCode = $AtmClientBanks->pin_no ?? '';
+
+        // Used Only for Logs
+            $ClientDetails = trim(
+                ($AtmClientBanks->ClientInformation->last_name ?? '') . ' ' .
+                ($AtmClientBanks->ClientInformation->first_name ?? '') . ' ' .
+                ($AtmClientBanks->ClientInformation->middle_name ?? '') . ' ' .
+                ($AtmClientBanks->ClientInformation->suffix ?? '')
+            );
+
+            // System Logs
+                SystemLogs::create([
+                    'module' => 'ATM Monitoring',
+                    'action' => 'Create',
+                    'title' => 'Viewing of Pin Code',
+                    'description_logs' => [ // Convert array to JSON
+                        'new_details' => [
+                            'Transaction' => 'Viewing of PIN Code System Logs',
+                            'Transaction Number' => $TransactionNumber ?? '',
+                            'Card No' => $BankAccountNo ?? '',
+                            'Card Type' => $BankType ?? '',
+                            'Bank Name' => $BankName ?? '',
+                            'PIN Code' => $PinCode,
+                            'Client Details' => $ClientDetails,
+                            'Branch' => $BranchDetails,
+                            'Location' => $location,
+                        ],
+                    ],
+                    'employee_id' => Auth::user()->employee_id,
+                    'ip_address' => $request->ip(),
+                    'created_at' => Carbon::now(),
+                    'company_id' => Auth::user()->company_id,
+                ]);
+            // System Logs
+
+        return response()->json(['status' => 'success' ]);
     }
 
 

@@ -60,8 +60,8 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'settings'], functio
         Route::get('/area/using/district', 'areaGetBydistrict')->name('settings.area.using.district');
         Route::get('/branch/using/area', 'branchGetByarea')->name('settings.branch.using.area');
 
-        Route::get('/release_reason/page', 'release_reason_page')->name('settings.release.reason.page');
-        Route::get('/release_reason/data', 'release_reason_data')->name('settings.release.reason.data');
+        Route::get('/release/reason/page', 'release_reason_page')->name('settings.release.reason.page');
+        Route::get('/release/reason/data', 'release_reason_data')->name('settings.release.reason.data');
         Route::get('/release/reason/get/{id}', 'release_reason_get')->name('settings.release.reason.get');
         Route::post('/release/reason/create', 'release_reason_create')->name('settings.release.reason.create');
         Route::post('/release/reason/update', 'release_reason_update')->name('settings.release.reason.update');
@@ -90,6 +90,11 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'settings'], functio
         Route::post('/company/create', 'companyCreate')->name('settings.company.create');
         Route::post('/company/update', 'companyUpdate')->name('settings.company.update');
 
+        Route::get('/borrow/reason/page', 'borrow_reason_page')->name('settings.borrow.reason.page');
+        Route::get('/borrow/reason/data', 'borrow_reason_data')->name('settings.borrow.reason.data');
+        Route::get('/borrow/reason/get/{id}', 'borrow_reason_get')->name('settings.borrow.reason.get');
+        Route::post('/borrow/reason/create', 'borrow_reason_create')->name('settings.borrow.reason.create');
+        Route::post('/borrow/reason/update', 'borrow_reason_update')->name('settings.borrow.reason.update');
 
         Route::get('/login_get_test', 'login_page')->name('login.page.test');
     });

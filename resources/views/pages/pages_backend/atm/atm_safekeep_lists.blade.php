@@ -34,15 +34,16 @@
                                 <tr>
                                     <th>Action</th>
                                     <th>Transaction / Pending By</th>
-                                    <th>Reference No</th>
+                                    <th>Transaction No</th>
                                     <th>Client</th>
                                     <th>Branch</th>
                                     <th>Pension No. / Type</th>
                                     <th>Created Date</th>
                                     <th>Birthdate</th>
-                                    <th>Safekeep Box</th>
-                                    <th>ATM / Passbook / Simcard No & Bank</th>
+                                    <th>Cash Box</th>
+                                    <th>Card No & Bank</th>
                                     <th>PIN Code</th>
+                                    <th>Collection Date</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
@@ -72,10 +73,12 @@
                         <div class="row">
                             <input type="hidden" name="atm_id" id="pullout_atm_id">
                             <input type="hidden" name="reason_for_pull_out" value="9">
+                            <input type="hidden" name="aprb_no" id="pullout_aprb_no">
                             <div class="col-12">
                                 <div class="form-group">
                                     <div id="pullout_fullname" class="fw-bold h4"></div>
-                                    <span id="pullout_pension_number_display" class="ms-3 pension_number_mask text-primary fw-bold h5"></span> / <span id="pullout_pension_account_type" class="fw-bold h5"></span>
+                                    <span id="pullout_pension_number_display" class="ms-3 text-primary fw-bold h5"></span> /
+                                    <span id="pullout_pension_type" class="fw-bold h5"></span>
                                 </div>
                                 <hr>
 
@@ -102,7 +105,7 @@
 
                                 <div class="row mb-3">
                                     <div class="form-group col-6">
-                                        <label class="fw-bold h6">Bank Account Number</label>
+                                        <label class="fw-bold h6">Card No.</label>
                                         <input type="text" class="form-control" id="pullout_bank_account_no" readonly>
                                     </div>
                                     <div class="form-group col-6">
@@ -143,358 +146,336 @@
 
     <script>
         $(document).ready(function () {
-            var FetchingDatatableBody = $('#FetchingDatatable tbody');
+            // Displaying of Data
+                var FetchingDatatableBody = $('#FetchingDatatable tbody');
 
-            const dataTable = new ServerSideDataTable('#FetchingDatatable');
-            var url = '{!! route('SafekeepData') !!}';
-            const buttons = [{
-                text: 'Delete',
-                action: function(e, dt, node, config) {
-                    // Add your custom button action here
-                    alert('Custom button clicked!');
+                const dataTable = new ServerSideDataTable('#FetchingDatatable');
+                var url = '{!! route('SafekeepData') !!}';
+                const buttons = [{
+                    text: 'Delete',
+                    action: function(e, dt, node, config) {
+                        // Add your custom button action here
+                        alert('Custom button clicked!');
+                    }
+                }];
+                const columns = [
+                    {
+                        data: 'action',
+                        render: function(data, type, row) {
+                            return `<span>${row.action ?? ''}</span>`;
+                        },
+                        orderable: false,
+                        searchable: false,
+                    },
+                    // Transaction Type and Pending By
+                    {
+                        data: 'pending_to',
+                        render: function(data, type, row, meta) {
+                            return `<span class="fw-bold h6 text-primary">${row.pending_to ?? ''}</span>`;
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    // Reference No
+                    {
+                        data: 'transaction_number',
+                        name: 'transaction_number',
+                        render: function(data, type, row, meta) {
+                            return '<span class="fw-bold">' + data + '</span>';
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'full_name',
+                        render: function(data, type, row, meta) {
+                            return '<span>' + row.full_name + '</span>';
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'branch_id',
+                        name: 'branch.branch_location',
+                        render: function(data, type, row, meta) {
+                            return row.branch ? '<span>' + row.branch.branch_location + '</span>' : ''; // Check if company exists
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'pension_details',
+                        render: function(data, type, row, meta) {
+                            return '<span>' + row.pension_details + '</span>';
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'client_information_id',
+                        name: 'client_information.created_at',
+                        render: function(data, type, row, meta) {
+                            if (row.client_information) {
+                                const createdAt = row.client_information.created_at ? new Date(row.client_information.created_at) : null;
+                                const formattedDate = createdAt ? createdAt.toLocaleDateString('en-US',
+                                    {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric'
+                                    })
+                                    : '';
+
+                                return `<span class="text-muted">${formattedDate}</span>`;
+                            }
+                            return '';
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'client_information_id',
+                        name: 'client_information.birth_date',
+                        render: function(data, type, row, meta) {
+                            if (row.client_information) {
+                                const BirthDate = row.client_information.birth_date ? new Date(row.client_information.birth_date) : null;
+                                const formattedBirthDate = BirthDate ? BirthDate.toLocaleDateString('en-US',
+                                    {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric'
+                                    })
+                                    : '';
+
+                                return `<span class="text-muted">${formattedBirthDate}</span>`;
+                            }
+                            return '';
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'cash_box_no',
+                        render: function(data, type, row, meta) {
+                            return `<span>${row.cash_box_no ?? ''}</span>`;
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'bank_details',
+                        render: function(data, type, row) {
+                            return `<span>${row.bank_details ?? ''}</span>`;
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'pin_code_details',
+                        render: function(data, type, row) {
+                            return `<span>${row.pin_code_details ?? ''}</span>`;
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'collection_date',
+                        render: function(data, type, row, meta) {
+                            return `<span>${row.collection_date ?? ''}</span>`;
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                    {
+                        data: 'bank_status',
+                        render: function(data, type, row, meta) {
+                            return `<span>${row.bank_status ?? ''}</span>`;
+                        },
+                        orderable: true,
+                        searchable: true,
+                    },
+                ];
+                dataTable.initialize(url, columns);
+            // Displaying of Data
+
+            // Creation of Pullout
+                $('#FetchingDatatable').on('click', '.pullOutTransaction', function(e) {
+                    e.preventDefault();
+                    var new_atm_id = $(this).data('id');
+                    var new_aprb_no = $(this).data('aprb_no');
+
+                    $('#pullout_aprb_no').val(new_aprb_no ?? '');
+
+                    $.ajax({
+                        url: "/AtmClientFetch",
+                        type: "GET",
+                        data: { new_atm_id : new_atm_id },
+                        success: function(data) {
+                            let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+
+                            $('#pullout_fullname').text(data.client_information.last_name +', '
+                                                        + data.client_information.first_name +' '
+                                                        +(data.client_information.middle_name ?? '') +' '
+                                                        + (data.client_information.suffix ?? ''));
+
+                            $('#pullout_branch_id').val(data.branch_id ?? '').trigger('change');
+
+                            $('#pullout_pension_number_display').text(data.pension_number ?? '');
+                            $('#pullout_pension_number_display').inputmask("99-9999999-99");
+
+                            $('#pullout_pension_number').val(data.pension_number ?? '');
+                            $('#pullout_pension_type').text(data.pension_type ?? '');
+                            $('#pullout_pension_account_type').val(data.pension_type ?? '');
+                            $('#pullout_birth_date').val(formattedBirthDate ?? '');
+                            $('#pullout_branch_location').val(data.branch.branch_location ?? '');
+
+                            $('#pullout_atm_id').val(data.id ?? '');
+                            $('#pullout_bank_account_no').val(data.bank_account_no ?? '');
+                            $('#pullout_collection_date').val(data.collection_date ?? '').trigger('change');
+                            $('#pullout_atm_type').val(data.atm_type ?? '');
+                            $('#pullout_bank_name').val(data.bank_name ?? '');
+                            $('#pullout_transaction_number').val(data.transaction_number ?? '');
+
+                            let expirationDate = '';
+                            if (data.expiration_date && data.expiration_date !== '0000-00-00') {
+                                expirationDate = new Date(data.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                            }
+                            $('#pullout_expiration_date').val((expirationDate || ''));
+
+                            $('#pulloutBranchTransactionModal').modal('show');
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("An error occurred: " + error);
+                        }
+                    });
+                });
+
+                function closeTransactionModal() {
+                    $('#pulloutBranchTransactionModal').modal('hide');
+                    $('#FetchingDatatable tbody').empty();
                 }
-            }];
-            const columns = [
-                {
-                    data: null,
-                    name: 'action', // This matches the name you used in your server-side code
-                    render: function(data, type, row) {
-                        return row.action; // Use the action rendered from the server
-                    },
-                    orderable: false,
-                    searchable: false,
-                },
-                // Transaction Type and Pending By
-                {
-                    data: 'pending_to',
-                    name: 'pending_to',
-                    render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6 text-primary">' + data + '</span>';
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
 
+                $('#TransactionPulloutValidateForm').validate({
+                    rules: {
+                        remarks: { required: true }
+                    },
+                    errorElement: 'span',
+                    errorPlacement: function(error, element) {
+                        error.addClass('invalid-feedback');
+                        element.closest('.form-group').append(error);
+                    },
+                    highlight: function(element, errorClass, validClass) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element, errorClass, validClass) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    submitHandler: function(form) {
+                        var hasRows = FetchingDatatableBody.children('tr').length > 0;
+                        if (hasRows) {
+                            Swal.fire({
+                                title: 'Confirmation',
+                                text: 'Are you sure you want to save this?',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonColor: "#007BFF",
+                                cancelButtonColor: "#6C757D",
+                                confirmButtonText: "Yes, Save it!"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    const currentPage = dataTable.table.page();
+                                    $.ajax({
+                                        url: form.action,
+                                        type: form.method,
+                                        data: $(form).serialize(),
+                                        success: function(response) {
 
-                // Reference No
-                {
-                    data: 'transaction_number',
-                    name: 'transaction_number',
-                    render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6">' + data + '</span>';
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: null,
-                    render: function(data, type, row, meta) {
-                        return '<span>' + row.full_name + '</span>';
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'branch_id',
-                    name: 'branch.branch_location',
-                    render: function(data, type, row, meta) {
-                        return row.branch ? '<span>' + row.branch.branch_location + '</span>' : ''; // Check if company exists
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: null,
-                    render: function(data, type, row, meta) {
-                        return '<span>' + row.pension_details + '</span>';
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'client_information_id',
-                    name: 'client_information.created_at',
-                    render: function(data, type, row, meta) {
-                        if (row.client_information) {
-                            const createdAt = row.client_information.created_at ? new Date(row.client_information.created_at) : null;
-                            const formattedDate = createdAt ? createdAt.toLocaleDateString('en-US',
-                                {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                })
-                                : '';
+                                            if (typeof response === 'string') {
+                                                var res = JSON.parse(response);
+                                            } else {
+                                                var res = response; // If it's already an object
+                                            }
 
-                            return `<span class="text-muted">${formattedDate}</span>`;
+                                            if (res.status === 'success') {
+                                                closeTransactionModal();
+                                                Swal.fire({
+                                                    title: 'Successfully Created!',
+                                                    text: 'Transaction is successfully Created!',
+                                                    icon: 'success',
+                                                    showCancelButton: false,
+                                                    showConfirmButton: true,
+                                                    confirmButtonText: 'OK',
+                                                    preConfirm: () => {
+                                                        return new Promise(( resolve
+                                                        ) => {
+                                                            Swal.fire({
+                                                                title: 'Please Wait...',
+                                                                allowOutsideClick: false,
+                                                                allowEscapeKey: false,
+                                                                showConfirmButton: false,
+                                                                showCancelButton: false,
+                                                                didOpen: () => {
+                                                                    Swal.showLoading();
+                                                                    // here the reload of datatable
+                                                                    dataTable.table.ajax.reload( () =>
+                                                                    {
+                                                                        Swal.close();
+                                                                        $(form)[0].reset();
+                                                                        dataTable.table.page(currentPage).draw( false );
+                                                                    },
+                                                                    false );
+                                                                }
+                                                            })
+                                                        });
+                                                    }
+                                                });
+                                            } else if (res.status === 'error') {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: res.message,
+                                                    icon: 'error',
+                                                });
+                                            } else {
+                                                Swal.fire({
+                                                    title: 'Error!',
+                                                    text: 'Error Occurred Please Try Again',
+                                                    icon: 'error',
+                                                });
+                                            }
+                                        },
+                                        error: function(xhr, status, error) {
+                                            var errorMessage =
+                                                'An error occurred. Please try again later.';
+                                            if (xhr.responseJSON && xhr.responseJSON.error) {
+                                                errorMessage = xhr.responseJSON.error;
+                                            }
+                                            Swal.fire({
+                                                title: 'Error!',
+                                                text: errorMessage,
+                                                icon: 'error',
+                                            });
+                                        }
+                                    })
+                                }
+                            })
+                        } else {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Empty Record!',
+                                text: 'Table is empty, add row to proceed!',
+                            });
                         }
-                        return '';
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'client_information_id',
-                    name: 'client_information.birth_date',
-                    render: function(data, type, row, meta) {
-                        if (row.client_information) {
-                            const BirthDate = row.client_information.birth_date ? new Date(row.client_information.birth_date) : null;
-                            const formattedBirthDate = BirthDate ? BirthDate.toLocaleDateString('en-US',
-                                {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                })
-                                : '';
-
-                            return `<span class="text-muted">${formattedBirthDate}</span>`;
-                        }
-                        return '';
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'safekeep_cash_box_no',
-                    name: 'safekeep_cash_box_no',
-                    render: function(data, type, row, meta) {
-                        return data ? `<span>${data}</span>` : '';
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'bank_account_no',
-                    name: 'bank_account_no',
-                    render: function(data, type, row, meta) {
-                            return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span><br>
-                                <span class="fw-bold">${row.bank_name}</span>`;
-
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'pin_no',
-                    name: 'pin_no',
-                    render: function(data, type, row) {
-                        return `<a href="#" class="text-info fs-4 view_pin_code"
-                                    data-pin="${row.pin_no}"
-                                    data-bank_account_no="${row.bank_account_no}"><i class="fas fa-eye"></i>
-                                </a><br>`;
-
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'atm_status',
-                    name: 'atm_status',
-                    render: function(data, type, row, meta) {
-                        let BankStatus = ''; // Define BankStatus outside the if block with a default value
-                        let atmTypeClass = ''; // Variable to hold the class based on atm_type
-
-                        BankStatus = row.atm_status;
-
-                        // Determine the text color based on atm_type
-                        switch (row.atm_type) {
-                            case 'ATM':
-                                atmTypeClass = 'text-primary';
-                                break;
-                            case 'Passbook':
-                                atmTypeClass = 'text-danger';
-                                break;
-                            case 'Sim Card':
-                                atmTypeClass = 'text-info';
-                                break;
-                            default:
-                                atmTypeClass = 'text-secondary'; // Default color if none match
-                        }
-
-                        return `<span class="${atmTypeClass}">${row.atm_type}</span><br>
-                                <span class="fw-bold h6">${BankStatus}</span>`;
-                    },
-                    orderable: true,
-                    searchable: true,
-                }
-            ];
-            dataTable.initialize(url, columns);
-
-            $('#FetchingDatatable').on('click', '.pullOutTransaction', function(e) {
-                e.preventDefault();
-                var new_atm_id = $(this).data('id');
-
-                $.ajax({
-                    url: "/AtmClientFetch",
-                    type: "GET",
-                    data: { new_atm_id : new_atm_id },
-                    success: function(data) {
-                        let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
-
-                        $('#pullout_fullname').text(data.client_information.last_name +', '
-                                                    + data.client_information.first_name +' '
-                                                    +(data.client_information.middle_name ?? '') +' '
-                                                    + (data.client_information.suffix ?? ''));
-
-                        $('#pullout_branch_id').val(data.branch_id ?? '').trigger('change');
-
-                        $('#pullout_pension_number_display').text(data.client_information.pension_number ?? '');
-                        $('#pullout_pension_number_display').inputmask("99-9999999-99");
-
-                        $('#pullout_pension_number').val(data.client_information.pension_number);
-                        $('#pullout_pension_account_type').text(data.client_information.pension_account_type);
-                        $('#pullout_pension_type').val(data.client_information.pension_type);
-                        $('#pullout_birth_date').val(formattedBirthDate);
-                        $('#pullout_branch_location').val(data.branch.branch_location);
-
-                        $('#pullout_atm_id').val(data.id);
-                        $('#pullout_bank_account_no').val(data.bank_account_no ?? '');
-                        $('#pullout_collection_date').val(data.collection_date ?? '').trigger('change');
-                        $('#pullout_atm_type').val(data.atm_type ?? '');
-                        $('#pullout_bank_name').val(data.bank_name ?? '');
-                        $('#pullout_transaction_number').val(data.transaction_number ?? '');
-
-                        let expirationDate = '';
-                        if (data.expiration_date && data.expiration_date !== '0000-00-00') {
-                            expirationDate = new Date(data.expiration_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                        }
-                        $('#pullout_expiration_date').val((expirationDate || ''));
-
-                        $('#pulloutBranchTransactionModal').modal('show');
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("An error occurred: " + error);
                     }
                 });
-            });
-
-            $('#TransactionPulloutValidateForm').validate({
-                rules: {
-                    remarks: { required: true }
-                },
-                errorElement: 'span',
-                errorPlacement: function(error, element) {
-                    error.addClass('invalid-feedback');
-                    element.closest('.form-group').append(error);
-                },
-                highlight: function(element, errorClass, validClass) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function(element, errorClass, validClass) {
-                    $(element).removeClass('is-invalid');
-                },
-                submitHandler: function(form) {
-                    var hasRows = FetchingDatatableBody.children('tr').length > 0;
-                    if (hasRows) {
-                        Swal.fire({
-                            title: 'Confirmation',
-                            text: 'Are you sure you want to save this?',
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonColor: "#007BFF",
-                            cancelButtonColor: "#6C757D",
-                            confirmButtonText: "Yes, Save it!"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                const currentPage = dataTable.table.page();
-                                $.ajax({
-                                    url: form.action,
-                                    type: form.method,
-                                    data: $(form).serialize(),
-                                    success: function(response) {
-
-                                        if (typeof response === 'string') {
-                                            var res = JSON.parse(response);
-                                        } else {
-                                            var res = response; // If it's already an object
-                                        }
-
-                                        if (res.status === 'success')
-                                        {
-                                            closeTransactionModal();
-                                            Swal.fire({
-                                                title: 'Successfully Created!',
-                                                text: 'Transaction is successfully Created!',
-                                                icon: 'success',
-                                                showCancelButton: false,
-                                                showConfirmButton: true,
-                                                confirmButtonText: 'OK',
-                                                preConfirm: () => {
-                                                    return new Promise(( resolve
-                                                    ) => {
-                                                        Swal.fire({
-                                                            title: 'Please Wait...',
-                                                            allowOutsideClick: false,
-                                                            allowEscapeKey: false,
-                                                            showConfirmButton: false,
-                                                            showCancelButton: false,
-                                                            didOpen: () => {
-                                                                Swal.showLoading();
-                                                                // here the reload of datatable
-                                                                dataTable.table.ajax.reload( () =>
-                                                                {
-                                                                    Swal.close();
-                                                                    $(form)[0].reset();
-                                                                    dataTable.table.page(currentPage).draw( false );
-                                                                },
-                                                                false );
-                                                            }
-                                                        })
-                                                    });
-                                                }
-                                            });
-                                        }
-                                        else if (res.status === 'error')
-                                        {
-                                            Swal.fire({
-                                                title: 'Error!',
-                                                text: res.message,
-                                                icon: 'error',
-                                            });
-                                        }
-                                        else
-                                        {
-                                            Swal.fire({
-                                                title: 'Error!',
-                                                text: 'Error Occurred Please Try Again',
-                                                icon: 'error',
-                                            });
-                                        }
-                                    },
-                                    error: function(xhr, status, error) {
-                                        var errorMessage =
-                                            'An error occurred. Please try again later.';
-                                        if (xhr.responseJSON && xhr.responseJSON
-                                            .error) {
-                                            errorMessage = xhr.responseJSON.error;
-                                        }
-                                        Swal.fire({
-                                            title: 'Error!',
-                                            text: errorMessage,
-                                            icon: 'error',
-                                        });
-                                    }
-                                })
-                            }
-                        })
-                    } else {
-
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Empty Record!',
-                            text: 'Table is empty, add row to proceed!',
-                        });
-                    }
-                }
-            });
+            // Creation of Pullout
         });
 
         $(document).on('click', '.view_pin_code', function(e) {
             e.preventDefault(); // Prevent the default anchor behavior
 
-            const pinCode = $(this).data('pin'); // Get the PIN code from the data attribute
-            const bankAccountNo = $(this).data('bank_account_no'); // Get the bank account number
+            const pinCode = $(this).data('pin');
+            const bankAccountNo = $(this).data('bank_account_no');
+            const atmId = $(this).data('atm_id');
 
-            // SweetAlert confirmation
             Swal.fire({
                 icon: "question",
                 title: 'Do you want to view the PIN code?',
@@ -503,26 +484,51 @@
                 cancelButtonText: 'No'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // If confirmed, show another SweetAlert with the PIN code and bank account number
-                    Swal.fire({
-                        title: 'PIN Code Details',
-                        html: `<br>
-                            <span class="fw-bold h3 text-dark">${pinCode}</span><br><br>
-                            <span class="fw-bold h4 text-primary">${bankAccountNo}</span><br>
-                        `,
-                        icon: 'info',
-                        confirmButtonText: 'Okay'
+                    let csrfToken = $('meta[name="csrf-token"]').attr('content');
+                    $.ajax({
+                        url: "{{ route('system.pin-code.logs') }}",
+                        type: "POST",
+                        data: {
+                            atm_id: atmId,
+                            location: 'Safekeep',
+                            _token: csrfToken
+                        },
+                        success: function(response) {
+                            if (typeof response === 'string') {
+                                var res = JSON.parse(response);
+                            } else {
+                                var res = response; // If it's already an object
+                            }
+
+                            if (res.status === 'success') {
+                                Swal.fire({
+                                    title: 'PIN Code Details',
+                                    html: `<br>
+                                        <span class="fw-bold h3 text-dark">${pinCode}</span><br><br>
+                                        <span class="fw-bold h4 text-primary">${bankAccountNo}</span><br>`,
+                                    icon: 'info',
+                                    confirmButtonText: 'Okay'
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Unable to Display PIN code details. Please try again.'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Something went wrong!',
+                                text: 'Unable to log or fetch PIN code. Please try again.'
+                            });
+                            console.error('AJAX Error:', xhr.responseText);
+                        }
                     });
                 }
             });
         });
-    </script>
-
-    <script>
-            function closeTransactionModal() {
-                $('#pulloutBranchTransactionModal').modal('hide');
-                $('#FetchingDatatable tbody').empty();
-            }
     </script>
 
 @endsection

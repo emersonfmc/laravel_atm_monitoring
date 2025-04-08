@@ -55,6 +55,12 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('settings.borrow.reason.page') }}" key="settings_atm_borrow_reason">
+                                <i class="fas fa-stream fs-6 text-success"></i>
+                                Borrow Reason
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('settings.transaction.action.page') }}" key="settings_atm_transaction_action">
                                 <i class="fas fa-location-arrow fs-6 text-primary"></i>
                                 Transaction Action

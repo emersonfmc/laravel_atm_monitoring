@@ -81,7 +81,7 @@
                     </ul>
                 </li>
 
-                <li class="menu-title" key="atm-pb-monitoring">Monitoring</li>
+                <li class="menu-title" key="atm-pb-monitoring">Card Monitoring</li>
                 <li class="mm-active">
                     <a href="javascript: void(0);" class="has-arrow waves-effect" aria-expanded="true">
                         <i class="far fa-credit-card" style="color: #3787FD;"></i>
@@ -146,9 +146,12 @@
                     </ul>
                 </li>
 
+                <li class="menu-title" key="atm-pb-monitoring">Passbook Monitoring</li>
                 <li class="mm-active">
-                    <a href="javascript: void(0);" class="has-arrow"
-                        key="pb_for_collection"><i class="fas fa-book" style="color: #cc2424;"></i>PB For Collection</a>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect" aria-expanded="true">
+                        <i class="fas fa-book" style="color: #cc2424;"></i>
+                        <span key="pb_monitoring">PB For Collection</span>
+                    </a>
                     <ul class="sub-menu" aria-expanded="true">
                         <li>
                             <a href="{{ route('PassbookCollectionSetUpPage') }}" key="pb_setup">
@@ -185,8 +188,6 @@
                                 PB All Transaction
                             </a>
                         </li>
-
-
                     </ul>
                 </li>
 

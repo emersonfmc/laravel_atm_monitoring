@@ -3,42 +3,43 @@
 namespace App\Http\Controllers\ATM;
 
 use Illuminate\Http\Request;
-use App\Models\DataBankLists;
-use App\Models\ATM\AtmClientBanks;
-use App\Models\DataCollectionDate;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 
+use App\Models\Branch;
+use App\Models\DataBankLists;
+use App\Models\DataCollectionDate;
 use App\Models\DataTransactionAction;
+use App\Models\ATM\AtmClientBanks;
+use App\Models\ATM\AtmBanksTransaction;
+use App\Models\ATM\AtmBanksTransactionApproval;
+
 use App\Models\System\MaintenancePage;
 
-use App\Models\ATM\AtmBanksTransaction;
-use Yajra\DataTables\Facades\DataTables;
-use App\Models\ATM\AtmBanksTransactionApproval;
+use App\Http\Controllers\Controller;
 
 class AtmBranchOfficeController extends Controller
 {
-    public function BranchOfficePage()
-    {
+    public function BranchOfficePage(){
         $userGroup = Auth::user()->UserGroup->group_name;
-
+        $branch_id = Auth::user()->branch_id;
+        $Branches = Branch::where('status', 'Active')->get();
         $DataCollectionDate = DataCollectionDate::where('status','Active')->get();
         $DataBankLists = DataBankLists::where('status','Active')->get();
         $MaintenancePage = MaintenancePage::where('pages_name', 'Branch Office Page')->first();
 
         if ($MaintenancePage->status == 'yes') {
             if (in_array($userGroup, ['Developer', 'Admin'])) {
-                return view('pages.pages_backend.atm.atm_branch_office_atm_lists', compact('DataCollectionDate','DataBankLists'));
+                return view('pages.pages_backend.atm.atm_branch_office_atm_lists', compact('DataCollectionDate','DataBankLists','userGroup','Branches','branch_id'));
             } else {
                 return view('pages.pages_validate.pages-maintenance');
             }
         } else {
-            return view('pages.pages_backend.atm.atm_branch_office_atm_lists', compact('DataCollectionDate','DataBankLists'));
+            return view('pages.pages_backend.atm.atm_branch_office_atm_lists', compact('DataCollectionDate','DataBankLists','userGroup','Branches','branch_id'));
         }
     }
 
-    public function BranchOfficeData()
-    {
+    public function BranchOfficeData(Request $request){
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
         $userDepartment = Auth::user()->department;
@@ -46,12 +47,24 @@ class AtmBranchOfficeController extends Controller
         // Start the query with the necessary relationships
         $query = AtmClientBanks::with('ClientInformation', 'Branch', 'AtmBanksTransaction')
             ->where('location', 'Branch')
-            ->orderBy('id','desc');
+            ->whereIn('status', ['1'])
+            ->latest('updated_at');
 
-        // Check if the user has a valid branch_id
-        if ($userBranchId !== null && $userBranchId !== 0) {
-            // Filter by branch_id if it's set and valid
+        if ($userBranchId) {
+            // Case 1: User has a branch_id
             $query->where('branch_id', $userBranchId);
+        } else if (in_array($userGroup, ['Developer', 'Admin'])) {
+            // Case 2: Developer or Admin
+            if ($request->filled('branch_id') && $request->branch_id != 0) {
+                $query->where('branch_id', $request->branch_id);
+            }
+        } else {
+            // If a specific branch_id is selected, override default
+            if ($request->filled('branch_id') && $request->branch_id != 0) {
+                $query->where('branch_id', $request->branch_id);
+            } else {
+                $query->where('branch_id', 5);
+            }
         }
 
         // Get the filtered data
@@ -95,10 +108,16 @@ class AtmBranchOfficeController extends Controller
                 if (in_array($userGroup, ['Developer', 'Admin', 'Branch Head', 'Everfirst Admin'])) {
                     if ($hasOngoingTransaction) {
                         // Display the spinning icon if there is any ongoing transaction
-                        $action = '<i class="fas fa-spinner fa-spin fs-3 text-success me-2 mb-2"></i>';
+                        $action = '<button type="button" class="btn fs-3 text-success me-1">
+                                        <i class="fas fa-spinner fa-spin"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="On Going Transaction">
+                                        </i>
+                                    </button>';
                     } else if ($CompletedTransaction && $CompletedTransaction->transaction_actions_id) {
                         // Generate buttons based on `transaction_actions_id`
-                        if ($CompletedTransaction->transaction_actions_id == 3 || $CompletedTransaction->transaction_actions_id == 9) { // Safekeep and Release
+                        if ($CompletedTransaction->transaction_actions_id == 3 ) { // Safekeep and Release
                             $action = '<button type="button" class="btn btn-success release_transaction me-2"
                                             data-id="'.$row->id.'"
                                             data-aprb_no="'.$aprb_no_details.'"
@@ -107,6 +126,44 @@ class AtmBranchOfficeController extends Controller
                                             title="Releasing of Transaction">
                                             <i class="fas fa-sign-in-alt"></i>
                                         </button>';
+                        } else if($CompletedTransaction->transaction_actions_id == 9){
+                            $currentId = $row->id;
+                            $nearest = AtmBanksTransaction::where('status', 'COMPLETED')
+                                ->where('transaction_number', $row->transaction_number)
+                                ->where('oc_transaction', 'NO')
+                                ->whereIn('transaction_actions_id', ['3', '16'])
+                                ->orderBy('id', 'desc') // get the latest one before current
+                                ->first();
+
+                                if ($nearest && $nearest->transaction_actions_id == 3) {
+                                    $action = '<button type="button" class="btn btn-success release_transaction me-2"
+                                                    data-id="'.$row->id.'"
+                                                    data-aprb_no="'.$aprb_no_details.'"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="right"
+                                                    title="Releasing of Transaction">
+                                                    <i class="fas fa-sign-in-alt"></i>
+                                                </button>';
+                                } else if ($nearest && $nearest->transaction_actions_id == 16) {
+                                    $action = '<button type="button" class="btn btn-danger release_balance_transaction me-2"
+                                                    data-id="'.$row->id.'"
+                                                    data-aprb_no="'.$aprb_no_details.'"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="right"
+                                                    title="Release with Outstanding Balance Transaction">
+                                                    <i class="fas fa-sign-in-alt"></i>
+                                                </button>';
+                                } else {
+                                    $action = '<button type="button" class="btn btn-success release_transaction me-2"
+                                                    data-id="'.$row->id.'"
+                                                    data-aprb_no="'.$aprb_no_details.'"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="right"
+                                                    title="Releasing of Transaction">
+                                                    <i class="fas fa-sign-in-alt"></i>
+                                                </button>';
+                                }
+
                         } else if ($CompletedTransaction->transaction_actions_id == 1) { // Borrow Transaction
                             $action = '<button type="button" class="btn btn-warning borrow_transaction me-2"
                                             data-id="'.$row->id.'"
@@ -199,9 +256,11 @@ class AtmBranchOfficeController extends Controller
                         ->orderBy('id', 'asc')
                         ->first();
 
+                // Ensure $Approval is not null before accessing relationships
+
                     if($AtmBanksTransaction){
-                        $TransactionActionName = optional($Approval->DataTransactionAction)->name ?? '';
-                        $UserGroupName = optional($Approval->DataUserGroup)->group_name ?? '';
+                        $TransactionActionName = $Approval?->DataTransactionAction?->name ?? null;
+                        $UserGroupName = $Approval?->DataUserGroup?->group_name ?? null;
                     } else {
                         $TransactionActionName = '';
                         $UserGroupName = '';
@@ -248,7 +307,7 @@ class AtmBranchOfficeController extends Controller
                 $PensionNumber = $row->pension_number ?? '';
                 $PensionType = $row->pension_type ?? '';
 
-                $pension_details = "<span class='fw-bold text-primary h6 pension_number_mask'>{$PensionNumber}</span><br>
+                $pension_details = "<span class='fw-bold text-primary h6'>{$PensionNumber}</span><br>
                                     <span class='fw-bold text-success'>{$PensionType}</span>";
 
                 return $pension_details;
@@ -266,6 +325,7 @@ class AtmBranchOfficeController extends Controller
                             $pin_code_details =
                                 '<a href="#" class="text-info fs-4 view_pin_code"
                                     data-pin="' . $row->pin_no . '"
+                                    data-atm_id="' . $row->id . '"
                                     data-transaction_number="' . $row->transaction_number . '"
                                     data-bank_account_no="' . $row->bank_account_no . '">
                                     <i class="fas fa-eye"></i>
@@ -274,7 +334,7 @@ class AtmBranchOfficeController extends Controller
                             $pin_code_details = 'No Pin Code';
                         }
                     } else {
-                        $pin_code_details = 'No Pin Code';
+                        $pin_code_details = '';
                     }
                 } else {
                     $pin_code_details = '********';
@@ -325,8 +385,7 @@ class AtmBranchOfficeController extends Controller
             ->make(true);
     }
 
-    public function CancelledLoanPage()
-    {
+    public function CancelledLoanPage(){
         $userGroup = Auth::user()->UserGroup->group_name;
         $MaintenancePage = MaintenancePage::where('pages_name', 'Cancelled Loan Page')->first();
 
@@ -341,8 +400,7 @@ class AtmBranchOfficeController extends Controller
         }
     }
 
-    public function CancelledLoanData()
-    {
+    public function CancelledLoanData(){
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
         $userDepartment = Auth::user()->department;
@@ -350,6 +408,7 @@ class AtmBranchOfficeController extends Controller
         // Start the query with the necessary relationships
         $query = AtmClientBanks::with('ClientInformation', 'Branch', 'AtmBanksTransaction')
             ->where('location', 'Branch')
+            ->where('status', '10')
             ->latest('updated_at');
 
         // Check if the user has a valid branch_id

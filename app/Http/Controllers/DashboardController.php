@@ -253,9 +253,9 @@ class DashboardController extends Controller
         $ClientInformationCount = ClientInformation::get();
 
         $HeadOfficeCounts = AtmClientBanks::where('location', 'Head Office')->where('status', '1');
+        $SafekeepCounts = AtmClientBanks::where('location', 'Head Office')->where('status', '6');
         $BranchOfficeCounts = AtmClientBanks::where('location', 'Branch')->where('status', '1');
         $ReleasedCounts = AtmClientBanks::where('location', 'Released')->whereIn('status', ['0', '2', '3', '4', '5', '7']);
-        $SafekeepCounts = AtmClientBanks::where('location', 'Safekeep')->where('status', '6');
         $OnGoingTransaction = AtmBanksTransaction::where('status', 'ON GOING');
 
         $userBranchId = Auth::user()->branch_id;
