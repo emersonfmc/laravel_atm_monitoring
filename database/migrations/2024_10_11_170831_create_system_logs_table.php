@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('system_logs', function (Blueprint $table) {
             $table->id();
-            $table->enum('module',['ATM / PB Monitoring','ATM Monitoring','PB Monitoring','Document Monitoring','Inventory'])->nullable();
+            $table->enum('module',['ATM / PB Monitoring','ATM Monitoring','PB Monitoring','Document Monitoring','Inventory','Settings'])->nullable();
             $table->enum('action',['Create','Update','Delete'])->nullable();
             $table->string('title')->nullable();
             $table->string('description')->nullable();

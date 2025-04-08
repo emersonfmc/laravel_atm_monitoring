@@ -37,7 +37,6 @@ class ServerSideDataTable {
                         width: "350px" // Adjust width as needed
                     });
                     return "<span class='fw-bold h6'>Please wait for a moment ....</span>";
-
                 },
             },
         });

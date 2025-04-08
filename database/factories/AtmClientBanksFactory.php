@@ -20,9 +20,6 @@ class AtmClientBanksFactory extends Factory
 
         return [
             'client_information_id' => null, // This will be filled in by ClientInformationFactory
-
-            'branch_id' => $this->faker->randomElement([4, 5, 6, 8]), // Select branch_id from 4, 5, 6, or 8
-            'pension_number' => $this->faker->unique()->numerify('###########'), // Generate 11-digit pension number
             'account_type' => $this->faker->randomElement(['SSS', 'GSIS']), // Select from predefined pension types
 
             // Select pension_name from data_pension_types_lists where types matches the account_type

@@ -66,6 +66,8 @@ class ClientContoller extends Controller
             if ($existingPension) {
                 if (!$userBranchId) {
                     return response()->json(['error' => 'Pension number already exists.']);
+
+                    $query->where('pension_number', $pension_number_get);
                 }
 
                 // Check if pension number belongs to the same branch
@@ -98,7 +100,7 @@ class ClientContoller extends Controller
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="top"
                                     title="Add More ATM / PB"
-                                    data-id="' . $row->id . '">
+                                    data-id="' . $row->id  . '">
                                     <i class="fas fa-credit-card"></i>
                                  </a>';
                 } else {
@@ -135,6 +137,46 @@ class ClientContoller extends Controller
 
                 return $pin_code_details;
             })
+            ->addColumn('pension_details', function ($row) {
+                $PensionNumber = $row->pension_number ?? '';
+                $PensionType = $row->pension_type ?? '';
+
+                $pension_details = "<span class='fw-bold text-primary'>{$PensionNumber}</span><br>
+                                    <span class='fw-bold text-success'>{$PensionType}</span>";
+
+                return $pension_details;
+            })
+            ->addColumn('bank_details', function ($row) {
+                $replacementCountDisplay = $row->replacement_count > 0
+                    ? '<span class="text-danger fw-bold"> / ' . ($row->replacement_count ?? '') . '</span>'
+                    : '';
+
+                return '<span class="fw-bold" style="color: #5AAD5D;">' . ($row->bank_account_no ?? '') . '</span>'
+                    . $replacementCountDisplay . '<br>'
+                    . '<span>' . ($row->bank_name ?? '') . '</span>';
+            })
+            ->addColumn('bank_status', function ($row) {
+                $bankStatus = $row->atm_status; // Correct PHP variable declaration
+                $atmTypeClass = ''; // Variable to hold the class based on atm_type
+
+                // Determine the text color based on atm_type
+                switch ($row->atm_type) {
+                    case 'ATM':
+                        $atmTypeClass = 'text-primary';
+                        break;
+                    case 'Passbook':
+                        $atmTypeClass = 'text-danger';
+                        break;
+                    case 'Sim Card':
+                        $atmTypeClass = 'text-info';
+                        break;
+                    default:
+                        $atmTypeClass = 'text-secondary'; // Default color if none match
+                }
+
+                return '<span class="' . $atmTypeClass . '">' . $row->atm_type . '</span><br>
+                        <span class="fw-bold">' . $bankStatus . '</span>';
+            })
             ->addColumn('full_name', function ($row) {
                 // Check if the relationships and fields exist
                 $clientInfo = $row->ClientInformation ?? null;
@@ -158,7 +200,13 @@ class ClientContoller extends Controller
                 $branch_location = $row->Branch->branch_location;
                 return $branch_location; // Return all the accumulated buttons
             })
-            ->rawColumns(['action','full_name','pin_code_details','branch_location'])
+            ->rawColumns(['action',
+                          'full_name',
+                          'pin_code_details',
+                          'branch_location',
+                          'pension_details',
+                          'bank_details',
+                          'bank_status'])
             ->make(true);
     }
 
@@ -174,9 +222,7 @@ class ClientContoller extends Controller
                     'status' => 'error',
                     'message' => 'Duplicate Pension Number Found'
                 ]);
-            }
-            else
-            {
+            } else {
                 // Validate First Existing Bank Account No Start
                     if (is_array($request->atm_number)) {
                         // Clear hyphens from each element in the array
@@ -222,6 +268,7 @@ class ClientContoller extends Controller
                 // Get the branch abbreviation
                 $BranchGet = Branch::where('id', $branch_id)->first();
                 $branch_abbreviation = $BranchGet->branch_abbreviation;
+                $branch_location = $BranchGet->branch_location;
 
                 // Fetch the last transaction number based on the branch_id and branch_code
                 $lastTransaction = AtmClientBanks::where('branch_id', $branch_id)
@@ -247,10 +294,9 @@ class ClientContoller extends Controller
                 ]);
 
                 if (is_array($request->atm_type) && !empty($request->atm_type)) {
-                    foreach ($request->atm_type as $key => $value)
-                    {
+                    foreach ($request->atm_type as $key => $value){
                         $transactionCounter = $lastadded + $key + 1;
-                        $TransactionNumber = $branch_abbreviation . '-' . date('mdy') . '-' . str_pad($transactionCounter, 5, '0', STR_PAD_LEFT);
+                        $TransactionNumber = $branch_abbreviation . '-' . date('Y') . '-' . str_pad($transactionCounter, 5, '0', STR_PAD_LEFT);
 
                         $BankAccountNo = str_replace('-', '', $request->atm_number[$key]);
 
@@ -300,27 +346,28 @@ class ClientContoller extends Controller
                             'created_at' => Carbon::now(),
                         ]);
 
-                        $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', 5)
-                            ->orderBy('sequence_no')
-                            ->get();
+                        // Sequence
+                            $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', 5)
+                                ->orderBy('sequence_no')
+                                ->get();
 
-                        foreach ($DataTransactionSequence as $transactionSequence)
-                        {
-                            // Set the status based on the sequence number
-                            $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
-                            AtmBanksTransactionApproval::create([
-                                'banks_transactions_id' => $AtmBanksTransaction->id,
-                                'transaction_actions_id' => 5,
-                                'employee_id' => NULL,
-                                'date_approved' => NULL,
-                                'user_groups_id' => $transactionSequence->user_group_id,
-                                'sequence_no' => $transactionSequence->sequence_no,
-                                'status' => $status,
-                                'type' => $transactionSequence->type,
-                                'created_at' => Carbon::now(),
-                            ]);
-                        }
+                            foreach ($DataTransactionSequence as $transactionSequence) {
+                                $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
+
+                                AtmBanksTransactionApproval::create([
+                                    'banks_transactions_id' => $AtmBanksTransaction->id,
+                                    'transaction_actions_id' => 5,
+                                    'employee_id' => NULL,
+                                    'date_approved' => NULL,
+                                    'user_groups_id' => $transactionSequence->user_group_id,
+                                    'sequence_no' => $transactionSequence->sequence_no,
+                                    'status' => $status,
+                                    'type' => $transactionSequence->type,
+                                    'created_at' => Carbon::now(),
+                                ]);
+                            }
+                        // Sequence
 
                         $balance = floatval(preg_replace('/[^\d]/', '', $request->atm_balance[$key]));
 
@@ -331,6 +378,47 @@ class ClientContoller extends Controller
                             'remarks' => $request->remarks[$key] ?? NULL,
                             'created_at' => Carbon::now(),
                         ]);
+
+                        // System Logs
+                            $FirstName = $request->first_name ?? '';
+                            $MiddleName = $request->middle_name ?? '';
+                            $LastName = $request->last_name ?? '';
+                            $Suffix = $request->suffix ?? '';
+
+                            $ClientDetails = $LastName .', '. $FirstName . $MiddleName . $Suffix;
+
+                            SystemLogs::create([
+                                'module' => 'ATM / PB Monitoring',
+                                'action' => 'Create',
+                                'title' => 'Create New Client',
+                                'description_logs' => [
+                                    'new_details' => [
+                                        'Transaction' => 'Add New Client',
+                                        'Client Details' => $ClientDetails,
+                                        'Pension Number' => $pension_number ?? NULL,
+                                        'Pension Type' => $request->pension_type ?? NULL,
+                                        'Account Type' => $request->account_type ?? NULL,
+                                        'Birthdate' => $request->birth_date ?? NULL,
+                                        'Transaction Number' => $TransactionNumber,
+                                        'Branch' => $branch_location ?? '',
+                                        'ATM Type' => $value,
+                                        'ATM Status' => 'New',
+                                        'Location' => 'Branch',
+                                        'Card No' => $BankAccountNo ?? NULL,
+                                        'Bank Name' => $request->bank_id[$key] ?? NULL,
+                                        'Pin No.' => $request->pin_code[$key] ?? NULL,
+                                        'Expiration Date' => $expirationDate,
+                                        'Collection Date' => $request->collection_date ?? NULL,
+                                        'Balance' => $request->atm_balance[$key],
+                                        'Remarks' => $request->remarks[$key] ?? NULL,
+                                    ],
+                                ],
+                                'employee_id' => Auth::user()->employee_id,
+                                'ip_address' => $request->ip(),
+                                'created_at' => Carbon::now(),
+                                'company_id' => Auth::user()->company_id,
+                            ]);
+                        // System Logs
 
                     }
                 }
@@ -344,9 +432,9 @@ class ClientContoller extends Controller
         ]);
     }
 
-    public function clientGet($id){
-        $ClientInformation = ClientInformation::with('Branch','AtmClientBanks')->findOrFail($id);
-        return response()->json($ClientInformation);
+    public function clientGetBanks($id){
+        $AtmClientBanks = AtmClientBanks::with('Branch','ClientInformation')->findOrFail($id);
+        return response()->json($AtmClientBanks);
     }
 
     public function PensionNumberValidate(Request $request){
@@ -381,13 +469,15 @@ class ClientContoller extends Controller
     }
 
     public function addMoreAtm(Request $request){
-        $information_id  = $request->information_id;
+        $atm_id  = $request->atm_id;
 
         // Fetch Data From AtmClientBanks
-            $ClientInformation = ClientInformation::findOrFail($information_id);
+            $AtmClientBanks = AtmClientBanks::with('ClientInformation','Branch')->findOrFail($atm_id);
 
-            $client_information_id = $ClientInformation->id;
-            $branch_id = $ClientInformation->branch_id;
+            $client_information_id = $AtmClientBanks->client_information_id;
+            $branch_id = $AtmClientBanks->branch_id;
+            $OldPensionNumber = $AtmClientBanks->pension_number;
+            $BranchDetails = $AtmClientBanks->Branch->branch_location ?? '';
         // Fetch Data From AtmClientBanks
 
                 $BankAccountNo = str_replace('-', '', $request->atm_number);
@@ -423,8 +513,25 @@ class ClientContoller extends Controller
                     }
 
                     $transactionCounter = $lastadded + 1;
-                    $TransactionNumber = $branch_abbreviation . '-' . date('y') . '-' . str_pad($transactionCounter, 5, '0', STR_PAD_LEFT);
+                    $TransactionNumber = $branch_abbreviation . '-' . date('Y') . '-' . str_pad($transactionCounter, 5, '0', STR_PAD_LEFT);
                 // Create Transaction Number
+
+                // Validate Pension Number and Pension Type Already Exists
+                    $existingPensionNoAndType = null;
+                    $NewPensionNumber = str_replace('-', '', $request->pension_number);
+                    $existingPensionNoAndType = AtmClientBanks::where('pension_number', $NewPensionNumber)
+                        ->where('pension_type', $request->pension_type)
+                        ->first();
+
+                    if ($request->pension_no_select === 'no' && $existingPensionNoAndType) {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Pension Number and Pension Type Already Exist'
+                        ]);
+                    }
+
+                    $InsertPensionNumber = ($request->pension_no_select === 'no') ? $NewPensionNumber : $OldPensionNumber;
+                // Validate Pension Number Already Exists
 
                 $expirationDate = $request->expiration_date;
 
@@ -436,6 +543,9 @@ class ClientContoller extends Controller
 
                 AtmClientBanks::create([
                     'client_information_id' => $client_information_id,
+                    'pension_type' => $request->pension_type ?? '',
+                    'pension_number' => $InsertPensionNumber,
+                    'account_type' => $request->account_type ?? '',
                     'transaction_number' => $TransactionNumber,
                     'branch_id' => $branch_id ?? NULL,
                     'atm_type' => $request->atm_type ?? NULL,
@@ -451,17 +561,44 @@ class ClientContoller extends Controller
                     'updated_at' => Carbon::now(),
                 ]);
 
-                // // Create System Logs used for Auditing of Logs
-                // SystemLogs::create([
-                //     'system' => 'ATM Monitoring',
-                //     'action' => 'Create',
-                //     'title' => 'Create Transaction | Add ATM',
-                //     'description' => $reason .' | '.$TransactionNumber,
-                //     'employee_id' => Auth::user()->employee_id,
-                //     'ip_address' => $request->ip(),
-                //     'created_at' => Carbon::now(),
-                //     'company_id' => Auth::user()->company_id,
-                // ]);
+                // Create System Logs used for Auditing of Logs
+                $ClientDetails = trim(
+                    ($request->last_name ?? '') . ' ' .
+                    ($request->first_name ?? '') . ' ' .
+                    ($request->middle_name ?? '') . ' ' .
+                    ($request->suffix ?? '')
+                );
+
+                SystemLogs::create([
+                    'module' => 'ATM / PB Monitoring',
+                    'action' => 'Create',
+                    'title' => 'Create Add ATM Transaction',
+                    'description_logs' => [ // Convert array to JSON
+                        'new_details' => [
+                            'Transaction' =>  'Add New ' . $request->atm_type ?? '',
+                            'Remarks' => $remarks ?? '',
+                            'Client Details' => $ClientDetails,
+                            'Pension No.' => $InsertPensionNumber,
+                            'Pension Type' => $request->pension_type,
+                            'Account Type' => $request->account_type ?? '',
+                            'Branch' => $BranchDetails,
+                            'Transaction Number' => $TransactionNumber ?? '',
+                            'Card Type' => $request->atm_type ?? '',
+                            'ATM Status' => $request->atm_status ?? '',
+                            'Location' => 'Branch',
+                            'Bank Account No.' => $BankAccountNo ?? '',
+                            'Bank Name' => $request->bank_name ?? '',
+                            'PIN No.' => $request->pin_code ?? '',
+                            'Expiration Date' => $expirationDate,
+                            'Collection Date' => $request->collection_date ?? '',
+                        ],
+                    ],
+                    'employee_id' => Auth::user()->employee_id,
+                    'ip_address' => $request->ip(),
+                    'created_at' => Carbon::now(),
+                    'company_id' => Auth::user()->company_id,
+                ]);
+            // Create System Logs used for Auditing of Logs
 
 
 

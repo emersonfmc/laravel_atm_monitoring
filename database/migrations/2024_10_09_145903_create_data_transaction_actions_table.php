@@ -16,8 +16,9 @@ return new class extends Migration
         Schema::create('data_transaction_actions', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('type',['Going to Head Office','Going to Branch Office','Outside For Collection'])->nullable();
+            $table->enum('transaction_type',['Going to Head Office','Going to Branch Office','Outside For Collection'])->nullable();
             $table->integer('transaction')->nullable();
+            $table->enum('atm_type',['ATM','Passbook','Sim Card'])->nullable();
             $table->enum('status',['Active','Inactive'])->nullable();
             $table->softDeletes();
             $table->timestamps();

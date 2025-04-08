@@ -29,13 +29,9 @@ class DefaultController extends Controller
     public function AtmClientFetch(Request $request)
     {
         $new_atm_id = $request->new_atm_id;
-        $AtmClientBanks = AtmClientBanks::with('ClientInformation', 'ClientInformation.AtmClientBanks', 'Branch')->findOrFail($new_atm_id);
-
-        // $Lastname = $AtmClientBanks->ClientInformation->last_name ?? '';
-        // $FirstName = $AtmClientBanks->ClientInformation->first_name ?? '';
-        // $MiddleName = $AtmClientBanks->ClientInformation->middle_name ?? '';
-        // $Suffix = $AtmClientBanks->ClientInformation->suffix ?? '';
-        // $Fullname = $Lastname . ', ' . $FirstName . ' ' . $MiddleName . ' ' . $Suffix;
+        $AtmClientBanks = AtmClientBanks::with('ClientInformation',
+                                               'ClientInformation.AtmClientBanks',
+                                               'Branch')->findOrFail($new_atm_id);
 
         return response()->json($AtmClientBanks);
     }
@@ -46,17 +42,18 @@ class DefaultController extends Controller
         $client_id = $request->client_id;
 
         // Fetch the ClientInformation along with its AtmClientBanks that have no ongoing transactions
-        $ClientInfo = ClientInformation::with(['AtmClientBanks' => function ($query) {
+        $ClientInfo = ClientInformation::with([
+            'AtmClientBanks' => function ($query) {
                 $query->whereDoesntHave('AtmBanksTransaction', function ($query) {
-                    $query->where('status', 'ON GOING')->where('oc_transaction','NO');
+                    $query->where('status', 'ON GOING')
+                          ->where('oc_transaction', 'NO');
                 });
-            }, 'Branch'])
-            ->where('id', $client_id)
-            ->firstOrFail();
+            }
+        ])->findOrFail($client_id);
 
-        // Return the ClientInformation including the fullname attribute
-        return response()->json($ClientInfo->toArray());
+        return response()->json($ClientInfo);
     }
+
 
     public function UserSelect()
     {
