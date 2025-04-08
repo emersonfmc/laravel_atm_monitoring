@@ -28,37 +28,34 @@ class ClientInformationFactory extends Factory
         ];
     }
 
-
     public function configure()
     {
         return $this->afterCreating(function (ClientInformation $client) {
-            // Format today's date as MMDDYY for the transaction number prefix
-            $datePart = now()->format('Y'); // e.g., "103024" for October 30, 2024
+            $datePart = now()->format('Y');
 
-            // Create 2 unique ATMs for each client
+            // Generate a shared pension number per client
+            $sharedPensionNumber = fake()->unique()->numerify('###########');
+            $sameBranchId = $this->faker->randomElement([4]);
+
             for ($i = 0; $i < 2; $i++) {
-                // Fetch the latest transaction number for today and increment it
-                $latestTransactionNumber = AtmClientBanks::where('transaction_number', 'LIKE', "TS-$datePart-%")
+                $latestTransactionNumber = AtmClientBanks::where('transaction_number', 'LIKE', "AL-$datePart-%")
                     ->orderBy('transaction_number', 'desc')
                     ->value('transaction_number');
 
-                // Determine the next increment
                 $increment = $latestTransactionNumber ? ((int)substr($latestTransactionNumber, -5) + 1) : 1;
-
-                // Generate a 5-digit incremented part, e.g., "00001"
                 $incrementedPart = str_pad($increment, 5, '0', STR_PAD_LEFT);
+                $transactionNumber = "AL-$datePart-$incrementedPart";
 
-                // Form the full transaction number
-                $transactionNumber = "TS-$datePart-$incrementedPart";
-
-                // Create an ATM record for the client with a unique transaction number
                 AtmClientBanks::factory()->create([
                     'client_information_id' => $client->id,
                     'transaction_number' => $transactionNumber,
+                    'pension_number' => $sharedPensionNumber, // <- use the same pension number for both
+                    'branch_id' => $sameBranchId, // <- use the same pension number for both
                 ]);
             }
         });
     }
+
 
 
 }

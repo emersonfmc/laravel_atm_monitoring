@@ -20,7 +20,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(ClientContoller::class)->group(function () {
         Route::get('/clients/page', 'client_page')->name('clients.page');
         Route::get('/clients/data', 'client_data')->name('clients.data');
-        Route::get('/clients/get/{id}', 'clientGet')->name('clients.get');
+        Route::get('/clients/get/banks/{id}', 'clientGetBanks')->name('clients.get.banks');
         Route::post('/clients/create', 'clientCreate')->name('clients.create');
         Route::post('/clients/update', 'clientUpdate')->name('clients.update');
         Route::post('/pension_number/validate', 'PensionNumberValidate')->name('pension.number.validate');
@@ -33,7 +33,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(AtmHeadOfficeController::class)->group(function () {
         Route::get('/head-office/page', 'HeadOfficePage')->name('HeadOfficePage');
         Route::get('/HeadOfficeData', 'HeadOfficeData')->name('HeadOfficeData');
-        Route::get('/SafekeepPage', 'SafekeepPage')->name('SafekeepPage');
+        Route::get('/safekeep/page', 'SafekeepPage')->name('SafekeepPage');
         Route::get('/SafekeepData', 'SafekeepData')->name('SafekeepData');
         Route::get('/released/page', 'ReleasedPage')->name('ReleasedPage');
         Route::get('/ReleasedData', 'ReleasedData')->name('ReleasedData');
@@ -57,6 +57,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/TransactionGet', 'TransactionGet')->name('TransactionGet');
 
         Route::post('/transaction/pullout/create', 'TransactionPulloutCreate')->name('transaction.pullout.create');
+        Route::post('/transaction/return/borrow/create', 'TransactionReturnBorrowCreate')->name('transaction.return.borrow.create');
 
         Route::post('/TransactionCreate', 'TransactionCreate')->name('TransactionCreate');
         Route::post('/TransactionAddAtm', 'TransactionAddAtm')->name('TransactionAddAtm');
@@ -72,13 +73,15 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         Route::get('/TransactionReleasingPage', 'TransactionReleasingPage')->name('TransactionReleasingPage');
         Route::get('/TransactionReleasingData', 'TransactionReleasingData')->name('TransactionReleasingData');
+
+        Route::post('/transaction/return-client', 'TransactionReturnClient')->name('transaction.return-client');
     });
 });
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::controller(PassbookCollectionController::class)->group(function () {
-        Route::get('/PassbookCollectionSetUpPage', 'PassbookCollectionSetUpPage')->name('PassbookCollectionSetUpPage');
+        Route::get('/passbook-collection/setup/page', 'PassbookCollectionSetUpPage')->name('PassbookCollectionSetUpPage');
         Route::get('/PassbookCollectionData', 'PassbookCollectionData')->name('PassbookCollectionData');
         Route::post('/PassbookForCollectionCreate', 'PassbookForCollectionCreate')->name('PassbookForCollectionCreate');
         Route::get('/PassbookCollectionAllTransactionPage', 'PassbookCollectionAllTransactionPage')->name('PassbookCollectionAllTransactionPage');

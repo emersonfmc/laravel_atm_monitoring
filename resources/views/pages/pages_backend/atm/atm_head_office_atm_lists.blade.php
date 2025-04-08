@@ -24,6 +24,7 @@
                                 <i class="fas fa-plus-circle me-1"></i> Add Old / New Client</button>
                         </div>
                     </div>
+                    <span class="loader2"></span>
                     <hr>
                         @if(in_array($userGroup, ['Developer', 'Admin', 'Everfirst Admin','Branch Head']))
                             <form id="filterForm">
@@ -33,9 +34,17 @@
                                         <div class="form-group mb-3">
                                             <label class="fw-bold h6">Branch</label>
                                             <select name="branch_id" id="branch_id_select" class="form-select select2" required>
-                                                <option value="0">Select Branches</option>
+                                                @php
+                                                    $defaultBranchId = 4; // fallback default
+                                                    $selectedBranchId = $branch_id ?? ($userBranchId ?? $defaultBranchId);
+                                                @endphp
+
+                                                @if(in_array($userGroup, ['Developer', 'Admin']))
+                                                    <option value="all" {{ ($selectedBranchId === 'all') ? 'selected' : '' }}>All Branches</option>
+                                                @endif
+
                                                 @foreach($Branches as $branch)
-                                                    <option value="{{ $branch->id }}" {{ $branch->id == $branch_id ? 'selected' : '' }}>
+                                                    <option value="{{ $branch->id }}" {{ $branch->id == $selectedBranchId ? 'selected' : '' }}>
                                                         {{ $branch->branch_location }}
                                                     </option>
                                                 @endforeach
@@ -59,7 +68,7 @@
                                 <tr>
                                     <th>Action</th>
                                     <th>Transaction / Pending By</th>
-                                    <th>Reference No</th>
+                                    <th>Transaction No</th>
                                     <th>Client</th>
                                     <th>Branch</th>
                                     {{-- <th>Pension No. / Type</th> --}}
@@ -163,10 +172,9 @@
                                         <label class="fw-bold h6">Select Reason</label>
                                         <select name="borrow_reason" id="borrow_reason" class="form-select" required>
                                             <option value="" selected disabled>Select Reason</option>
-                                            <option value="For SSS/GSIS Report">For SSS/GSIS Report</option>
-                                            <option value="For Emegency Loan">For Emegency Loan</option>
-                                            <option value="For Bank Report">For Bank Report</option>
-                                            <option value="For Requirements">For Requirements</option>
+                                            @foreach ($DataBorrowOption as $borrow_reason)
+                                                <option value="{{ $borrow_reason->reason }}">{{ $borrow_reason->reason }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </span>
@@ -370,7 +378,7 @@
                                             <div class="col-8">
                                                 <div class="form-group">
                                                     <select name="bank_name" id="add_atm_bank_names" class="form-select select2" required>
-                                                        <option value="" selected>Select Bank</option>
+                                                        <option value=""selected disabled>Select Bank</option>
                                                         @foreach ($DataBankLists as $bank)
                                                             <option value="{{ $bank->bank_name }}">{{ $bank->bank_name }}</option>
                                                         @endforeach
@@ -569,7 +577,7 @@
                             <div class="col-md-3 form-group mb-3">
                                 <label class="fw-bold h6">Middle Initial</label>
                                 <input type="text" name="middle_name" id="edit_middle_name" class="form-control"
-                                       minlength="0" maxlength="3" placeholder="Middle Initial" required>
+                                       minlength="0" maxlength="3" placeholder="Middle Initial">
                             </div>
 
                             <div class="col-md-3 form-group mb-3">
@@ -789,7 +797,7 @@
                         data: 'pending_to',
                         name: 'pending_to',
                         render: function(data, type, row, meta) {
-                            return '<span class="fw-bold h6 text-primary">' + data + '</span>';
+                            return '<span class="fw-bold text-primary">' + data + '</span>';
                         },
                         orderable: true,
                         searchable: true,
@@ -798,7 +806,7 @@
                         data: 'transaction_number',
                         name: 'transaction_number',
                         render: function(data, type, row, meta) {
-                            return '<span class="fw-bold h6">' + data + '</span>';
+                            return '<span class="fw-bold">' + data + '</span>';
                         },
                         orderable: true,
                         searchable: true,
@@ -919,7 +927,9 @@
                         searchable: false,
                     },
                 ];
-                 dataTable.initialize(url, columns);
+
+                const orderBy = { order: [[3, 'asc'], [4, 'asc'], [9, 'asc']] };
+                dataTable.initialize(url, columns, orderBy);
 
                 // Filtering of Transaction
                     var branchId = @json($branch_id);
@@ -944,7 +954,7 @@
                         // Update the DataTable with the filtered data
                         dataTable.table.ajax.url(targetUrl).load();
                     });
-                // End Filtering of Transaction
+                // Filtering of Transaction
             // Display Data
 
             // Create of Transaction for Pullout
@@ -2021,10 +2031,10 @@
         $(document).on('click', '.view_pin_code', function(e) {
             e.preventDefault(); // Prevent the default anchor behavior
 
-            const pinCode = $(this).data('pin'); // Get the PIN code from the data attribute
-            const bankAccountNo = $(this).data('bank_account_no'); // Get the Card No.
+            const pinCode = $(this).data('pin');
+            const bankAccountNo = $(this).data('bank_account_no');
+            const atmId = $(this).data('atm_id');
 
-            // SweetAlert confirmation
             Swal.fire({
                 icon: "question",
                 title: 'Do you want to view the PIN code?',
@@ -2033,15 +2043,47 @@
                 cancelButtonText: 'No'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // If confirmed, show another SweetAlert with the PIN code and Card No.
-                    Swal.fire({
-                        title: 'PIN Code Details',
-                        html: `<br>
-                            <span class="fw-bold h3 text-dark">${pinCode}</span><br><br>
-                            <span class="fw-bold h4 text-primary">${bankAccountNo}</span><br>
-                        `,
-                        icon: 'info',
-                        confirmButtonText: 'Okay'
+                    let csrfToken = $('meta[name="csrf-token"]').attr('content');
+                    $.ajax({
+                        url: "{{ route('system.pin-code.logs') }}",
+                        type: "POST",
+                        data: {
+                            atm_id: atmId,
+                            location: 'Head Office',
+                            _token: csrfToken
+                        },
+                        success: function(response) {
+                            if (typeof response === 'string') {
+                                var res = JSON.parse(response);
+                            } else {
+                                var res = response; // If it's already an object
+                            }
+
+                            if (res.status === 'success') {
+                                Swal.fire({
+                                    title: 'PIN Code Details',
+                                    html: `<br>
+                                        <span class="fw-bold h3 text-dark">${pinCode}</span><br><br>
+                                        <span class="fw-bold h4 text-primary">${bankAccountNo}</span><br>`,
+                                    icon: 'info',
+                                    confirmButtonText: 'Okay'
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Unable to Display PIN code details. Please try again.'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Something went wrong!',
+                                text: 'Unable to log or fetch PIN code. Please try again.'
+                            });
+                            console.error('AJAX Error:', xhr.responseText);
+                        }
                     });
                 }
             });

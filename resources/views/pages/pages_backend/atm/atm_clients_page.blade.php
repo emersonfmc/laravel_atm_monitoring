@@ -80,10 +80,8 @@
                                     <th>Pension No. / Type</th>
                                     <th>Transaction Number</th>
                                     <th>Card No.</th>
-                                    <th>Bank</th>
                                     <th>PIN Code</th>
                                     <th>Type</th>
-                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -139,9 +137,9 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group mb-3">
-                                    <label class="fw-bold h6">Pension Number Type</label>
+                                    <label class="fw-bold h6">Account Type</label>
                                     <select name="account_type" id="pension_type" class="form-select" required>
-                                        <option value="" selected disabled>Pension Number Type</option>
+                                        <option value="" selected disabled>Account Type</option>
                                         <option value="SSS">SSS</option>
                                         <option value="GSIS">GSIS</option>
                                     </select>
@@ -150,9 +148,9 @@
 
                             <div class="col-md-3">
                                 <div class="form-group mb-3">
-                                    <label class="fw-bold h6">Pension Account Type</label>
+                                    <label class="fw-bold h6">Pension Types</label>
                                     <select name="pension_type" id="pension_account_type" class="form-select select2" required disabled>
-                                        <option value="" selected disabled>Pension Account Type</option>
+                                        <option value="" selected disabled>Pension Type</option>
                                     </select>
                                 </div>
                             </div>
@@ -255,15 +253,9 @@
                                             </div>
                                         </div>
                                         <div class="form-group mb-2 row align-items-center">
-                                            <label class="col-form-label col-sm-4 fw-bold">ATM / Passbook / Sim No.</label>
+                                            <label class="col-form-label col-sm-4 fw-bold">Card No.</label>
                                             <div class="col-8">
-                                                <input type="text" name="atm_number[]" class="atm_card_input_mask form-control" placeholder="ATM / Passbook / Sim No." required>
-                                            </div>
-                                        </div>
-                                        <div class="form-group mb-3 row align-items-center">
-                                            <label class="col-form-label col-4 fw-bold">Balance</label>
-                                            <div class="col-8">
-                                                <input type="text" name="atm_balance[]" class="balanceCurrency form-control" value="0" placeholder="Balance" required>
+                                                <input type="text" name="atm_number[]" class="atm_card_input_mask form-control" placeholder="Card No." required>
                                             </div>
                                         </div>
                                         <div class="form-group mb-2 row align-items-center">
@@ -279,21 +271,27 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-3 row align-items-center">
+                                        <div class="form-group mb-2 row align-items-center">
                                             <label class="col-form-label col-4 fw-bold">Pin Code</label>
                                             <div class="col-8">
-                                                <input type="number" name="pin_code[]" class="form-control" placeholder="PIN Code">
+                                                <input type="number" name="pin_code[]" class="form-control" min="0" placeholder="PIN Code">
                                             </div>
                                         </div>
-                                        <div class="form-group mb-3 row align-items-center">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-2 row align-items-center">
                                             <label class="col-form-label col-4 fw-bold">Expiration Date</label>
                                             <div class="col-8">
                                                 <input type="month" name="expiration_date[]" class="form-control">
                                             </div>
                                         </div>
-                                        <div class="form-group mb-3 row align-items-center">
+                                        <div class="form-group mb-2 row align-items-center">
+                                            <label class="col-form-label col-4 fw-bold">Balance</label>
+                                            <div class="col-8">
+                                                <input type="text" name="atm_balance[]" class="balanceCurrency form-control" value="0" placeholder="Balance" required>
+                                            </div>
+                                        </div>
+                                        <div class="form-group mb-2 row align-items-center">
                                             <label class="col-form-label col-4 fw-bold">Remarks</label>
                                             <div class="col-8">
                                                 <input type="text" name="remarks[]" class="form-control" placeholder="Remarks" minlength="0" maxlength="100">
@@ -402,7 +400,7 @@
                 <form action="{{ route('add.more.atm') }}" method="POST" id="addAtmValidationForm">
                     @csrf
                     <div class="modal-body">
-                        <input type="text" name="information_id" id="add_more_information_id">
+                        <input type="hidden" name="atm_id" id="add_atm_item_id">
 
                         <div class="row">
                             <div class="col-8 text-start">
@@ -430,15 +428,47 @@
                                 <label class="fw-bold h6">Branch</label>
                                 <input type="text" class="form-control" id="add_more_branch_location" readonly>
                             </div>
+                        </div>
 
-                            <div class="form-group mb-3 col-3">
-                                <label class="fw-bold h6">Collection Date</label>
-                                <select name="collection_date" id="collection_date" class="form-select" required>
-                                    <option value="" selected disabled>Collection Date</option>
-                                    @foreach ($DataCollectionDates as $DataCollectionDate)
-                                        <option value="{{ $DataCollectionDate->collection_date }}">{{ $DataCollectionDate->collection_date }}</option>
-                                    @endforeach
-                                </select>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group mb-2">
+                                    <label class="fw-bold h6">Pension Number</label>
+                                    <span id="SamePensionNumberSelected" style="display: none;">
+                                        <input type="text" class="form-control pension_number_mask"
+                                            name="pension_number"
+                                            id="add_atm_pension_number_value"
+                                            placeholder="Pension Number">
+                                    </span>
+                                    <div class="form-check mt-1">
+                                        <input class="form-check-input" type="checkbox" id="same_pension_number" checked>
+                                        <label class="text-danger" for="same_pension_number" style="font-size: 10px;">
+                                            check if same pension no. used
+                                        </label>
+                                    </div>
+                                    <input type="hidden" name="pension_no_select" id="pension_no_select" value="yes">
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group mb-2">
+                                    <label class="fw-bold h6">Account Type</label>
+                                    <select name="account_type" id="add_atm_account_type" class="form-select" required>
+                                        <option value="SSS">SSS</option>
+                                        <option value="GSIS">GSIS</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <input type="hidden" id="add_atm_pension_type_value">
+
+                            <div class="col-md-3">
+                                <div class="form-group mb-2">
+                                    <label class="fw-bold h6">Pension Type</label>
+                                    <select name="pension_type" id="add_atm_pension_account_type_dropdown" class="form-select select2" required>
+                                        <option value="">Pension Account Type</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -490,18 +520,30 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-2 row align-items-center">
-                                    <label class="col-form-label col-4 fw-bold">Pin Code</label>
-                                    <div class="col-5">
+                                    <label class="col-form-label col-md-4 fw-bold">Pin Code</label>
+                                    <div class="col-md-5">
                                         <input type="number" name="pin_code" class="form-control" placeholder="PIN Code">
                                     </div>
-                                    <div class="col-3">
+                                    <div class="col-md-3">
                                         <input type="number" name="cash_box_no" class="form-control" placeholder="Cash Box" min="0" max="100">
                                     </div>
                                 </div>
                                 <div class="form-group mb-2 row align-items-center">
-                                    <label class="col-form-label col-4 fw-bold">Expiration Date</label>
-                                    <div class="col-8">
+                                    <label class="col-md-form-label col-md-4 fw-bold">Expiration Date</label>
+                                    <div class="col-md-8">
                                         <input type="month" name="expiration_date" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="form-group mb-2 row align-items-center">
+                                    <label class="col-md-form-label col-md-4 fw-bold">Collection Date</label>
+                                    <div class="col-md-8">
+                                        <select name="collection_date" id="add_more_collection_date" class="form-select select2" required>
+                                            <option value="" selected disabled>Collection Date</option>
+                                            @foreach ($DataCollectionDates as $DataCollectionDate)
+                                                <option value="{{ $DataCollectionDate->collection_date }}">{{ $DataCollectionDate->collection_date }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -522,17 +564,10 @@
 
             const dataTable = new ServerSideDataTable('#FetchingDatatable');
             var url = '{!! route('clients.data') !!}';
-            const buttons = [{
-                text: 'Delete',
-                action: function(e, dt, node, config) {
-                    // Add your custom button action here
-                    alert('Custom button clicked!');
-                }
-            }];
+
             const columns = [
                 {
-                    data: null,
-                    name: 'action',
+                    data: 'action',
                     render: function(data, type, row) {
                         return `
                             <a href="#" class="btn btn-info view_btn" data-id="${row.id}"
@@ -562,10 +597,9 @@
                     searchable: true,
                 },
                 {
-                    data: 'pension_number', // Correct field name
+                    data: 'pension_details', // Correct field name
                     render: function(data, type, row, meta) {
-                        return `<span class="fw-bold text-primary h6 pension_number_mask_display">${row.pension_number}</span><br>
-                                <span class="fw-bold text-success">${row.pension_type}</span>`;
+                        return `<span>${row.pension_details ?? ''}</span>`;
                     },
                     orderable: true,
                     searchable: true,
@@ -579,17 +613,9 @@
                     searchable: true,
                 },
                 {
-                    data: 'bank_account_no', // Correct field name
+                    data: 'bank_details', // Correct field name
                     render: function(data, type, row, meta) {
-                        return `<span>${row.bank_account_no}</span>`;
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'bank_name', // Correct field name
-                    render: function(data, type, row, meta) {
-                        return `<span>${row.bank_name}</span>`;
+                        return `<span>${row.bank_details ?? ''}</span>`;
                     },
                     orderable: true,
                     searchable: true,
@@ -602,43 +628,16 @@
                     orderable: true,
                     searchable: true,
                 },
-
                 {
-                    data: 'atm_type', // Correct field name
+                    data: 'bank_status', // Correct field name
                     render: function(data, type, row, meta) {
-                        // Determine class based on atm_type
-                        if (row.atm_type === 'ATM') {
-                            className = 'fw-bold h6 text-primary';
-                        } else if (row.atm_type === 'Passbook') {
-                            className = 'fw-bold h6 text-danger';
-                        } else if (row.atm_type === 'Sim Card') {
-                            className = 'fw-bold h6 text-info';
-                        } else {
-                            className = 'fw-bold h6'; // Default class if no match
-                        }
-                        return `<span class="${className}">${row.atm_type}</span><br>`;
-                    },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'atm_status', // Correct field name
-                    render: function(data, type, row, meta) {
-                        return `<span>${row.atm_status}</span>`;
+                        return `<span>${row.bank_status ?? ''}</span>`;
                     },
                     orderable: true,
                     searchable: true,
                 },
             ];
-            dataTable.initialize(url, columns, {
-                drawCallback: function() {
-                    // Apply Inputmask to the pension_number column after the table is drawn
-                    $('.pension_number_mask_display').inputmask('99-9999999-99', {
-                        placeholder: "",
-                        removeMaskOnSubmit: true
-                    });
-                }
-            });
+            dataTable.initialize(url, columns);
 
             $('#validatePensionNumber').validate({
                 rules: {
@@ -763,29 +762,32 @@
             // Add More ATM / PB Transaction
                 $('#addAtmInformationModal').on('shown.bs.modal', function () {
                     $('#add_atm_bank_name').select2({ dropdownParent: $('#addAtmInformationModal'), });
+                    $('#add_more_collection_date').select2({ dropdownParent: $('#addAtmInformationModal'), });
+                    $('#add_atm_pension_account_type_dropdown').select2({  dropdownParent: $('#addAtmInformationModal') });
                 });
 
                 $('#FetchingDatatable').on('click', '.add_more_atm', function(e) {
                     e.preventDefault();
                     var itemID = $(this).data('id');
 
-                    var url = "/clients/get/" + itemID;
+                    var url = "/clients/get/banks/" + itemID;
 
                     $.get(url, function(data) {
-                        $('#add_more_information_id').val(data.id);
-                        $('#item_id').val(data.id);
-                        $('#userTypeSelectUpdate').val(data.user_types).trigger('change');
+                        $('#add_atm_item_id').val(data.id);
 
-                        // Format birth_date and created_at
-                        let formattedBirthDate = data.birth_date ? new Date(data.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
+                        let formattedBirthDate = data.client_information.birth_date ? new Date(data.client_information.birth_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
                         let formattedCreatedAt = data.created_at ? new Date(data.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '';
 
                         // Display formatted dates or blank if not valid
                         $('#add_more_birth_date').val(formattedBirthDate);
                         $('#add_more_created_at').text(formattedCreatedAt);
-                        $('#add_more_fullname').text(`${data.last_name} ${data.first_name} ${data.middle_name ?? ''} ${data.suffix ?? ''}`.trim());
+                        $('#add_more_fullname').text(`${data.client_information.last_name} ${data.client_information.first_name} ${data.client_information.middle_name ?? ''} ${data.client_information.suffix ?? ''}`.trim());
                         $('#add_more_pension_number').text(data.pension_number ?? '');
                         $('#add_more_pension_number').inputmask("99-9999999-99");
+                        $('#add_atm_pension_number_value').val(data.pension_number ?? '');
+
+                        $('#add_atm_pension_type_value').val(data.pension_type ?? '');
+                        $('#add_atm_account_type').val(data.account_type ?? '').trigger('change');
 
                         $('#add_more_pension_type').text(data.pension_type ?? '');
                         $('#add_more_account_type').text(data.account_type ?? '');
@@ -926,6 +928,53 @@
                     $('#AddAtmInformationModal').modal('hide');
                     $('#FetchingDatatable tbody').empty();
                 }
+
+                $('#add_atm_account_type').on('change', function() {
+                    var selected_pension_types = $(this).val();
+
+                    setTimeout(function() {
+                        var PreviousPensionType = $('#add_atm_pension_type_value').val(); // Get the latest area ID value after a brief delay
+
+                        // Make the AJAX GET request for areas
+                        $.ajax({
+                            url: '/pension/types/fetch',
+                            type: 'GET',
+                            data: {
+                                selected_pension_types: selected_pension_types
+                            },
+                            success: function(response) {
+                                var options = '<option value="" selected disabled>Pension Types</option>';
+
+                                // Build options for each area
+                                $.each(response, function(index, item) {
+                                    // Check if this area matches the previous one and mark it as selected
+                                    var selected = (item.pension_name == PreviousPensionType) ? 'selected' : '';
+                                    options += `<option value="${item.pension_name}" ${selected}>${item.pension_name}</option>`;
+                                });
+
+                                $('#add_atm_pension_account_type_dropdown').html(options); // Update the dropdown with the new options
+
+                                // Automatically trigger the area change to load branches
+                                if (PreviousPensionType) {
+                                    $('#add_atm_pension_account_type_dropdown').val(PreviousPensionType).trigger('change'); // Set previous area as selected and trigger change event
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('AJAX Error:', status, error);
+                            }
+                        });
+                    }, 100); // Small delay to ensure area ID is updated
+                });
+
+                $('#same_pension_number').on('change', function() {
+                    if ($(this).is(':checked')) {
+                        $('#pension_no_select').val('yes'); // Hide the entire span (label + input)
+                        $('#SamePensionNumberSelected').hide(); // Hide the entire span (label + input)
+                    } else {
+                        $('#SamePensionNumberSelected').show(); // Show the span back
+                        $('#pension_no_select').val('no');
+                    }
+                });
             // Add More ATM / PB Transaction
 
             $(document).on('click', '.view_pin_code', function(e) {
@@ -1185,18 +1234,12 @@
                                 </div>
 
                                 <div class="form-group mb-2 row align-items-center">
-                                    <label class="col-form-label col-sm-4 fw-bold">ATM / Passbook / Sim No.</label>
+                                    <label class="col-form-label col-sm-4 fw-bold">Card No.</label>
                                     <div class="col-8">
-                                        <input type="text" name="atm_number[]" class="atm_card_input_mask form-control" placeholder="ATM / Passbook / Sim No." required>
+                                        <input type="text" name="atm_number[]" class="atm_card_input_mask form-control" placeholder="Card No." required>
                                     </div>
                                 </div>
 
-                                <div class="form-group mb-3 row align-items-center">
-                                    <label class="col-form-label col-4 fw-bold">Balance</label>
-                                    <div class="col-8">
-                                        <input type="text" name="atm_balance[]" class="balanceCurrency form-control" value="0" placeholder="Balance" required>
-                                    </div>
-                                </div>
 
                                 <div class="form-group mb-2 row align-items-center">
                                     <label class="font-size col-form-label col-4 fw-bold">Banks</label>
@@ -1211,23 +1254,29 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3 row align-items-center">
+
+                                <div class="form-group mb-2 row align-items-center">
                                     <label class="col-form-label col-4 fw-bold">Pin Code</label>
                                     <div class="col-8">
                                         <input type="number" name="pin_code[]" class="form-control" placeholder="PIN Code">
                                     </div>
                                 </div>
-
-                                <div class="form-group mb-3 row align-items-center">
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-2 row align-items-center">
                                     <label class="col-form-label col-4 fw-bold">Expiration Date</label>
                                     <div class="col-8">
                                         <input type="month" name="expiration_date[]" class="form-control">
                                     </div>
                                 </div>
+                                <div class="form-group mb-2 row align-items-center">
+                                    <label class="col-form-label col-4 fw-bold">Balance</label>
+                                    <div class="col-8">
+                                        <input type="text" name="atm_balance[]" class="balanceCurrency form-control" value="0" placeholder="Balance" required>
+                                    </div>
+                                </div>
 
-                                <div class="form-group mb-3 row align-items-center">
+                                <div class="form-group mb-2 row align-items-center">
                                     <label class="col-form-label col-4 fw-bold">Remarks</label>
                                     <div class="col-8">
                                         <input type="text" name="remarks[]" class="form-control" placeholder="Remarks" minlength="0" maxlength="100">

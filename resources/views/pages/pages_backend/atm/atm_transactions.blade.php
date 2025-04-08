@@ -83,15 +83,16 @@
                                 <tr>
                                     <th>Action</th>
                                     <th>Transaction / Pending By</th>
+                                    <th>Status</th>
                                     <th>Date Requested</th>
                                     <th>Transaction Number</th>
                                     <th>Client</th>
+                                    <th>Branch</th>
                                     <th>Pension No. / Type</th>
                                     <th>Card No & Bank</th>
                                     <th>Type</th>
                                     <th>PIN Code</th>
                                     <th>Collection Date</th>
-                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -549,18 +550,47 @@
             const columns = [
                 {
                     data: 'action',
-                    name: 'action',
                     render: function(data, type, row, meta) {
-                        return data;
+                        return `<span>${row.action ?? ''}</span>`;
                     },
                     orderable: false,
                     searchable: false,
                 },
                 {
                     data: 'pending_to',
-                    name: 'pending_to',
                     render: function(data, type, row, meta) {
-                        return data;
+                        return `<span>${row.pending_to ?? ''}</span>`;
+                    },
+                    orderable: true,
+                    searchable: true
+                },
+                {
+                    data: 'status',
+                    render: function(data, type, row, meta) {
+                        let badgeClass = '';
+                        let statusClass = '';
+
+                        // Determine the badge class and status label based on status value
+                        switch (row.status) {
+                            case 'ON GOING':
+                                badgeClass = 'pt-1 pb-1 ps-2 ps-2 pe-2 badge bg-warning';
+                                statusClass = 'On Going';
+                                break;
+                            case 'CANCELLED':
+                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-danger';
+                                statusClass = 'Cancelled';
+                                break;
+                            case 'COMPLETED':
+                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-success';
+                                statusClass = 'Completed';
+                                break;
+                            default:
+                                badgeClass = 'badge bg-secondary'; // Default badge class
+                                statusClass = 'Unknown Status';
+                        }
+
+                        // Return the status wrapped in a span with the appropriate badge and status class
+                        return `<span class="${badgeClass}">${statusClass}</span>`;
                     },
                     orderable: true,
                     searchable: true
@@ -569,11 +599,23 @@
                     data: 'created_at',
                     name: 'created_at',
                     render: function(data, type, row) {
-                        return new Date(data).toLocaleDateString('en-US', {
-                            month: 'long',
-                            day: 'numeric',
-                            year: 'numeric'
+                        let dateObj = new Date(data);
+
+                        // Format Date (e.g., "Sep 20, 2024")
+                        let formattedDate = dateObj.toLocaleDateString('en-US', {
+                            month: 'short',  // "Sep"
+                            day: 'numeric',  // "20"
+                            year: 'numeric'  // "2024"
                         });
+
+                        // Format Time (e.g., "10:30 AM")
+                        let formattedTime = dateObj.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true  // Ensures AM/PM format
+                        });
+
+                        return `${formattedDate} <br> ${formattedTime}`;
                     },
                     orderable: true,
                     searchable: true
@@ -589,16 +631,22 @@
                 },
                 {
                     data: 'full_name',
-                    name: 'full_name',
                     render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6">' + data + '</span>';
+                        return '<span>' + data + '</span>';
+                    },
+                    orderable: true,
+                    searchable: true
+                },
+                {
+                    data: 'branch_location',
+                    render: function(data, type, row, meta) {
+                        return '<span>' + data + '</span>';
                     },
                     orderable: true,
                     searchable: true
                 },
                 {
                     data: 'pension_details',
-                    name: 'pension_details',
                     render: function(data, type, row, meta) {
                         return '<span>' + data + '</span>';
                     },
@@ -607,7 +655,6 @@
                 },
                 {
                     data: 'bank_details',
-                    name: 'bank_details',
                     render: function(data, type, row, meta) {
                         return '<span>' + data + '</span>';
                     },
@@ -616,7 +663,6 @@
                 },
                 {
                     data: 'atm_type',
-                    name: 'atm_type',
                     render: function(data, type, row, meta) {
                         let BankStatus = ''; // Define BankStatus outside the if block with a default value
                         let atmTypeClass = ''; // Variable to hold the class based on atm_type
@@ -668,38 +714,6 @@
                     },
                     orderable: true,
                     searchable: true,
-                },
-                {
-                    data: 'status',
-                    name: 'status',
-                    render: function(data, type, row, meta) {
-                        let badgeClass = '';
-                        let statusClass = '';
-
-                        // Determine the badge class and status label based on status value
-                        switch (row.status) {
-                            case 'ON GOING':
-                                badgeClass = 'pt-1 pb-1 ps-2 ps-2 pe-2 badge bg-warning';
-                                statusClass = 'On Going';
-                                break;
-                            case 'CANCELLED':
-                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-danger';
-                                statusClass = 'Cancelled';
-                                break;
-                            case 'COMPLETED':
-                                badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-success';
-                                statusClass = 'Completed';
-                                break;
-                            default:
-                                badgeClass = 'badge bg-secondary'; // Default badge class
-                                statusClass = 'Unknown Status';
-                        }
-
-                        // Return the status wrapped in a span with the appropriate badge and status class
-                        return `<span class="${badgeClass}">${statusClass}</span>`;
-                    },
-                    orderable: true,
-                    searchable: true
                 },
             ];
 

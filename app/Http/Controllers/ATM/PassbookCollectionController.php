@@ -69,16 +69,10 @@ class PassbookCollectionController extends Controller
                 $latestTransactionId = null;
                 $action = '';
 
-                if ($row->PassbookForCollectionTransaction) {
-                    $ongoingTransactions = $row->PassbookForCollectionTransaction->filter(function ($transaction) {
-                        return $transaction->status === 'On Going';
-                    })->sortByDesc('id');
-
-                    if ($ongoingTransactions->isNotEmpty()) {
-                        $hasOngoingTransaction = true;
-                        $latestTransactionId = $ongoingTransactions->first()->id;
-                    }
-                }
+                $hasOngoingTransaction = PassbookForCollectionTransaction::where('reference_no', $row->transaction_number)
+                    ->where('status','On Going')
+                    ->orderByDesc('id')
+                    ->first();
 
                 if (in_array($userGroup, ['Developer', 'Admin', 'Branch Head', 'Everfirst Admin'])) {
                     if ($hasOngoingTransaction) {
