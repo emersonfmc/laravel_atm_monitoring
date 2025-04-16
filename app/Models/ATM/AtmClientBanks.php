@@ -3,6 +3,8 @@
 namespace App\Models\ATM;
 
 use App\Models\Branch;
+
+use App\Models\EFMain\DataBranch;
 use App\Models\ClientInformation;
 use App\Models\Passbook\PassbookForCollectionTransaction;
 
@@ -41,7 +43,7 @@ class AtmClientBanks extends Model
     }
 
     public function Branch(){
-        return $this->belongsTo(Branch::class,'branch_id','id')->select(['id', 'branch_location','branch_abbreviation']);
+        return $this->belongsTo(DataBranch::class,'branch_id','id')->select(['id', 'branch_location','branch_abbreviation']);
     }
 
     public function AtmBanksTransaction(){

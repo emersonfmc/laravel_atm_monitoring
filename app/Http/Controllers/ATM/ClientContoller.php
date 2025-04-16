@@ -1,11 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\ATM;
-use App\Models\Branch;
 
 use App\Models\System\SystemLogs;
 use App\Models\System\MaintenancePage;
-use App\Models\DataTransactionSequence;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -13,28 +11,35 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 use App\Models\ClientInformation;
-use App\Models\DataCollectionDate;
-use App\Models\AtmTransactionSequence;
-use App\Models\DataBankLists;
 
 use App\Models\ATM\AtmClientBanks;
 use App\Models\ATM\AtmBanksTransaction;
 use App\Models\ATM\AtmTransactionBalanceLogs;
 use App\Models\ATM\AtmBanksTransactionApproval;
 
+use App\Models\EFMain\DataCollectionDate;
+use App\Models\EFMain\DataTransactionSequence;
+use App\Models\EFMain\DataBranch;
+use App\Models\EFMain\DataBankLists;
+use App\Models\EFMain\SystemMaintenance;
+
 use Yajra\DataTables\Facades\DataTables;
 use App\Http\Controllers\Controller;
+
+
 class ClientContoller extends Controller
 {
     public function client_page(){
         $userGroup = Auth::user()->UserGroup->group_name;
         $branch_id = Auth::user()->branch_id;
-        $branches = Branch::where('status', 'Active')->get();
+        $branches = DataBranch::where('status', 'Active')->get();
 
         $DataCollectionDates = DataCollectionDate::where('status', 'Active')->get();
         $DataBankLists = DataBankLists::where('status', 'Active')->get();
 
-        $MaintenancePage = MaintenancePage::where('pages_name', 'Client Lists Page')->first();
+        $MaintenancePage = SystemMaintenance::where('system','ELOG Monitoring')
+            ->where('pages_name', 'Client Lists Page')
+            ->first();
 
         if ($MaintenancePage->status == 'yes') {
             if (in_array($userGroup, ['Developer', 'Admin'])) {
@@ -66,7 +71,6 @@ class ClientContoller extends Controller
             if ($existingPension) {
                 if (!$userBranchId) {
                     return response()->json(['error' => 'Pension number already exists.']);
-
                     $query->where('pension_number', $pension_number_get);
                 }
 
@@ -266,7 +270,7 @@ class ClientContoller extends Controller
                 }
 
                 // Get the branch abbreviation
-                $BranchGet = Branch::where('id', $branch_id)->first();
+                $BranchGet = DataBranch::where('id', $branch_id)->first();
                 $branch_abbreviation = $BranchGet->branch_abbreviation;
                 $branch_location = $BranchGet->branch_location;
 
@@ -497,7 +501,7 @@ class ClientContoller extends Controller
                 // Validate First Existing Bank Account No End
 
                 // Create Transaction Number
-                    $BranchGet = Branch::where('id', $branch_id)->first();
+                    $BranchGet = DataBranch::where('id', $branch_id)->first();
                     $branch_abbreviation = $BranchGet->branch_abbreviation;
 
                     // Fetch the last transaction number based on the branch_id and branch_code

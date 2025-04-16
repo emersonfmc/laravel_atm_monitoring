@@ -734,13 +734,6 @@
 
         const dataTable = new ServerSideDataTable('#FetchingDatatable');
         var url = '{!! route('elog_monitoring_transaction_data') !!}';
-        const buttons = [{
-            text: 'Delete',
-            action: function(e, dt, node, config) {
-                // Add your custom button action here
-                alert('Custom button clicked!');
-            }
-        }];
         const columns = [
             {
                 data: 'action',

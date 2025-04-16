@@ -2,8 +2,8 @@
 
 namespace App\Models\ATM;
 
-use App\Models\Branch;
-use App\Models\DataTransactionAction;
+use App\Models\EFMain\DataBranch;
+use App\Models\EFMain\DataTransactionAction;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ATM\AtmReleasedRiderImage;
 use App\Models\ATM\AtmReleasedClientImage;
@@ -23,7 +23,7 @@ class AtmBanksTransaction extends Model
     }
 
     public function Branch(){
-        return $this->belongsTo(Branch::class, 'branch_id','id')->select(['id','branch_location','branch_abbreviation']);
+        return $this->belongsTo(DataBranch::class, 'branch_id','id')->select(['id','branch_location','branch_abbreviation']);
     }
 
     public function DataTransactionAction(){

@@ -3,6 +3,10 @@
 namespace Database\Factories;
 
 use App\Models\ATM\AtmClientBanks;
+
+use App\Models\EFMain\DataCollectionDate;
+use App\Models\EFMain\DataPensionTypesLists;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -24,8 +28,7 @@ class AtmClientBanksFactory extends Factory
 
             // Select pension_name from data_pension_types_lists where types matches the account_type
             'pension_type' => function (array $attributes) {
-                return DB::table('data_pension_types_lists')
-                    ->where('types', $attributes['account_type']) // Filter by account_type
+                return DataPensionTypesLists::where('types', $attributes['account_type']) // Filter by account_type
                     ->inRandomOrder()
                     ->value('pension_name');
             },
@@ -36,7 +39,7 @@ class AtmClientBanksFactory extends Factory
             'pin_no' => $this->faker->unique()->numerify('########'),
             'atm_status' => $this->faker->randomElement(['new']),
             'expiration_date' => date('Y-m-d', mktime(0, 0, 0, rand(1, 12), 1, 2030)),
-            'collection_date' => DB::table('data_collection_dates')->inRandomOrder()->value('collection_date'),
+            'collection_date' => DataCollectionDate::inRandomOrder()->value('collection_date'),
             'cash_box_no' => null,
             'safekeep_cash_box_no' => null,
             'location' => 'Head Office',

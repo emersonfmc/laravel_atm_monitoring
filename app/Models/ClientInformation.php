@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\ATM\AtmClientBanks;
+use App\Models\EFMain\DataBranch;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -16,7 +17,7 @@ class ClientInformation extends Model
 
     public function Branch()
     {
-        return $this->belongsTo(Branch::class,'branch_id','id')->select(['id', 'branch_location','branch_abbreviation']);
+        return $this->belongsTo(DataBranch::class,'branch_id','id')->select(['id', 'branch_location','branch_abbreviation']);
     }
 
     public function AtmClientBanks()

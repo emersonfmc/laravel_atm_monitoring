@@ -215,13 +215,6 @@
 
             const dataTable = new ServerSideDataTable('#FetchingDatatable');
             var url = '{!! route('PassbookCollectionAllTransactionData') !!}';
-            const buttons = [{
-                text: 'Delete',
-                action: function(e, dt, node, config) {
-                    // Add your custom button action here
-                    alert('Custom button clicked!');
-                }
-            }];
             const columns = [
                 {
                     data: 'request_number',
@@ -343,67 +336,59 @@
                                 lengthMenu: [ [50, 55, 60, 70, 100], [50, 55, 60, 70, 100] ], // Custom length menu options
                                 columns: [
                                     {
-                                        data: null, // Custom rendering for transaction action and pending_to
-                                        render: function (row) {
-                                            const transactionAction = row.transaction_action ?? ''; // Allow null/undefined, default to empty string
-                                            const pendingTo = row.pending_to ?? ''; // Allow null/undefined, default to empty string
-
-                                            return (
-                                                '<span class="fw-bold text-primary">' + transactionAction + '</span><br>' +
-                                                '<span class="text-dark">' + pendingTo + '</span>'
-                                            );
-                                        },
+                                        "data": function(row, type, set) {
+                                        const transactionAction = row.transaction_action ?? '';
+                                        const pendingTo = row.pending_to ?? '';
+                                        return (
+                                            '<span class="fw-bold text-primary">' + transactionAction + '</span><br>' +
+                                            '<span class="text-dark">' + pendingTo + '</span>'
+                                        );
+                                        }
                                     },
                                     {
-                                        data: null, // Custom rendering for pension details
-                                        render: function (row) {
+                                        "data": function(row, type, set) {
                                             return (
-                                                '<span class="fw-bold text-primary">' + row.atm_client_banks.client_information.pension_number + '</span><br>' +
-                                                '<span class="text-dark">' + row.atm_client_banks.client_information.pension_account_type + '</span><br>' +
-                                                '<span class="text-success">' + row.atm_client_banks.client_information.pension_type + '</span>'
+                                                '<span class="fw-bold text-primary">' + row.atm_client_banks.pension_number + '</span><br>' +
+                                                '<span class="text-success">' + row.atm_client_banks.pension_type + '</span>'
                                             );
-                                        },
+                                        }
                                     },
                                     { data: 'id' },
                                     { data: 'branch.branch_location' },
                                     {
-                                        data: null, // Custom rendering for full name
-                                        render: function (row) {
+                                        "data": function(row, type, set) {
                                             var clientInfo = row.atm_client_banks.client_information;
                                             var fullName = clientInfo.last_name + ', ' + clientInfo.first_name + ' ' + (clientInfo.middle_name || '') + ' ' + (clientInfo.suffix || '');
                                             return fullName.trim();
-                                        },
+                                        }
                                     },
                                     {
-                                        data: null, // Custom rendering for bank details
-                                        render: function (row) {
-                                            return (
-                                                '<span class="fw-bold text-success">' + row.atm_client_banks.bank_account_no + '</span><br>' +
-                                                row.atm_client_banks.bank_name
-                                            );
-                                        },
+                                        "data": function(row, type, set) {
+                                        return (
+                                            '<span class="fw-bold text-success">' + row.atm_client_banks.bank_account_no + '</span><br>' +
+                                            row.atm_client_banks.bank_name
+                                        );
+                                        }
                                     },
                                     {
-                                        data: null, // Custom rendering for ATM details
-                                        render: function (row) {
+                                        "data": function(row, type, set) {
                                             return (
                                                 '<span class="text-danger">' + row.atm_client_banks.atm_type + '</span><br>' +
                                                 row.atm_client_banks.atm_status
                                             );
-                                        },
+                                        }
                                     },
                                     {
-                                        data: null,
-                                        render: function(data, type, row, meta) {
+                                        "data": function(row, type, set) {
                                             return `<span>${row.atm_client_banks.collection_date}</span>`;
-
                                         },
                                         orderable: true,
                                         searchable: true,
                                     },
                                     {
-                                        data: 'status', // Status with badge
-                                        render: function (status) {
+                                        "data": function(row, type, set) {
+                                            var status = row.status;
+
                                             var statusBadgeClass = 'badge bg-secondary';
                                             var statusTextClass = 'Unknown';
 
@@ -423,21 +408,22 @@
 
                                             return '<span class="' + statusBadgeClass + '">' + statusTextClass + '</span>';
                                         },
+                                        orderable: true,
+                                        searchable: true,
                                     },
                                     {
                                         data: 'remarks', // Remarks
                                         defaultContent: '', // Handle null or undefined remarks
                                     },
                                     {
-                                        data: null, // Action column with view button
-                                        render: function (row) {
+                                        "data": function(row, type, set) {
                                             return (
                                                 `<a href="#" class="text-success viewPassbookTransactionApproval" data-bs-toggle="tooltip"
                                                         data-bs-placement="top" title="View Transaction" data-transaction_id='${row.id}'>'
                                                       '<i class="fas fa-eye fs-5"></i>'
                                                 </a>`
                                             );
-                                        },
+                                        }
                                     },
                                 ],
                                 drawCallback: function () {
@@ -446,6 +432,10 @@
                                 },
                                 language: {
                                     searchPlaceholder: "Enter to search ...",
+                                    paginate: {
+                                        previous: "<i class='fas fa-chevron-left'></i>",
+                                        next: "<i class='fas fa-chevron-right'></i>",
+                                    },
                                 },
                                 columnDefs: [
                                     {

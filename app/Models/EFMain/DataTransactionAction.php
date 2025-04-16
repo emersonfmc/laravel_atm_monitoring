@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\EFMain;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,6 +11,7 @@ class DataTransactionAction extends Model
     use HasFactory, SoftDeletes;
 
     protected $guarded = [];
+    protected $connection = 'mysql_connection_ef_main';
 
     public function DataTransactionSequence()
     {

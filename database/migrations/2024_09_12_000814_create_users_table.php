@@ -40,12 +40,6 @@ class CreateUsersTable extends Migration
 
             $table->enum('status',['Active','Inactive'])->default('Active');
 
-            $table->foreign('user_group_id')->references('id')->on('data_user_groups')->onDelete('set null')->onUpdate('cascade');
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('set null')->onUpdate('cascade');
-            $table->foreign('branch_id')->references('id')->on('branches')->onDelete('set null')->onUpdate('cascade');
-            $table->foreign('district_code_id')->references('id')->on('data_districts')->onDelete('set null')->onUpdate('cascade');
-            $table->foreign('area_code_id')->references('id')->on('data_areas')->onDelete('set null')->onUpdate('cascade');
-
             $table->softDeletes();
             $table->timestamps();
         });

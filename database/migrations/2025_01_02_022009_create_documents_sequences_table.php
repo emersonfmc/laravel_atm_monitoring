@@ -19,8 +19,6 @@ return new class extends Migration
             $table->integer('sequence_no');
             $table->unsignedBigInteger('user_group_id');
             $table->enum('type',['Received','Released'])->nullable();
-            $table->foreign('user_group_id')->references('id')->on('data_user_groups')->onDelete('restrict')->onUpdate('cascade');
-            $table->foreign('documents_actions_id')->references('id')->on('documents_actions')->onDelete('restrict')->onUpdate('cascade');
             $table->softDeletes();
             $table->timestamps();
         });

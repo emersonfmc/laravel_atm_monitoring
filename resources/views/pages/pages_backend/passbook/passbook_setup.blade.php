@@ -69,7 +69,7 @@
                                         <input type="checkbox" id="selectAll" title="Select All">
                                     </th>
                                     <th style="width: 15%;">Pending By</th>
-                                    <th>Reference No</th>
+                                    <th>Transaction No</th>
                                     <th>Client</th>
                                     <th>Branch</th>
                                     <th>Pension No. / Type</th>
@@ -93,181 +93,137 @@
 
     <script>
         $(document).ready(function () {
-            var FetchingDatatableBody = $('#FetchingDatatable tbody');
+            // Displaying of Data
+                var FetchingDatatableBody = $('#FetchingDatatable tbody');
 
-            const dataTable = new ServerSideDataTable('#FetchingDatatable');
-            var url = '{!! route('PassbookCollectionData') !!}';
-            const buttons = [{
-                text: 'Delete',
-                action: function(e, dt, node, config) {
-                    // Add your custom button action here
-                    alert('Custom button clicked!');
-                }
-            }];
-            const columns = [
-                {
-                    data: 'action',
-                    name: 'action',
-                    render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6 text-primary">' + data + '</span>';
+                const dataTable = new ServerSideDataTable('#FetchingDatatable');
+                var url = '{!! route('PassbookCollectionData') !!}';
+                const columns = [
+                    {
+                        data: 'action',
+                        render: function(data, type, row, meta) {
+                            return '<span class="fw-bold h6 text-primary">' + data + '</span>';
+                        },
+                        orderable: false,
+                        searchable: false,
                     },
-                    orderable: false,
-                    searchable: false,
-                },
-                // Transaction Type and Pending By
-                {
-                    data: 'pending_to',
-                    name: 'pending_to',
-                    render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6 text-primary">' + data + '</span>';
+                    {
+                        data: 'pending_to',
+                        render: function(data, type, row, meta) {
+                            return '<span class="fw-bold text-primary">' + data + '</span>';
+                        },
+                        orderable: true,
+                        searchable: true,
                     },
-                    orderable: true,
-                    searchable: true,
-                },
-                // Reference No
-                {
-                    data: 'transaction_number',
-                    name: 'transaction_number',
-                    render: function(data, type, row, meta) {
-                        return '<span class="fw-bold h6">' + data + '</span>';
+                    {
+                        data: 'transaction_number',
+                        render: function(data, type, row, meta) {
+                            return '<span class="fw-bold h6">' + data + '</span>';
+                        },
+                        orderable: true,
+                        searchable: true,
                     },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: null,
-                    render: function(data, type, row, meta) {
-                        return '<span>' + row.full_name + '</span>';
+                    {
+                        data: 'full_name',
+                        render: function(data, type, row, meta) {
+                            return `<span>${row.full_name ?? ''}</span>`;
+                        },
+                        orderable: true,
+                        searchable: true,
                     },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'branch_id',
-                    name: 'branch.branch_location',
-                    render: function(data, type, row, meta) {
-                        return row.branch ? '<span>' + row.branch.branch_location + '</span>' : ''; // Check if company exists
+                    {
+                        data: 'branch_location',
+                        render: function(data, type, row, meta) {
+                            return `<span>${row.branch_location ?? ''}</span>`;
+                        },
+                        orderable: true,
+                        searchable: true,
                     },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: null,
-                    render: function(data, type, row, meta) {
-                        return '<span>' + row.pension_details + '</span>';
+                    {
+                        data: 'pension_details',
+                        render: function(data, type, row, meta) {
+                            return `<span>${row.pension_details ?? ''}</span>`;
+                        },
+                        orderable: true,
+                        searchable: true,
                     },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'client_information_id',
-                    name: 'client_information.created_at',
-                    render: function(data, type, row, meta) {
-                        if (row.client_information) {
-                            const createdAt = row.client_information.created_at ? new Date(row.client_information.created_at) : null;
-                            const formattedDate = createdAt ? createdAt.toLocaleDateString('en-US',
-                                {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                })
-                                : '';
+                    {
+                        data: 'created_at',
+                        render: function(data, type, row, meta) {
+                                const createdAt = row.created_at ? new Date(row.created_at) : null;
+                                const formattedDate = createdAt ? createdAt.toLocaleDateString('en-US',
+                                    {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric'
+                                    })
+                                    : '';
 
-                            return `<span class="text-muted">${formattedDate}</span>`;
-                        }
-                        return '';
+                                return `<span class="text-muted">${formattedDate}</span>`;
+                        },
+                        orderable: true,
+                        searchable: true,
                     },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'client_information_id',
-                    name: 'client_information.birth_date',
-                    render: function(data, type, row, meta) {
-                        if (row.client_information) {
-                            const BirthDate = row.client_information.birth_date ? new Date(row.client_information.birth_date) : null;
-                            const formattedBirthDate = BirthDate ? BirthDate.toLocaleDateString('en-US',
-                                {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                })
-                                : '';
+                    {
+                        data: 'client_information_id',
+                        name: 'client_information.birth_date',
+                        render: function(data, type, row, meta) {
+                            if (row.client_information) {
+                                const BirthDate = row.client_information.birth_date ? new Date(row.client_information.birth_date) : null;
+                                const formattedBirthDate = BirthDate ? BirthDate.toLocaleDateString('en-US',
+                                    {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric'
+                                    })
+                                    : '';
 
-                            return `<span class="text-muted">${formattedBirthDate}</span>`;
-                        }
-                        return '';
+                                return `<span class="text-muted">${formattedBirthDate}</span>`;
+                            }
+                            return '';
+                        },
+                        orderable: true,
+                        searchable: true,
                     },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'bank_account_no',
-                    name: 'bank_account_no',
-                    render: function(data, type, row, meta) {
-                            return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span><br>
-                                <span class="fw-bold">${row.bank_name}</span>`;
-
+                    {
+                        data: 'bank_details',
+                        render: function(data, type, row, meta) {
+                            return `<span>${row.bank_details ?? ''}</span>`;
+                        },
+                        orderable: true,
+                        searchable: true,
                     },
-                    orderable: true,
-                    searchable: true,
-                },
-                {
-                    data: 'atm_status',
-                    name: 'atm_status',
-                    render: function(data, type, row, meta) {
-                        let BankStatus = ''; // Define BankStatus outside the if block with a default value
-                        let atmTypeClass = ''; // Variable to hold the class based on atm_type
-
-                        BankStatus = row.atm_status;
-
-                        // Determine the text color based on atm_type
-                        switch (row.atm_type) {
-                            case 'ATM':
-                                atmTypeClass = 'text-primary';
-                                break;
-                            case 'Passbook':
-                                atmTypeClass = 'text-danger';
-                                break;
-                            case 'Sim Card':
-                                atmTypeClass = 'text-info';
-                                break;
-                            default:
-                                atmTypeClass = 'text-secondary'; // Default color if none match
-                        }
-
-                        return `<span class="${atmTypeClass}">${row.atm_type}</span><br>
-                                <span class="fw-bold h6">${BankStatus}</span>`;
+                    {
+                        data: 'pb_status',
+                        render: function(data, type, row, meta) {
+                            return `<span>${row.pb_status ?? ''}</span>`;
+                        },
+                        orderable: true,
+                        searchable: true,
                     },
-                    orderable: true,
-                    searchable: true,
-                }
-            ];
-            dataTable.initialize(url, columns, { pageLength: 200, lengthMenu: [200,250,300,350,400,500], });
-            // Filtering of Transaction
-                var branchId = @json($branch_id);
-                var userHasBranchId = {!! Auth::user()->branch_id ? 'true' : 'false' !!};
+                ];
+                dataTable.initialize(url, columns, { pageLength: 200, lengthMenu: [200,250,300,350,400,500], });
 
-                if (userHasBranchId) {
-                    $('#branch_id_select').val(branchId).prop('disabled', true);
-                }
+                // Filtering of Transaction
+                    var branchId = @json($branch_id);
+                    var userHasBranchId = {!! Auth::user()->branch_id ? 'true' : 'false' !!};
 
-                $('#filterForm').submit(function(e) {
-                    e.preventDefault();
-                    var selectedBranch = $('#branch_id_select').val();
-
-                    // Get the base URL for filtering
-                    var targetUrl = '{!! route('PassbookCollectionData') !!}';
-
-                    // Add branch_id as a query parameter if user doesn't have a fixed branch and has selected a branch
-                    if (!userHasBranchId && selectedBranch) {
-                        targetUrl += '?branch_id=' + selectedBranch;
+                    if (userHasBranchId) {
+                        $('#branch_id_select').val(branchId).prop('disabled', true);
                     }
 
-                    // Update the DataTable with the filtered data
-                    dataTable.table.ajax.url(targetUrl).load();
-                });
-            // End Filtering of Transaction
+                    $('#filterForm').submit(function(e) {
+                        e.preventDefault();
+                        var selectedBranch = $('#branch_id_select').val();
+                        var targetUrl = '{!! route('PassbookCollectionData') !!}';
+
+                        if (!userHasBranchId && selectedBranch) {
+                            targetUrl += '?branch_id=' + selectedBranch;
+                        }
+                        dataTable.table.ajax.url(targetUrl).load();
+                    });
+                // Filtering of Transaction
+            // Displaying of Data
 
             $('#selectAll').on('change', function () {
                 const isChecked = $(this).is(':checked');
@@ -301,27 +257,46 @@
                 });
 
                 const csrfToken = $('meta[name="csrf-token"]').attr('content'); // Get CSRF token
+                const today = new Date().toISOString().slice(0, 16);
 
                 // Confirm the action with SweetAlert
                 Swal.fire({
                     title: 'Passbook For Collection Approval',
                     text: 'Are you sure you want to proceed with these to Passbook for Collection?',
+                    html: `
+                        <p>Publish this selected clients?</p>
+                        <span><hr></span>
+                        <div class="form-group col-md-12">
+                            <label for="publishDatetime" class="fw-bold">Select Pickup Date and Time</label>
+                            <input type="datetime-local" id="publishDatetime" class="swal2-input form-control fs-5" min="${today}" name="publishDatetime">
+                        </div>
+                    `,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: "#3085d6",
                     cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, proceed!"
+                    confirmButtonText: "Yes, proceed!",
+                    preConfirm: () => {
+                        const publishDatetime = Swal.getPopup().querySelector('#publishDatetime').value;
+                        if (!publishDatetime) {
+                            Swal.showValidationMessage(`Please select pick up date`);
+                        }
+                        return { publishDatetime: publishDatetime };
+                    }
                 }).then((result) => {
                     if (result.isConfirmed) {
+
                         const currentPage = dataTable.table.page();
+                        const publishDatetime = result.value.publishDatetime;
+
                         $.ajax({
                             url: '{!! route('PassbookForCollectionCreate') !!}',
                             type: 'POST',
                             data: {
                                 items: checkedItemsData,
+                                publishDatetime: publishDatetime,
                                 _token: csrfToken // Include CSRF token in the request
                             },
-
                             success: function(response) {
                                 if (typeof response === 'string') {
                                     var res = JSON.parse(response);
@@ -329,8 +304,7 @@
                                     var res = response; // If it's already an object
                                 }
 
-                                if (res.status === 'success')
-                                {
+                                if (res.status === 'success'){
                                     createDatatable();
                                     Swal.fire({
                                         title: 'Successfully Create!',
@@ -363,17 +337,13 @@
                                             });
                                         }
                                     });
-                                }
-                                else if (res.status === 'error')
-                                {
+                                } else if (res.status === 'error'){
                                     Swal.fire({
                                         title: 'Error!',
                                         text: res.message,
                                         icon: 'error',
                                     });
-                                }
-                                else
-                                {
+                                } else {
                                     Swal.fire({
                                         title: 'Error!',
                                         text: 'Error Occurred Please Try Again',

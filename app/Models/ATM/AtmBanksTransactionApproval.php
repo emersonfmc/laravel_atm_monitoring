@@ -3,8 +3,8 @@
 namespace App\Models\ATM;
 
 use App\Models\User;
-use App\Models\DataUserGroup;
-use App\Models\DataTransactionAction;
+use App\Models\EFMain\DataTransactionAction;
+use App\Models\EFMain\DataUserGroup;
 
 use App\Models\ATM\AtmTransactionApprovalsBalanceLogs;
 use App\Models\ATM\AtmBanksTransaction;
