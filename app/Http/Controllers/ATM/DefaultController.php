@@ -11,7 +11,7 @@ use Mpdf\QrCode\Output;
 
 use App\Models\ATM\AtmClientBanks;
 use App\Models\ClientInformation;
-use App\Models\DataPensionTypesLists;
+use App\Models\EFMain\DataPensionTypesLists;
 
 use App\Http\Controllers\Controller;
 class DefaultController extends Controller

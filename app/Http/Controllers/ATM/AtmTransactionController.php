@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers\ATM;
 
-use App\Models\Branch;
 use App\Models\System\SystemLogs;
-use App\Models\DataBankLists;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -12,17 +10,21 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 
 use App\Models\ClientInformation;
-use App\Models\DataReleaseOption;
-use App\Models\DataCollectionDate;
-use App\Models\DataPensionTypesLists;
-use App\Models\DataTransactionAction;
-use App\Models\DataTransactionSequence;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\ATM\AtmTransactionBalanceLogs;
 use App\Models\ATM\AtmBanksTransactionApproval;
 use App\Models\ATM\AtmBanksTransaction;
 use App\Models\ATM\AtmClientBanks;
 use App\Models\ATM\AtmReleasedClientImage;
+
+use App\Models\EFMain\DataBranch;
+use App\Models\EFMain\DataBankLists;
+use App\Models\EFMain\DataCollectionDate;
+use App\Models\EFMain\DataTransactionAction;
+use App\Models\EFMain\DataReleaseOption;
+use App\Models\EFMain\DataPensionTypesLists;
+use App\Models\EFMain\DataTransactionSequence;
+use App\Models\EFMain\SystemMaintenance;
 
 use App\Http\Controllers\Controller;
 
@@ -31,9 +33,8 @@ class AtmTransactionController extends Controller
     public function TransactionPage(){
         $branch_id = Auth::user()->branch_id;
 
-        $Branches = Branch::where('status', 'Active')->get();
+        $Branches = DataBranch::where('status', 'Active')->get();
         $DataTransactionAction = DataTransactionAction::where('status', 'Active')->get();
-
         $DataBankLists = DataBankLists::where('status','Active')->get();
         $DataReleaseOption = DataReleaseOption::where('status','Active')->get();
         $DataPensionTypesLists = DataPensionTypesLists::where('status','Active')->get();
@@ -683,7 +684,7 @@ class AtmTransactionController extends Controller
                     }
 
                     // Creation of Transaction Number
-                        $BranchGet = Branch::where('id', $branch_id)->first();
+                        $BranchGet = DataBranch::where('id', $branch_id)->first();
                         $branch_abbreviation = $BranchGet->branch_abbreviation;
 
                         // Fetch the last transaction number based on the branch_id and branch_code
@@ -1189,7 +1190,7 @@ class AtmTransactionController extends Controller
                 }
 
                 // Creation of Transaction Number
-                    $BranchGet = Branch::where('id', $branch_id)->first();
+                    $BranchGet = DataBranch::where('id', $branch_id)->first();
                     $branch_abbreviation = $BranchGet->branch_abbreviation;
 
                     // Fetch the last transaction number based on the branch_id and branch_code
@@ -1593,7 +1594,7 @@ class AtmTransactionController extends Controller
                     }
 
                     // Creation of Transaction Number
-                        $BranchGet = Branch::where('id', $branch_id)->first();
+                        $BranchGet = DataBranch::where('id', $branch_id)->first();
                         $branch_abbreviation = $BranchGet->branch_abbreviation;
 
                         // Fetch the last transaction number based on the branch_id and branch_code
@@ -1996,7 +1997,7 @@ class AtmTransactionController extends Controller
                     }
 
                     // Get branch location
-                    $BranchGet = Branch::where('id', $branch_id)->first();
+                    $BranchGet = DataBranch::where('id', $branch_id)->first();
                     if (!$BranchGet) {
                         return response()->json([
                             'status' => 'error',
@@ -2131,7 +2132,7 @@ class AtmTransactionController extends Controller
                     }
 
                     // Get branch location
-                    $BranchGet = Branch::where('id', $branch_id)->first();
+                    $BranchGet = DataBranch::where('id', $branch_id)->first();
                     if (!$BranchGet) {
                         return response()->json([
                             'status' => 'error',
@@ -2405,7 +2406,7 @@ class AtmTransactionController extends Controller
                 // Validate First Existing Bank Account No End
 
                 // Create Transaction Number
-                    $BranchGet = Branch::where('id', $branch_id)->first();
+                    $BranchGet = DataBranch::where('id', $branch_id)->first();
                     $branch_abbreviation = $BranchGet->branch_abbreviation;
 
                     // Fetch the last transaction number based on the branch_id and branch_code
@@ -2553,7 +2554,7 @@ class AtmTransactionController extends Controller
 
     public function TransactionReceivingPage(){
         $branch_id = Auth::user()->branch_id;
-        $Branches = Branch::where('status', 'Active')->get();
+        $Branches = DataBranch::where('status', 'Active')->get();
         $DataTransactionAction = DataTransactionAction::where('status', 'Active')->get();
 
         return view('pages.pages_backend.atm.atm_receiving_of_transaction', compact('branch_id','Branches','DataTransactionAction'));
@@ -2561,7 +2562,7 @@ class AtmTransactionController extends Controller
 
     public function TransactionReleasingPage(){
         $branch_id = Auth::user()->branch_id;
-        $Branches = Branch::where('status', 'Active')->get();
+        $Branches = DataBranch::where('status', 'Active')->get();
         $DataTransactionAction = DataTransactionAction::where('status', 'Active')->get();
 
         return view('pages.pages_backend.atm.atm_releasing_of_transaction', compact('branch_id','Branches','DataTransactionAction'));
@@ -2840,7 +2841,7 @@ class AtmTransactionController extends Controller
         } else {
             $OldBranchLocation = $AtmClientBanks->Branch->branch_location;
 
-            $NewBranch = Branch::findOrFail($branch_id);
+            $NewBranch = DataBranch::findOrFail($branch_id);
             $NewBranchLocation = $NewBranch->branch_location;
 
             $TransactionNumber = $AtmClientBanks->transaction_number;
@@ -2950,7 +2951,7 @@ class AtmTransactionController extends Controller
                 // Validate Pension Number Already Exists
 
                 // Create System Logs used for Auditing of Logs
-                    $NewBranch = Branch::findOrFail($request->branch_id);
+                    $NewBranch = DataBranch::findOrFail($request->branch_id);
                     $NewBranchDetails = $NewBranch->branch_location;
 
                     $OldBranchDetails = $AtmClientBanks->Branch->branch_location ?? '';
@@ -3311,7 +3312,7 @@ class AtmTransactionController extends Controller
                 }
 
                 // Get the branch abbreviation
-                $BranchGet = Branch::where('id', $branch_id)->first();
+                $BranchGet = DataBranch::where('id', $branch_id)->first();
                 $branch_abbreviation = $BranchGet->branch_abbreviation;
                 $branch_location = $BranchGet->branch_location;
 

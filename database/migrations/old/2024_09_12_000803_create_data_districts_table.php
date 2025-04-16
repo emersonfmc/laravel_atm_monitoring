@@ -18,9 +18,8 @@ return new class extends Migration
             $table->string('district_name')->nullable();
             $table->string('district_number')->nullable();
             $table->string('email')->nullable();
-            $table->unsignedBigInteger('company_id');
+            $table->unsignedBigInteger('company_id')->nullable();
             $table->string('status')->nullable();
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('restrict')->onUpdate('cascade');
             $table->softDeletes();
             $table->timestamps();
         });

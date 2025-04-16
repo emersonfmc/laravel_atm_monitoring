@@ -1,20 +1,15 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\EFMain;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class DataDepartments extends Model
+class DataReleaseOption extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $guarded = [];
-
-    public function Company()
-    {
-        return $this->belongsTo(Company::class, 'company_id', 'id');
-    }
+    protected $connection = 'mysql_connection_ef_main';
 }
-

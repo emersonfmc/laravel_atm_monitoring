@@ -4,22 +4,26 @@ namespace App\Http\Controllers\ATM;
 use Exception;
 use App\Models\Branch;
 use Illuminate\Http\Request;
-use App\Models\DataBankLists;
+
 use Illuminate\Support\Carbon;
 use App\Models\ClientInformation;
-use App\Models\DataReleaseOption;
 use App\Models\System\SystemLogs;
 use App\Models\ATM\AtmClientBanks;
-use App\Models\DataCollectionDate;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Models\DataPensionTypesLists;
-use App\Models\DataTransactionAction;
 use App\Models\System\MaintenancePage;
 use App\Models\ATM\AtmBanksTransaction;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\ATM\AtmBanksTransactionApproval;
-use App\Models\DataBorrowOption;
+
+use App\Models\EFMain\DataBranch;
+use App\Models\EFMain\DataBankLists;
+use App\Models\EFMain\DataCollectionDate;
+use App\Models\EFMain\DataTransactionAction;
+use App\Models\EFMain\DataReleaseOption;
+use App\Models\EFMain\DataPensionTypesLists;
+use App\Models\EFMain\DataBorrowOption;
+use App\Models\EFMain\SystemMaintenance;
 
 class AtmHeadOfficeController extends Controller
 {
@@ -27,7 +31,7 @@ class AtmHeadOfficeController extends Controller
         $userGroup = Auth::user()->UserGroup->group_name;
         $branch_id = Auth::user()->branch_id;
 
-        $Branches = Branch::where('status', 'Active')->get();
+        $Branches = DataBranch::where('status', 'Active')->get();
         $DataBankLists = DataBankLists::where('status', 'Active')->get();
         $DataCollectionDate = DataCollectionDate::where('status', 'Active')->get();
         $DataTransactionAction = DataTransactionAction::where('transaction', '1')->where('status', 'Active')->get();
@@ -35,7 +39,10 @@ class AtmHeadOfficeController extends Controller
         $DataPensionTypesLists = DataPensionTypesLists::where('status', 'Active')->get();
         $DataBorrowOption = DataBorrowOption::where('status', 'Active')->get();
 
-        $MaintenancePage = MaintenancePage::where('pages_name', 'Head Office Page')->first();
+        $MaintenancePage = SystemMaintenance::where('system','ELOG Monitoring')
+                ->where('pages_name', 'Client Lists Page')
+                ->first();
+
         if ($MaintenancePage->status == 'yes') {
             // Allow "Developer" group to bypass maintenance mode
             if (in_array($userGroup, ['Developer', 'Admin'])) {
@@ -386,7 +393,9 @@ class AtmHeadOfficeController extends Controller
     public function SafekeepPage(){
         $userGroup = Auth::user()->UserGroup->group_name;
 
-        $MaintenancePage = MaintenancePage::where('pages_name', 'Safekeep Page')->first();
+        $MaintenancePage = SystemMaintenance::where('system','ELOG Monitoring')
+            ->where('pages_name', 'Safekeep Page')
+            ->first();
 
         if ($MaintenancePage->status == 'yes') {
             if (in_array($userGroup, ['Developer', 'Admin'])) {
@@ -629,10 +638,13 @@ class AtmHeadOfficeController extends Controller
     public function ReleasedPage(){
         $userGroup = Auth::user()->UserGroup->group_name;
         $branch_id = Auth::user()->branch_id;
-        $Branches = Branch::where('status', 'Active')->get();
+        $Branches = DataBranch::where('status', 'Active')->get();
         $DataBankLists = DataBankLists::where('status','Active')->get();
         $DataCollectionDate = DataCollectionDate::where('status', 'Active')->get();
-        $MaintenancePage = MaintenancePage::where('pages_name', 'Released Page')->first();
+
+        $MaintenancePage = SystemMaintenance::where('system','ELOG Monitoring')
+            ->where('pages_name', 'Released Page')
+            ->first();
 
         if ($MaintenancePage->status == 'yes') {
             if (in_array($userGroup, ['Developer', 'Admin'])) {

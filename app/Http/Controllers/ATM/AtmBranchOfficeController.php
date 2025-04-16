@@ -4,18 +4,18 @@ namespace App\Http\Controllers\ATM;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\Facades\DataTables;
 
-use App\Models\Branch;
-use App\Models\DataBankLists;
-use App\Models\DataCollectionDate;
-use App\Models\DataTransactionAction;
 use App\Models\ATM\AtmClientBanks;
 use App\Models\ATM\AtmBanksTransaction;
 use App\Models\ATM\AtmBanksTransactionApproval;
 
-use App\Models\System\MaintenancePage;
+use App\Models\EFMain\DataBranch;
+use App\Models\EFMain\DataBankLists;
+use App\Models\EFMain\DataCollectionDate;
+use App\Models\EFMain\DataTransactionAction;
+use App\Models\EFMain\SystemMaintenance;
 
+use Yajra\DataTables\Facades\DataTables;
 use App\Http\Controllers\Controller;
 
 class AtmBranchOfficeController extends Controller
@@ -23,10 +23,13 @@ class AtmBranchOfficeController extends Controller
     public function BranchOfficePage(){
         $userGroup = Auth::user()->UserGroup->group_name;
         $branch_id = Auth::user()->branch_id;
-        $Branches = Branch::where('status', 'Active')->get();
+        $Branches = DataBranch::where('status', 'Active')->get();
         $DataCollectionDate = DataCollectionDate::where('status','Active')->get();
         $DataBankLists = DataBankLists::where('status','Active')->get();
-        $MaintenancePage = MaintenancePage::where('pages_name', 'Branch Office Page')->first();
+
+        $MaintenancePage = SystemMaintenance::where('system','ELOG Monitoring')
+            ->where('pages_name', 'Branch Office Page')
+            ->first();
 
         if ($MaintenancePage->status == 'yes') {
             if (in_array($userGroup, ['Developer', 'Admin'])) {
@@ -387,7 +390,10 @@ class AtmBranchOfficeController extends Controller
 
     public function CancelledLoanPage(){
         $userGroup = Auth::user()->UserGroup->group_name;
-        $MaintenancePage = MaintenancePage::where('pages_name', 'Cancelled Loan Page')->first();
+
+        $MaintenancePage = SystemMaintenance::where('system','ELOG Monitoring')
+            ->where('pages_name', 'Cancelled Loan Page')
+            ->first();
 
         if ($MaintenancePage->status == 'yes') {
             if (in_array($userGroup, ['Developer', 'Admin'])) {

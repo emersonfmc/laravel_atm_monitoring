@@ -11,7 +11,8 @@ class AreaSeeder extends Seeder
 {
     public function run()
     {
-            $data = [
+            $data =
+                    [
                         [
                             'area_no' => 'A1',
                             'area_supervisor' => 'Josephine Julio',

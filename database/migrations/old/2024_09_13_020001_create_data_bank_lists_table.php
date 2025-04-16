@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('data_bank_lists', function (Blueprint $table) {
             $table->id();
             $table->string('bank_name')->nullable();
-            $table->enum('status', ['active','inactive'])->default('active');
+            $table->enum('status', ['Active','Inactive'])->default('Active');
             $table->softDeletes();
             $table->timestamps();
         });

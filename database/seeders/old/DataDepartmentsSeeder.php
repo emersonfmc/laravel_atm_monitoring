@@ -13,7 +13,8 @@ class DataDepartmentsSeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
-            $data = [
+            $data =
+                    [
                         [
                             'name' => 'Information Technology',
                             'status' => 'Active',

@@ -2,8 +2,8 @@
 
 namespace App\Models\Passbook;
 
-use App\Models\DataUserGroup;
-use App\Models\DataTransactionAction;
+use App\Models\EFMain\DataUserGroup;
+use App\Models\EFMain\DataTransactionAction;
 use App\Models\User;
 
 use Illuminate\Database\Eloquent\Model;

@@ -2,31 +2,31 @@
 
 namespace App\Http\Controllers\ATM;
 
-use Yajra\DataTables\Facades\DataTables;
-
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-
-use App\Http\Controllers\Controller;
-
 use App\Models\Branch;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use App\Models\EFMain\DataBranch;
+
 use App\Models\System\SystemLogs;
-use App\Models\System\MaintenancePage;
-use App\Models\DataTransactionAction;
-use App\Models\DataTransactionSequence;
 
 use App\Models\ATM\AtmClientBanks;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Models\DataTransactionAction;
+use App\Models\System\MaintenancePage;
+
+use App\Models\DataTransactionSequence;
+use Yajra\DataTables\Facades\DataTables;
 use App\Models\Passbook\PassbookForCollectionTransaction;
 use App\Models\Passbook\PassbookForCollectionTransactionApproval;
 
 class PassbookCollectionController extends Controller
 {
-    public function PassbookCollectionSetUpPage()
-    {
+    public function PassbookCollectionSetUpPage() {
         $userGroup = Auth::user()->UserGroup->group_name;
         $branch_id = Auth::user()->branch_id;
-        $Branches = Branch::where('status','Active')->get();
+        $Branches = DataBranch::where('status','Active')->get();
 
         $MaintenancePage = MaintenancePage::where('pages_name', 'PB Collection Setup Page')->first();
 
@@ -51,6 +51,7 @@ class PassbookCollectionController extends Controller
                 $query->where('passbook_for_collection', 'yes');
             })
             ->where('atm_type','Passbook')
+            ->whereIn('location',['Head Office'])
             ->where('status','1')
             ->latest('updated_at');
 
@@ -65,8 +66,6 @@ class PassbookCollectionController extends Controller
         return DataTables::of($PassbookCollectionData)
             ->setRowId('id')
             ->addColumn('action', function($row) use ($userGroup) {
-                $hasOngoingTransaction = false;
-                $latestTransactionId = null;
                 $action = '';
 
                 $hasOngoingTransaction = PassbookForCollectionTransaction::where('reference_no', $row->transaction_number)
@@ -74,45 +73,39 @@ class PassbookCollectionController extends Controller
                     ->orderByDesc('id')
                     ->first();
 
-                if (in_array($userGroup, ['Developer', 'Admin', 'Branch Head', 'Everfirst Admin'])) {
                     if ($hasOngoingTransaction) {
                         return '<i class="fas fa-spinner fa-spin fs-3 text-success"></i>';
                     } else {
-                        $action .= '<input type="checkbox" class="check check-item" data-id="' . $row->id . '"/>';
+                        if (in_array($userGroup, ['Developer', 'Admin', 'Branch Head', 'Everfirst Admin'])) {
+                            $action .= '<input type="checkbox" class="check check-item" data-id="' . $row->id . '"/>';
+                        } else {
+                             $action .= '';
+                        }
                     }
-                }
                 return $action;
             })
             ->addColumn('pending_to', function($row) {
-                $groupName = ''; // Variable to hold the group name
-                $atmTransactionActionName = ''; // Variable to hold the ATM transaction action name
+                $PassbookForCollectionTransaction = PassbookForCollectionTransaction::where('reference_no', $row->transaction_number)
+                    ->where('status', 'ON GOING')
+                    ->first();
 
-                if ($row->PassbookForCollectionTransaction) {
-                    // Filter for ongoing transactions and sort by id in descending order
-                    $ongoingTransactions = $row->PassbookForCollectionTransaction->filter(function ($transaction) {
-                        return $transaction->status === 'On Going';
-                    })->sortByDesc('id'); // Sort by id in descending order
+                    $transaction_id = $PassbookForCollectionTransaction->id ?? '';
 
-                    // Get the first ongoing transaction details if it exists
-                    if ($ongoingTransactions->isNotEmpty()) {
-                        $firstOngoingTransaction = $ongoingTransactions->first();
+                    $Approval = PassbookForCollectionTransactionApproval::with('DataTransactionAction', 'DataUserGroup')
+                        ->where('passbook_transactions_id', $transaction_id)
+                        ->where('status', 'Pending')
+                        ->orderBy('id', 'asc')
+                        ->first();
 
-                        // Get the approvals related to this transaction with status 'Pending'
-                        $pendingApprovals = $firstOngoingTransaction->PassbookForCollectionTransactionApproval->filter(function ($approval) {
-                            return $approval->status === 'Pending';
-                        });
-
-                        // If there are pending approvals, get the group name from the first one
-                        if ($pendingApprovals->isNotEmpty()) {
-                            // Use the relationship to get the group name
-                            $groupName = optional($pendingApprovals->first()->DataUserGroup)->group_name;
-                            $atmTransactionActionName = optional($pendingApprovals->first()->DataTransactionAction)->name;
-                        }
+                    if($PassbookForCollectionTransaction){
+                        $TransactionActionName = optional($Approval->DataTransactionAction)->name ?? '';
+                        $UserGroupName = optional($Approval->DataUserGroup)->group_name ?? '';
+                    } else {
+                        $TransactionActionName = '';
+                        $UserGroupName = '';
                     }
-                }
 
-                // Prepare the output
-                return $atmTransactionActionName . ' <div class="text-dark"> ' . $groupName .'</div>'; // Combine the group name and action name
+                return $TransactionActionName . ' <div class="text-dark"> ' . $UserGroupName .'</div>';
             })
             ->addColumn('full_name', function ($row) {
                 // Check if the relationships and fields exist
@@ -134,32 +127,64 @@ class PassbookCollectionController extends Controller
                 return $fullName;
             })
             ->addColumn('pension_details', function ($row) {
-                // Check if the relationships and fields exist
-                $pensionDetails = $row->ClientInformation ?? null;
+                    $PensionNumber = $row->pension_number ?? '';
+                    $PensionType = $row->pension_type ?? '';
 
-                if ($pensionDetails) {
-                    $PensionNumber = $pensionDetails->pension_number ?? '';
-                    $PensionType = $pensionDetails->pension_account_type ?? '';
-                    $AccountType = $pensionDetails->pension_type ?? '';
-
-                    // Combine the parts into the full name
                     $pension_details = "<span class='fw-bold text-primary h6 pension_number_mask_display'>{$PensionNumber}</span><br>
-                                       <span class='fw-bold'>{$PensionType}</span><br>
-                                       <span class='fw-bold text-success'>{$AccountType}</span>";
-                } else {
-                    // Fallback if client information is missing
-                    $pension_details = 'N/A';
+                                       <span class='fw-bold text-success'>{$PensionType}</span>";
+
+                    return $pension_details;
+            })
+            ->addColumn('bank_details', function ($row) {
+                $replacementCountDisplay = $row->replacement_count > 0
+                    ? '<span class="text-danger fw-bold"> / ' . ($row->replacement_count ?? '') . '</span>'
+                    : '';
+
+                return '<span class="fw-bold" style="color: #5AAD5D;">' . ($row->bank_account_no ?? '') . '</span>'
+                    . $replacementCountDisplay . '<br>'
+                    . '<span>' . ($row->bank_name ?? '') . '</span>';
+            })
+            ->addColumn('branch_location', function ($row){
+                $branch_location = $row->Branch->branch_location ?? '';
+                return $branch_location;
+            })
+            ->addColumn('pb_status', function ($row) {
+                // Define the default ATM type class
+                $atmTypeClass = 'text-secondary'; // Default if no match
+
+                // Assign classes based on ATM type
+                switch ($row->atm_type) {
+                    case 'ATM':
+                        $atmTypeClass = 'text-primary';
+                        break;
+                    case 'Passbook':
+                        $atmTypeClass = 'text-danger';
+                        break;
+                    case 'Sim Card':
+                        $atmTypeClass = 'text-info';
+                        break;
                 }
 
-                return $pension_details;
+                // Get ATM Status
+                $BankStatus = $row->atm_status ?? '';
+
+                return '<span class="' . $atmTypeClass . '">' . ($row->atm_type ?? '') . '</span><br>
+                        <span class="fw-bold">' . $BankStatus . '</span>';
             })
-            ->rawColumns(['action','pending_to','full_name','pension_details'])
+            ->rawColumns(['action',
+                          'pending_to',
+                          'full_name',
+                          'pension_details',
+                          'bank_details',
+                          'branch_location',
+                          'pb_status'])
             ->make(true);
     }
 
     public function PassbookForCollectionCreate(Request $request)
     {
         $item_ids = $request->items;
+        $pick_up_date = $request->publishDatetime ?? '';
 
         if (is_array($item_ids) && count($item_ids) > 0) {
             // Retrieve all selected ATM client banks based on the provided IDs
@@ -179,7 +204,7 @@ class PassbookCollectionController extends Controller
 
             // Get the branch abbreviation for the single branch_id
             $branchId = $branchIds->first();
-            $branch = Branch::where('id', $branchId)->first();
+            $branch = DataBranch::where('id', $branchId)->first();
             $branchAbbreviation = $branch->branch_abbreviation;
 
             // Generate Request Number
@@ -209,6 +234,7 @@ class PassbookCollectionController extends Controller
                 $PassbookForCollectionTransaction = PassbookForCollectionTransaction::create([
                     'client_banks_id' => $atmClientBank->id,
                     'branch_id' => $branchId,
+                    'pick_up_date' => $pick_up_date,
                     'request_number' => $RequestNumber,
                     'reference_no' => $atmClientBank->transaction_number,
                     'request_by_employee_id' => Auth::user()->employee_id,
@@ -222,17 +248,16 @@ class PassbookCollectionController extends Controller
                     'updated_at' => Carbon::now(),
                 ]);
 
-                $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', 19)
+                $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', '19')
                     ->orderBy('sequence_no')
                     ->get();
 
-                foreach ($DataTransactionSequence as $transactionSequence)
-                {
+                foreach ($DataTransactionSequence as $transactionSequence){
                     $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                     PassbookForCollectionTransactionApproval::create([
                         'passbook_transactions_id' => $PassbookForCollectionTransaction->id,
-                        'transaction_actions_id' => 19,
+                        'transaction_actions_id' => '19',
                         'employee_id' => NULL,
                         'date_approved' => NULL,
                         'user_groups_id' => $transactionSequence->user_group_id,
@@ -261,8 +286,7 @@ class PassbookCollectionController extends Controller
 
     }
 
-    public function PassbookCollectionAllTransactionPage()
-    {
+    public function PassbookCollectionAllTransactionPage(){
         $userGroup = Auth::user()->UserGroup->group_name;
 
         $userBranchId = Auth::user()->branch_id;

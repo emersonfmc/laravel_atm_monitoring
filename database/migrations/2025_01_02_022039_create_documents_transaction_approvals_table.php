@@ -27,8 +27,7 @@ return new class extends Migration
 
             $table->foreign('employee_id')->references('employee_id')->on('users')->onDelete('set null')->onUpdate('cascade');
             $table->foreign('documents_transactions_id','documents_transactions_id')->references('id')->on('documents_transactions')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('user_groups_id')->references('id')->on('data_user_groups')->onDelete('set null')->onUpdate('cascade');
-            $table->foreign('transaction_actions_id')->references('id')->on('data_transaction_actions')->onDelete('set null')->onUpdate('cascade');
+
 
             $table->softDeletes();
             $table->timestamps();

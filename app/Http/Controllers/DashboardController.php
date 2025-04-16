@@ -4,23 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Branch;
-use App\Models\DataArea;
-use App\Models\DataDistrict;
-use App\Models\DataBankLists;
-use App\Models\DataUserGroup;
+use Illuminate\Http\Request;
+use App\Models\EFMain\DataArea;
 use App\Models\ClientInformation;
+use App\Models\EFMain\DataBranch;
+use App\Models\ATM\AtmClientBanks;
+
+use App\Models\EFMain\DataDistrict;
+use App\Http\Controllers\Controller;
+use App\Models\EFMain\DataBankLists;
+
+use App\Models\EFMain\DataUserGroup;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\ATM\AtmBanksTransaction;
-use App\Models\ATM\AtmClientBanks;
-use App\Models\ATM\AtmBanksTransactionApproval;
-
-use App\Http\Controllers\Controller;
-use App\Models\DataTransactionAction;
-
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-
 use Yajra\DataTables\Facades\DataTables;
+
+use App\Models\EFMain\DataTransactionAction;
+use App\Models\ATM\AtmBanksTransactionApproval;
 
 class DashboardController extends Controller
 {
@@ -33,7 +34,7 @@ class DashboardController extends Controller
     public function elog_monitoring_dashboard()
     {
         $branch_id = Auth::user()->branch_id;
-        $Branches = Branch::where('status', 'Active')->get();
+        $Branches = DataBranch::where('status', 'Active')->get();
         $DataTransactionAction = DataTransactionAction::where('status', 'Active')->get();
 
         return view('pages.pages_backend.atm_dashboard',compact('branch_id','Branches','DataTransactionAction'));
@@ -46,7 +47,7 @@ class DashboardController extends Controller
         $UserCount = User::where('status', 'Active')->count();
         $AreaCount = DataArea::where('status', 'Active')->count();
         $DistrictCount = DataDistrict::where('status', '1')->count();
-        $BranchCount = Branch::where('status', 'Active')->count();
+        $BranchCount = DataBranch::where('status', 'Active')->count();
         $UserGroupCount = DataUserGroup::where('status', 'Active')->count();
         $BanksCount = DataBankLists::where('status', 'Active')->count();
 
@@ -319,7 +320,7 @@ class DashboardController extends Controller
 
 
 
-
-
-
 }
+
+
+
