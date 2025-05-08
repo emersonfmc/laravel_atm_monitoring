@@ -45,7 +45,7 @@
                                 <img src="{{ isset(Auth::user()->avatar) ? asset(Auth::user()->avatar) : asset('images/no_image.jpg') }}" alt="" class="img-thumbnail rounded-circle">
                             </div>
                             <h5 class="font-size-15 text-truncate">{{ Str::ucfirst(Auth::user()->name) }}</h5>
-                            <p class="mb-0 text-truncate text-danger ms-2">{{ Auth::user()->UserGroup->group_name }}</p>
+                            <p class="mb-0 text-truncate text-danger ms-2">{{ Auth::user()->UserGroup->group_name ?? ''}}</p>
                         </div>
 
                         <div class="col-sm-6">

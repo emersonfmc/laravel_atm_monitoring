@@ -17,12 +17,12 @@ use App\Models\ATM\AtmBanksTransaction;
 use App\Models\ATM\AtmTransactionBalanceLogs;
 use App\Models\ATM\AtmBanksTransactionApproval;
 
-use App\Models\EFMain\DataCollectionDate;
-use App\Models\EFMain\DataTransactionSequence;
 use App\Models\EFMain\DataBranch;
-use App\Models\EFMain\DataBankLists;
 use App\Models\EFMain\SystemMaintenance;
 
+use App\Models\Settings\ElmCollectionDate;
+use App\Models\Settings\ElmTransactionSequence;
+use App\Models\Settings\ElmBankLists;
 use Yajra\DataTables\Facades\DataTables;
 use App\Http\Controllers\Controller;
 
@@ -30,19 +30,21 @@ use App\Http\Controllers\Controller;
 class ClientContoller extends Controller
 {
     public function client_page(){
-        $userGroup = Auth::user()->UserGroup->group_name;
+        $userGroup = Auth::user()->UserGroupPositions()->toArray();
+        // dd($userGroup);
+
         $branch_id = Auth::user()->branch_id;
         $branches = DataBranch::where('status', 'Active')->get();
 
-        $DataCollectionDates = DataCollectionDate::where('status', 'Active')->get();
-        $DataBankLists = DataBankLists::where('status', 'Active')->get();
+        $DataCollectionDates = ElmCollectionDate::where('status', 'Active')->get();
+        $DataBankLists = ElmBankLists::where('status', 'Active')->get();
 
-        $MaintenancePage = SystemMaintenance::where('system','ELOG Monitoring')
+        $MaintenancePage = SystemMaintenance::where('system_id','2')
             ->where('pages_name', 'Client Lists Page')
             ->first();
 
         if ($MaintenancePage->status == 'yes') {
-            if (in_array($userGroup, ['Developer', 'Admin'])) {
+            if (in_array('Admin', $userGroup) || in_array('Developer', $userGroup)) {
                 return view('pages.pages_backend.atm.atm_clients_page', compact('branches','userGroup','DataCollectionDates','DataBankLists'));
             } else {
                 return view('pages.pages_validate.pages-maintenance');
@@ -54,7 +56,7 @@ class ClientContoller extends Controller
 
     public function client_data(Request $request){
         $userBranchId = Auth::user()->branch_id;
-        $userGroup = Auth::user()->UserGroup->group_name;
+        $userGroup = Auth::user()->UserGroupPositions()->toArray();
         $userDepartment = Auth::user()->department;
 
         // Start the query with the necessary relationships
@@ -97,8 +99,10 @@ class ClientContoller extends Controller
             ->setRowId('id')
             ->addColumn('action', function($row) use ($userGroup) {
                 $action = '';
+
+                $allowedGroups = ['Admin', 'Developer', 'Collection Staff', 'Everfirst Admin'];
                 // Add buttons for users in Collection Staff and others
-                if (in_array($userGroup, ['Collection Staff', 'Developer', 'Admin', 'Everfirst Admin'])) {
+                if (array_intersect($allowedGroups, $userGroup)) {
                     // Show the button to transfer branch transaction and edit information
                     $action .= '<a href="#" class="btn btn-success fw-bold add_more_atm"
                                     data-bs-toggle="tooltip"
@@ -119,7 +123,7 @@ class ClientContoller extends Controller
                     'Collection Staff', 'Collection Staff / Releasing',
                     'Collection Custodian', 'Collection Supervisor', 'Checker'];
 
-                if (in_array($userGroup, $authorizedUserGroups) || $userDepartment == 'Collection') {
+                if (array_intersect($authorizedUserGroups, $userGroup) || $userDepartment == 'Collection') {
                     if ($row->atm_type == 'ATM') {
                         if ($row->pin_no != NULL) {
                             $pin_code_details =
@@ -200,8 +204,8 @@ class ClientContoller extends Controller
 
                 return $fullName;
             })
-            ->addColumn('branch_location', function($row) use ($userGroup) {
-                $branch_location = $row->Branch->branch_location;
+            ->addColumn('branch_location', function($row) {
+                $branch_location = $row->Branch->branch_location ?? '';
                 return $branch_location; // Return all the accumulated buttons
             })
             ->rawColumns(['action',
@@ -351,7 +355,7 @@ class ClientContoller extends Controller
                         ]);
 
                         // Sequence
-                            $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', 5)
+                            $DataTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', 5)
                                 ->orderBy('sequence_no')
                                 ->get();
 

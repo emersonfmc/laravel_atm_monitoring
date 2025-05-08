@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Settings\SettingsController;
 use App\Http\Controllers\Settings\SettingsEFMainController;
+use App\Http\Controllers\Settings\SettingsElogCardMonitoringController;
+use App\Http\Controllers\Settings\SettingsElogDocumentMonitoringController;
 
 Auth::routes();
 
@@ -22,7 +24,70 @@ Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'settings'], functio
         Route::post('/maintenance/update', 'maintenance_update')->name('settings.maintenance.update');
     });
 
+
+    // Elog Card Monitoring
+        Route::controller(SettingsElogCardMonitoringController::class)->group(function () {
+
+            Route::get('/bank_page', 'bank_page')->name('settings.bank.page');
+            Route::get('/bank_data', 'bank_data')->name('settings.bank.data');
+            Route::get('/bank/get/{id}', 'bankGet')->name('settings.bank.get');
+            Route::post('/bank/create', 'bankCreate')->name('settings.bank.create');
+            Route::post('/bank/update', 'bankUpdate')->name('settings.bank.update');
+
+            Route::get('/pension_types/page', 'pension_types_page')->name('settings.pension.types.page');
+            Route::get('/pension_types/data', 'pension_types_data')->name('settings.pension.types.data');
+            Route::get('/pension/types/get/{id}', 'pension_typesGet')->name('settings.pension.types.get');
+            Route::post('/pension_types/create', 'pension_typesCreate')->name('settings.pension.types.create');
+            Route::post('/pension_types/update', 'pension_typesUpdate')->name('settings.pension.types.update');
+
+            Route::get('/transaction/action/page', 'transaction_action_page')->name('settings.transaction.action.page');
+            Route::get('/transaction/action/data', 'transaction_action_data')->name('settings.transaction.action.data');
+            Route::get('/transaction/action/get/{id}', 'transaction_typesGet')->name('settings.transaction.action.get');
+            Route::post('/transaction/action/create', 'transaction_typesCreate')->name('settings.transaction.action.create');
+            Route::post('/transaction/action/update', 'transaction_typesUpdate')->name('settings.transaction.action.update');
+
+            Route::get('/release/reason/page', 'release_reason_page')->name('settings.release.reason.page');
+            Route::get('/release/reason/data', 'release_reason_data')->name('settings.release.reason.data');
+            Route::get('/release/reason/get/{id}', 'release_reason_get')->name('settings.release.reason.get');
+            Route::post('/release/reason/create', 'release_reason_create')->name('settings.release.reason.create');
+            Route::post('/release/reason/update', 'release_reason_update')->name('settings.release.reason.update');
+
+            Route::get('/collection_date/page', 'collection_date_page')->name('settings.collection.date.page');
+            Route::get('/collection_date/data', 'collection_date_data')->name('settings.collection.date.data');
+            Route::get('/collection/date/get/{id}', 'collection_date_get')->name('settings.collection.date.get');
+            Route::post('/collection/date/create', 'collection_date_create')->name('settings.collection.date.create');
+            Route::post('/collection/date/update', 'collection_date_update')->name('settings.collection.date.update');
+
+            Route::get('/maintenance/page', 'maintenance_page')->name('settings.maintenance.page');
+            Route::get('/maintenance/data', 'maintenance_data')->name('settings.maintenance.data');
+            Route::get('/maintenance/get/{id}', 'maintenance_get')->name('settings.maintenance.get');
+            Route::post('/maintenance/create', 'maintenance_create')->name('settings.maintenance.create');
+            Route::post('/maintenance/update', 'maintenance_update')->name('settings.maintenance.update');
+
+            Route::get('/borrow/reason/page', 'borrow_reason_page')->name('settings.borrow.reason.page');
+            Route::get('/borrow/reason/data', 'borrow_reason_data')->name('settings.borrow.reason.data');
+            Route::get('/borrow/reason/get/{id}', 'borrow_reason_get')->name('settings.borrow.reason.get');
+            Route::post('/borrow/reason/create', 'borrow_reason_create')->name('settings.borrow.reason.create');
+            Route::post('/borrow/reason/update', 'borrow_reason_update')->name('settings.borrow.reason.update');
+        });
+    // Elog Card Monitoring
+
+    // Elog Document Monitoring
+        Route::controller(SettingsElogDocumentMonitoringController::class)->group(function () {
+            Route::get('/documents/action/page', 'documents_action_page')->name('settings.documents.action.page');
+            Route::get('/documents/action/data', 'documents_action_data')->name('settings.documents.action.data');
+            Route::get('/documents/action/get/{id}', 'documents_action_get')->name('settings.documents.action.get');
+            Route::post('/documents/action/create', 'documents_action_create')->name('settings.documents.action.create');
+            Route::post('/documents/action/update', 'documents_action_update')->name('settings.documents.action.update');
+        });
+    // Elog Document Monitoring
+
 });
+
+
+// Route::post('/maintenance/create', 'maintenance_create')->name('settings.maintenance.create');
+Route::get('/validate/admin-user/access', [SettingsController::class, 'validateAccess']);
+
 
 
 

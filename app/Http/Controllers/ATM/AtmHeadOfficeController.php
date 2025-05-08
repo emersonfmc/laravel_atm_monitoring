@@ -3,27 +3,28 @@
 namespace App\Http\Controllers\ATM;
 use Exception;
 use App\Models\Branch;
-use Illuminate\Http\Request;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+
 use App\Models\ClientInformation;
 use App\Models\System\SystemLogs;
 use App\Models\ATM\AtmClientBanks;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use App\Models\System\MaintenancePage;
 use App\Models\ATM\AtmBanksTransaction;
-use Yajra\DataTables\Facades\DataTables;
 use App\Models\ATM\AtmBanksTransactionApproval;
 
 use App\Models\EFMain\DataBranch;
-use App\Models\EFMain\DataBankLists;
-use App\Models\EFMain\DataCollectionDate;
-use App\Models\EFMain\DataTransactionAction;
-use App\Models\EFMain\DataReleaseOption;
-use App\Models\EFMain\DataPensionTypesLists;
-use App\Models\EFMain\DataBorrowOption;
 use App\Models\EFMain\SystemMaintenance;
+use App\Models\settings\ElmBankLists;
+use App\Models\settings\ElmCollectionDate;
+use App\Models\settings\ElmTransactionAction;
+use App\Models\settings\ElmReleaseOption;
+use App\Models\settings\ElmPensionTypesLists;
+use App\Models\settings\ElmBorrowOption;
+
+use Yajra\DataTables\Facades\DataTables;
 
 class AtmHeadOfficeController extends Controller
 {
@@ -32,12 +33,12 @@ class AtmHeadOfficeController extends Controller
         $branch_id = Auth::user()->branch_id;
 
         $Branches = DataBranch::where('status', 'Active')->get();
-        $DataBankLists = DataBankLists::where('status', 'Active')->get();
-        $DataCollectionDate = DataCollectionDate::where('status', 'Active')->get();
-        $DataTransactionAction = DataTransactionAction::where('transaction', '1')->where('status', 'Active')->get();
-        $DataReleaseOption = DataReleaseOption::where('status', 'Active')->get();
-        $DataPensionTypesLists = DataPensionTypesLists::where('status', 'Active')->get();
-        $DataBorrowOption = DataBorrowOption::where('status', 'Active')->get();
+        $DataBankLists = ElmBankLists::where('status', 'Active')->get();
+        $DataCollectionDate = ElmCollectionDate::where('status', 'Active')->get();
+        $DataTransactionAction = ElmTransactionAction::where('transaction', '1')->where('status', 'Active')->get();
+        $DataReleaseOption = ElmReleaseOption::where('status', 'Active')->get();
+        $DataPensionTypesLists = ElmPensionTypesLists::where('status', 'Active')->get();
+        $DataBorrowOption = ElmBorrowOption::where('status', 'Active')->get();
 
         $MaintenancePage = SystemMaintenance::where('system','ELOG Monitoring')
                 ->where('pages_name', 'Client Lists Page')
@@ -639,8 +640,8 @@ class AtmHeadOfficeController extends Controller
         $userGroup = Auth::user()->UserGroup->group_name;
         $branch_id = Auth::user()->branch_id;
         $Branches = DataBranch::where('status', 'Active')->get();
-        $DataBankLists = DataBankLists::where('status','Active')->get();
-        $DataCollectionDate = DataCollectionDate::where('status', 'Active')->get();
+        $DataBankLists = ElmBankLists::where('status','Active')->get();
+        $DataCollectionDate = ElmCollectionDate::where('status', 'Active')->get();
 
         $MaintenancePage = SystemMaintenance::where('system','ELOG Monitoring')
             ->where('pages_name', 'Released Page')

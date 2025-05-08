@@ -20,6 +20,19 @@ class User extends Authenticatable
 
     protected $guarded = [];
 
+    public function UserGroupPositions()
+    {
+        // Decode JSON string to array
+        $positions = json_decode($this->position, true);
+
+        // Ensure it's a valid array before querying
+        if (empty($positions) || !is_array($positions)) {
+            return collect();
+        }
+
+        return DataUserGroup::whereIn('id', $positions)->pluck('group_name');
+    }
+
     public function Company(){
         return $this->belongsTo(DataCompany::class, 'company_id', 'id');
     }
@@ -29,11 +42,11 @@ class User extends Authenticatable
     }
 
     public function District(){
-        return $this->belongsTo(DataDistrict::class, 'district_code_id', 'id');
+        return $this->belongsTo(DataDistrict::class, 'district_id', 'id');
     }
 
     public function Area(){
-        return $this->belongsTo(DataArea::class, 'area_code_id', 'id');
+        return $this->belongsTo(DataArea::class, 'area_id', 'id');
     }
 
     public function UserGroup(){

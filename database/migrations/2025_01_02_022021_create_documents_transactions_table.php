@@ -24,7 +24,6 @@ return new class extends Migration
             $table->string('remarks')->nullable();
 
             $table->enum('status',['On Going','Cancelled','Completed'])->nullable();
-            $table->foreign('request_by_employee_id')->references('employee_id')->on('users')->onDelete('set null')->onUpdate('cascade');
 
             $table->softDeletes();
             $table->timestamps();

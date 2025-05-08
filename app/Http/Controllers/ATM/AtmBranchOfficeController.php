@@ -10,9 +10,10 @@ use App\Models\ATM\AtmBanksTransaction;
 use App\Models\ATM\AtmBanksTransactionApproval;
 
 use App\Models\EFMain\DataBranch;
-use App\Models\EFMain\DataBankLists;
-use App\Models\EFMain\DataCollectionDate;
-use App\Models\EFMain\DataTransactionAction;
+use App\Models\settings\ElmBankLists;
+use App\Models\settings\ElmCollectionDate;
+use App\Models\settings\ElmTransactionAction;
+
 use App\Models\EFMain\SystemMaintenance;
 
 use Yajra\DataTables\Facades\DataTables;
@@ -24,8 +25,8 @@ class AtmBranchOfficeController extends Controller
         $userGroup = Auth::user()->UserGroup->group_name;
         $branch_id = Auth::user()->branch_id;
         $Branches = DataBranch::where('status', 'Active')->get();
-        $DataCollectionDate = DataCollectionDate::where('status','Active')->get();
-        $DataBankLists = DataBankLists::where('status','Active')->get();
+        $DataCollectionDate = ElmCollectionDate::where('status','Active')->get();
+        $DataBankLists = ElmBankLists::where('status','Active')->get();
 
         $MaintenancePage = SystemMaintenance::where('system','ELOG Monitoring')
             ->where('pages_name', 'Branch Office Page')
@@ -547,7 +548,7 @@ class AtmBranchOfficeController extends Controller
 
                         // Get the ATM transaction action name if it exists
                         if (isset($firstOngoingTransaction->transaction_actions_id)) {
-                            $atmTransactionAction = DataTransactionAction::find($firstOngoingTransaction->transaction_actions_id);
+                            $atmTransactionAction = ElmTransactionAction::find($firstOngoingTransaction->transaction_actions_id);
                             if ($atmTransactionAction) {
                                 $atmTransactionActionName = htmlspecialchars($atmTransactionAction->name);
                             }

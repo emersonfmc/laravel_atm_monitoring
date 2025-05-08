@@ -17,10 +17,12 @@ use App\Models\EFMain\DataBankLists;
 use App\Models\EFMain\DataUserGroup;
 use Illuminate\Support\Facades\Auth;
 
+use App\Models\settings\ElmBankLists;
+use Illuminate\Support\Facades\Crypt;
+
 use App\Models\ATM\AtmBanksTransaction;
 use Yajra\DataTables\Facades\DataTables;
-
-use App\Models\EFMain\DataTransactionAction;
+use App\Models\settings\ElmTransactionAction;
 use App\Models\ATM\AtmBanksTransactionApproval;
 
 class DashboardController extends Controller
@@ -31,11 +33,11 @@ class DashboardController extends Controller
     //     return view('index');
     // }
 
-    public function elog_monitoring_dashboard()
+    public function elog_monitoring_dashboard(Request $request)
     {
         $branch_id = Auth::user()->branch_id;
         $Branches = DataBranch::where('status', 'Active')->get();
-        $DataTransactionAction = DataTransactionAction::where('status', 'Active')->get();
+        $DataTransactionAction = ElmTransactionAction::where('status', 'Active')->get();
 
         return view('pages.pages_backend.atm_dashboard',compact('branch_id','Branches','DataTransactionAction'));
     }
@@ -49,7 +51,7 @@ class DashboardController extends Controller
         $DistrictCount = DataDistrict::where('status', '1')->count();
         $BranchCount = DataBranch::where('status', 'Active')->count();
         $UserGroupCount = DataUserGroup::where('status', 'Active')->count();
-        $BanksCount = DataBankLists::where('status', 'Active')->count();
+        $BanksCount = ElmBankLists::where('status', 'Active')->count();
 
         $TopBranchesCount = ClientInformation::selectRaw('branch_id, COUNT(*) as client_count')
             ->with('branch') // Include branch relationship

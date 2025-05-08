@@ -11,7 +11,7 @@ use Mpdf\QrCode\Output;
 
 use App\Models\ATM\AtmClientBanks;
 use App\Models\ClientInformation;
-use App\Models\EFMain\DataPensionTypesLists;
+use App\Models\settings\ElmPensionTypesLists;
 
 use App\Http\Controllers\Controller;
 class DefaultController extends Controller
@@ -19,7 +19,7 @@ class DefaultController extends Controller
     public function PensionTypesFetch(Request $request)
     {
         $selected_pension_types = $request->selected_pension_types;
-        $DataPensionTypesLists = DataPensionTypesLists::where('types',$selected_pension_types)
+        $DataPensionTypesLists = ElmPensionTypesLists::where('types',$selected_pension_types)
             ->where('status','Active')
             ->get();
 

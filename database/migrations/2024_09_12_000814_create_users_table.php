@@ -16,27 +16,31 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name')->nullable();
-            $table->string('employee_id')->unique();
+            $table->string('employee_id')->nullable();
             $table->string('contact_no')->nullable();
             $table->string('address')->nullable();
-            $table->string('email')->unique();
+            $table->string('email')->nullable();
+
             $table->timestamp('email_verified_at')->nullable();
 
             $table->string('username')->nullable();
-            $table->string('password');
+            $table->string('password')->default('$2y$12$Y0/wCO5ghJDL.DHsRaxOyOpByhTEv9z03pxZEcsKJjgh1JZL1Vn36'); // default as password
 
-            $table->enum('session',['Online','Offline'])->default('Offline');
-            $table->enum('user_types',['Developer','Admin','District','Area','Branch','Head Office'])->nullable();
+            $table->string('user_session')->nullable();
+            $table->enum('user_types',['Administrator','District','Area','Branch','Head Office'])->nullable();
 
             $table->string('avatar')->nullable();
-            $table->date('dob');
+            $table->date('dob')->nullable();
             $table->rememberToken();
 
-            $table->unsignedBigInteger('user_group_id')->nullable();
-            $table->unsignedBigInteger('company_id')->nullable();
+            $table->json('position')->nullable(); // array
+
+            $table->unsignedBigInteger('user_system_id')->nullable();
+            $table->unsignedBigInteger('department_id')->nullable();
+            $table->unsignedBigInteger('district_id')->nullable();
+            $table->unsignedBigInteger('area_id')->nullable();
             $table->unsignedBigInteger('branch_id')->nullable();
-            $table->unsignedBigInteger('district_code_id')->nullable();
-            $table->unsignedBigInteger('area_code_id')->nullable();
+            $table->unsignedBigInteger('company_id')->nullable()->default('2');
 
             $table->enum('status',['Active','Inactive'])->default('Active');
 

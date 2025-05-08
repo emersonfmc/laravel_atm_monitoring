@@ -18,13 +18,14 @@ use App\Models\ATM\AtmClientBanks;
 use App\Models\ATM\AtmReleasedClientImage;
 
 use App\Models\EFMain\DataBranch;
-use App\Models\EFMain\DataBankLists;
-use App\Models\EFMain\DataCollectionDate;
-use App\Models\EFMain\DataTransactionAction;
-use App\Models\EFMain\DataReleaseOption;
-use App\Models\EFMain\DataPensionTypesLists;
-use App\Models\EFMain\DataTransactionSequence;
 use App\Models\EFMain\SystemMaintenance;
+
+use App\Models\settings\ElmBankLists;
+use App\Models\settings\ElmCollectionDate;
+use App\Models\settings\ElmTransactionAction;
+use App\Models\settings\ElmReleaseOption;
+use App\Models\settings\ElmPensionTypesLists;
+use App\Models\settings\ElmTransactionSequence;
 
 use App\Http\Controllers\Controller;
 
@@ -34,14 +35,14 @@ class AtmTransactionController extends Controller
         $branch_id = Auth::user()->branch_id;
 
         $Branches = DataBranch::where('status', 'Active')->get();
-        $DataTransactionAction = DataTransactionAction::where('status', 'Active')->get();
-        $DataBankLists = DataBankLists::where('status','Active')->get();
-        $DataReleaseOption = DataReleaseOption::where('status','Active')->get();
-        $DataPensionTypesLists = DataPensionTypesLists::where('status','Active')->get();
-        $DataCollectionDate = DataCollectionDate::where('status','Active')->get();
+        $ElmTransactionAction = ElmTransactionAction::where('status', 'Active')->get();
+        $DataBankLists = ElmBankLists::where('status','Active')->get();
+        $DataReleaseOption = ElmReleaseOption::where('status','Active')->get();
+        $DataPensionTypesLists = ElmPensionTypesLists::where('status','Active')->get();
+        $DataCollectionDate = ElmCollectionDate::where('status','Active')->get();
 
         return view('pages.pages_backend.atm.atm_transactions',
-                    compact('Branches','DataTransactionAction','branch_id',
+                    compact('Branches','ElmTransactionAction','branch_id',
                             'DataBankLists','DataPensionTypesLists','DataCollectionDate'));
     }
 
@@ -138,7 +139,7 @@ class AtmTransactionController extends Controller
                 }
 
                 // Get the ATM transaction action name directly
-                $atmTransactionActionName = optional($row->DataTransactionAction)->name;
+                $atmTransactionActionName = optional($row->ElmTransactionAction)->name;
 
                 // Return the ATM transaction action name and group name
                 return  '<span class="fw-bold text-primary">'.$atmTransactionActionName . ' </span><br>
@@ -243,7 +244,7 @@ class AtmTransactionController extends Controller
         $AtmBanksTransaction = AtmBanksTransaction::with([
                 'AtmClientBanks',
                 'AtmClientBanks.ClientInformation',
-                'DataTransactionAction',
+                'ElmTransactionAction',
                 'AtmBanksTransactionApproval.DataUserGroup', // Include DataUserGroup for efficient loading
                 'AtmBanksTransactionApproval.Employee',
                 'AtmBanksTransactionApproval.AtmTransactionApprovalsBalanceLogs',
@@ -360,7 +361,7 @@ class AtmTransactionController extends Controller
                         // Create a new AtmBanksTransaction entry
 
                         // Retrieve transaction sequences for approvals
-                            $AtmTransactionSequences = DataTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
+                            $AtmTransactionSequences = ElmTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
                                 ->orderBy('sequence_no')
                                 ->get();
 
@@ -441,11 +442,11 @@ class AtmTransactionController extends Controller
                 // Transaction Create
 
                 // Sequence Approval
-                    $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
+                    $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
                         ->orderBy('sequence_no')
                         ->get();
 
-                    foreach ($DataTransactionSequence as $transactionSequence){
+                    foreach ($ElmTransactionSequence as $transactionSequence){
                         $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                         AtmBanksTransactionApproval::create([
@@ -600,7 +601,7 @@ class AtmTransactionController extends Controller
                         // Create a new AtmBanksTransaction entry
 
                         // Retrieve transaction sequences for approvals
-                            $AtmTransactionSequences = DataTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
+                            $AtmTransactionSequences = ElmTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
                                 ->orderBy('sequence_no')
                                 ->get();
 
@@ -779,11 +780,11 @@ class AtmTransactionController extends Controller
                                     'updated_at' => Carbon::now(),
                                 ]);
 
-                                $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', 17)
+                                $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', 17)
                                         ->orderBy('sequence_no')
                                         ->get();
 
-                                    foreach ($DataTransactionSequence as $transactionSequence){
+                                    foreach ($ElmTransactionSequence as $transactionSequence){
                                         $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                                         AtmBanksTransactionApproval::create([
@@ -836,9 +837,9 @@ class AtmTransactionController extends Controller
                                         'updated_at' => Carbon::now(),
                                     ]);
 
-                                    $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', 12)->orderBy('sequence_no')->get();
+                                    $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', 12)->orderBy('sequence_no')->get();
 
-                                    foreach ($DataTransactionSequence as $transactionSequence) {
+                                    foreach ($ElmTransactionSequence as $transactionSequence) {
                                         // Set the status based on the sequence number
                                         $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
@@ -887,11 +888,11 @@ class AtmTransactionController extends Controller
                         'updated_at' => Carbon::now(),
                     ]);
 
-                    $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
+                    $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
                         ->orderBy('sequence_no')
                         ->get();
 
-                    foreach ($DataTransactionSequence as $transactionSequence) {
+                    foreach ($ElmTransactionSequence as $transactionSequence) {
                         $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                         AtmBanksTransactionApproval::create([
@@ -964,11 +965,11 @@ class AtmTransactionController extends Controller
                 // Transaction Create
 
                 // Sequence Approval
-                    $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
+                    $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
                         ->orderBy('sequence_no')
                         ->get();
 
-                    foreach ($DataTransactionSequence as $transactionSequence)
+                    foreach ($ElmTransactionSequence as $transactionSequence)
                     {
                         // Set the status based on the sequence number
                         $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
@@ -1045,11 +1046,11 @@ class AtmTransactionController extends Controller
                 // Transaction Create
 
                 // Sequence Approval
-                    $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
+                    $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
                         ->orderBy('sequence_no')
                         ->get();
 
-                    foreach ($DataTransactionSequence as $transactionSequence){
+                    foreach ($ElmTransactionSequence as $transactionSequence){
                         // Set the status based on the sequence number
                         $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
@@ -1290,9 +1291,9 @@ class AtmTransactionController extends Controller
                         ]);
 
                         // Sequence
-                            $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', 17)->orderBy('sequence_no')->get();
+                            $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', 17)->orderBy('sequence_no')->get();
 
-                                foreach ($DataTransactionSequence as $transactionSequence){
+                                foreach ($ElmTransactionSequence as $transactionSequence){
                                     $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                                     AtmBanksTransactionApproval::create([
@@ -1346,9 +1347,9 @@ class AtmTransactionController extends Controller
                             ]);
 
                             // Sequence
-                                $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', 12)->orderBy('sequence_no')->get();
+                                $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', 12)->orderBy('sequence_no')->get();
 
-                                foreach ($DataTransactionSequence as $transactionSequence) {
+                                foreach ($ElmTransactionSequence as $transactionSequence) {
                                     $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                                     AtmBanksTransactionApproval::create([
@@ -1463,11 +1464,11 @@ class AtmTransactionController extends Controller
                 ]);
 
                 // Sequence
-                    $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
+                    $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
                         ->orderBy('sequence_no')
                         ->get();
 
-                    foreach ($DataTransactionSequence as $transactionSequence){
+                    foreach ($ElmTransactionSequence as $transactionSequence){
                         $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                         AtmBanksTransactionApproval::create([
@@ -1690,11 +1691,11 @@ class AtmTransactionController extends Controller
                                 ]);
 
                                 // Sequence
-                                    $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', 17)
+                                    $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', 17)
                                             ->orderBy('sequence_no')
                                             ->get();
 
-                                        foreach ($DataTransactionSequence as $transactionSequence){
+                                        foreach ($ElmTransactionSequence as $transactionSequence){
                                             $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                                             AtmBanksTransactionApproval::create([
@@ -1747,9 +1748,9 @@ class AtmTransactionController extends Controller
                                     ]);
 
                                     // Sequence
-                                        $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', 12)->orderBy('sequence_no')->get();
+                                        $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', 12)->orderBy('sequence_no')->get();
 
-                                        foreach ($DataTransactionSequence as $transactionSequence) {
+                                        foreach ($ElmTransactionSequence as $transactionSequence) {
                                             $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                                             AtmBanksTransactionApproval::create([
@@ -1869,11 +1870,11 @@ class AtmTransactionController extends Controller
                     ]);
 
                     // Sequence
-                        $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
+                        $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
                             ->orderBy('sequence_no')
                             ->get();
 
-                        foreach ($DataTransactionSequence as $transactionSequence) {
+                        foreach ($ElmTransactionSequence as $transactionSequence) {
                             $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                             AtmBanksTransactionApproval::create([
@@ -2038,11 +2039,11 @@ class AtmTransactionController extends Controller
                             'updated_at' => Carbon::now(),
                         ]);
 
-                        $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
+                        $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
                             ->orderBy('sequence_no')
                             ->get();
 
-                        foreach ($DataTransactionSequence as $transactionSequence){
+                        foreach ($ElmTransactionSequence as $transactionSequence){
                             $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                             AtmBanksTransactionApproval::create([
@@ -2174,11 +2175,11 @@ class AtmTransactionController extends Controller
                         ]);
 
                         // Sequence
-                            $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
+                            $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
                                 ->orderBy('sequence_no')
                                 ->get();
 
-                            foreach ($DataTransactionSequence as $transactionSequence){
+                            foreach ($ElmTransactionSequence as $transactionSequence){
                                 $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                                 AtmBanksTransactionApproval::create([
@@ -2279,12 +2280,12 @@ class AtmTransactionController extends Controller
                 ]);
 
                 // Sequence
-                    $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
+                    $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
                         ->orderBy('sequence_no')
                         ->get();
 
 
-                    foreach ($DataTransactionSequence as $transactionSequence){
+                    foreach ($ElmTransactionSequence as $transactionSequence){
                         $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                         AtmBanksTransactionApproval::create([
@@ -2473,11 +2474,11 @@ class AtmTransactionController extends Controller
                 // Bank Transaction
 
                 // Sequence
-                    $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
+                    $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', $reason_for_pull_out)
                         ->orderBy('sequence_no')
                         ->get();
 
-                    foreach ($DataTransactionSequence as $transactionSequence){
+                    foreach ($ElmTransactionSequence as $transactionSequence){
                         // Set the status based on the sequence number
                         $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
@@ -2555,24 +2556,24 @@ class AtmTransactionController extends Controller
     public function TransactionReceivingPage(){
         $branch_id = Auth::user()->branch_id;
         $Branches = DataBranch::where('status', 'Active')->get();
-        $DataTransactionAction = DataTransactionAction::where('status', 'Active')->get();
+        $ElmTransactionAction = ElmTransactionAction::where('status', 'Active')->get();
 
-        return view('pages.pages_backend.atm.atm_receiving_of_transaction', compact('branch_id','Branches','DataTransactionAction'));
+        return view('pages.pages_backend.atm.atm_receiving_of_transaction', compact('branch_id','Branches','ElmTransactionAction'));
     }
 
     public function TransactionReleasingPage(){
         $branch_id = Auth::user()->branch_id;
         $Branches = DataBranch::where('status', 'Active')->get();
-        $DataTransactionAction = DataTransactionAction::where('status', 'Active')->get();
+        $ElmTransactionAction = ElmTransactionAction::where('status', 'Active')->get();
 
-        return view('pages.pages_backend.atm.atm_releasing_of_transaction', compact('branch_id','Branches','DataTransactionAction'));
+        return view('pages.pages_backend.atm.atm_releasing_of_transaction', compact('branch_id','Branches','ElmTransactionAction'));
     }
 
     public function TransactionReceivingData(Request $request){
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
 
-        $query = AtmBanksTransactionApproval::with('DataUserGroup', 'Employee', 'DataTransactionAction',
+        $query = AtmBanksTransactionApproval::with('DataUserGroup', 'Employee', 'ElmTransactionAction',
                 'AtmBanksTransaction',
                 'AtmBanksTransaction.Branch',
                 'AtmBanksTransaction.AtmClientBanks',
@@ -2700,7 +2701,7 @@ class AtmTransactionController extends Controller
         $userBranchId = Auth::user()->branch_id;
         $userGroup = Auth::user()->UserGroup->group_name;
 
-        $query = AtmBanksTransactionApproval::with('DataUserGroup', 'Employee', 'DataTransactionAction',
+        $query = AtmBanksTransactionApproval::with('DataUserGroup', 'Employee', 'ElmTransactionAction',
                 'AtmBanksTransaction',
                 'AtmBanksTransaction.Branch',
                 'AtmBanksTransaction.AtmClientBanks',
@@ -3103,14 +3104,14 @@ class AtmTransactionController extends Controller
         }
 
         // Retrieve the transaction action data for logging purposes
-        $DataTransactionAction = DataTransactionAction::findOrFail($TransactionAction);
+        $ElmTransactionAction = ElmTransactionAction::findOrFail($TransactionAction);
 
         // Log the transaction update in the system logs
         SystemLogs::create([
             'module' => 'ATM / PB Monitoring',
             'action' => 'Update',
             'title' => 'Update Transaction',
-            'description' => $TransactionNumber . ' | ' . $DataTransactionAction->name,
+            'description' => $TransactionNumber . ' | ' . $ElmTransactionAction->name,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -3147,14 +3148,14 @@ class AtmTransactionController extends Controller
             ]);
 
         // Retrieve the transaction action data for logging purposes
-        $DataTransactionAction = DataTransactionAction::findOrFail($TransactionAction);
+        $ElmTransactionAction = ElmTransactionAction::findOrFail($TransactionAction);
 
         // Log the transaction update in the system logs
         SystemLogs::create([
             'module' => 'ATM / PB Monitoring',
             'action' => 'Update',
             'title' => 'Cancelled Transaction',
-            'description' => $TransactionNumber . ' | ' . $DataTransactionAction->name . ' | ' . $remarks,
+            'description' => $TransactionNumber . ' | ' . $ElmTransactionAction->name . ' | ' . $remarks,
             'employee_id' => Auth::user()->employee_id,
             'ip_address' => $request->ip(),
             'created_at' => Carbon::now(),
@@ -3214,11 +3215,11 @@ class AtmTransactionController extends Controller
                 ]);
 
                 // Sequence
-                    $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', 22)
+                    $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', 22)
                         ->orderBy('sequence_no')
                         ->get();
 
-                    foreach ($DataTransactionSequence as $transactionSequence) {
+                    foreach ($ElmTransactionSequence as $transactionSequence) {
                         $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                         AtmBanksTransactionApproval::create([
@@ -3380,11 +3381,11 @@ class AtmTransactionController extends Controller
                         ]);
 
                         // Sequence
-                            $DataTransactionSequence = DataTransactionSequence::where('transaction_actions_id', 22)
+                            $ElmTransactionSequence = ElmTransactionSequence::where('transaction_actions_id', 22)
                                 ->orderBy('sequence_no')
                                 ->get();
 
-                            foreach ($DataTransactionSequence as $transactionSequence) {
+                            foreach ($ElmTransactionSequence as $transactionSequence) {
                                 $status = ($transactionSequence->sequence_no == '1') ? 'Pending' : 'Stand By';
 
                                 AtmBanksTransactionApproval::create([

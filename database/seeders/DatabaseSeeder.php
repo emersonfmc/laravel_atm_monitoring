@@ -3,32 +3,38 @@
 namespace Database\Seeders;
 
 use Carbon\Carbon;
+
 use Illuminate\Database\Seeder;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\ClientsInformationSeeder;
-use Database\Seeders\SettingsSeeder\AreaSeeder;
-use Database\Seeders\SettingsSeeder\CompanySeeder;
-use Database\Seeders\SettingsSeeder\AtmBanksSeeder;
-use Database\Seeders\SettingsSeeder\BranchesSeeder;
-use Database\Seeders\SettingsSeeder\DistrictSeeder;
-use Database\Seeders\SettingsSeeder\DataBorrowOption;
-use Database\Seeders\SettingsSeeder\UserGroupSeeder;
-use Database\Seeders\SettingsSeeder\DocumentActionSeeder;
-use Database\Seeders\SettingsSeeder\AtmPensionTypesSeeder;
-use Database\Seeders\SettingsSeeder\DataDepartmentsSeeder;
-use Database\Seeders\SettingsSeeder\DataReleaseReasonSeeder;
-use Database\Seeders\SettingsSeeder\AtmMaintenancePageSeeder;
-use Database\Seeders\SettingsSeeder\DataBorrowedReasonSeeder;
-use Database\Seeders\SettingsSeeder\DataCollectionDateSeeder;
-use Database\Seeders\SettingsSeeder\AtmTransactionActionSeeder;
-use Database\Seeders\SettingsSeeder\AtmTrasanctionSequenceSeeder;
-use Database\Seeders\SettingsSeeder\DocumentsActionSequenceSeeder;
+use Database\Seeders\ElogSeeder\AtmBanksSeeder;
+
+use Database\Seeders\ElogSeeder\AtmPensionTypesSeeder;
+use Database\Seeders\ElogSeeder\AtmTransactionActionSeeder;
+use Database\Seeders\ElogSeeder\AtmTrasanctionSequenceSeeder;
+use Database\Seeders\ElogSeeder\DataBorrowOptionSeeder;
+use Database\Seeders\ElogSeeder\DataCollectionDateSeeder;
+use Database\Seeders\ElogSeeder\DataReleaseReasonSeeder;
+use Database\Seeders\ElogSeeder\DocumentActionSeeder;
+use Database\Seeders\ElogSeeder\DocumentsActionSequenceSeeder;
+
 
 class DatabaseSeeder extends Seeder
 {
     public function run()
     {
         $this->call([
+            AtmBanksSeeder::class,
+            AtmPensionTypesSeeder::class,
+            AtmTransactionActionSeeder::class,
+            AtmTrasanctionSequenceSeeder::class,
+            DataBorrowOptionSeeder::class,
+            DataCollectionDateSeeder::class,
+            DataReleaseReasonSeeder::class,
+
+            DocumentActionSeeder::class,
+            DocumentsActionSequenceSeeder::class,
+
             UserSeeder::class,
             ClientsInformationSeeder::class,
         ]);

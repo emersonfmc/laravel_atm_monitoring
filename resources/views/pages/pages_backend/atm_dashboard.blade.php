@@ -42,7 +42,7 @@
                             <img src="{{ isset(Auth::user()->avatar) ? asset(Auth::user()->avatar) : asset('images/no_image.jpg') }}" alt="" class="img-thumbnail rounded-circle">
                         </div>
                         <h5 class="font-size-15 text-truncate">{{ Str::ucfirst(Auth::user()->name) }}</h5>
-                        <p class="mb-0 text-truncate text-danger ms-2">{{ Auth::user()->UserGroup->group_name }}</p>
+                        <p class="mb-0 text-truncate text-danger ms-2">{{ Auth::user()->UserGroup->group_name ?? ''}}</p>
                     </div>
 
                     <div class="col-sm-8">
@@ -730,201 +730,201 @@
     });
 
     $(document).ready(function () {
-        var FetchingDatatableBody = $('#FetchingDatatable tbody');
+        // var FetchingDatatableBody = $('#FetchingDatatable tbody');
 
-        const dataTable = new ServerSideDataTable('#FetchingDatatable');
-        var url = '{!! route('elog_monitoring_transaction_data') !!}';
-        const columns = [
-            {
-                data: 'action',
-                name: 'action',
-                render: function(data, type, row, meta) {
-                    return data;
-                },
-                orderable: true,
-                searchable: true,
-            },
-            {
-                data: 'pending_to',
-                name: 'pending_to',
-                render: function(data, type, row, meta) {
-                    return '<span class="fw-bold h6 text-primary">' + data + '</span>';
-                },
-                orderable: true,
-                searchable: true,
-            },
-            // Reference No
-            {
-                data: 'transaction_number',
-                name: 'transaction_number',
-                render: function(data, type, row, meta) {
-                    return '<span class="fw-bold h6">' + data + '</span>';
-                },
-                orderable: true,
-                searchable: true,
-            },
-            {
-                data: 'client_banks_id',
-                name: 'client_banks_id',
-                render: function(data, type, row, meta) {
-                    let branchLocation = '';
-                    let clientName = `${row.full_name}`;
+        // const dataTable = new ServerSideDataTable('#FetchingDatatable');
+        // var url = '{!! route('elog_monitoring_transaction_data') !!}';
+        // const columns = [
+        //     {
+        //         data: 'action',
+        //         name: 'action',
+        //         render: function(data, type, row, meta) {
+        //             return data;
+        //         },
+        //         orderable: true,
+        //         searchable: true,
+        //     },
+        //     {
+        //         data: 'pending_to',
+        //         name: 'pending_to',
+        //         render: function(data, type, row, meta) {
+        //             return '<span class="fw-bold h6 text-primary">' + data + '</span>';
+        //         },
+        //         orderable: true,
+        //         searchable: true,
+        //     },
+        //     // Reference No
+        //     {
+        //         data: 'transaction_number',
+        //         name: 'transaction_number',
+        //         render: function(data, type, row, meta) {
+        //             return '<span class="fw-bold h6">' + data + '</span>';
+        //         },
+        //         orderable: true,
+        //         searchable: true,
+        //     },
+        //     {
+        //         data: 'client_banks_id',
+        //         name: 'client_banks_id',
+        //         render: function(data, type, row, meta) {
+        //             let branchLocation = '';
+        //             let clientName = `${row.full_name}`;
 
-                    // Get branch location
-                    if (row.branch && row.branch.branch_location) {
-                        branchLocation = row.branch.branch_location;
-                    }
+        //             // Get branch location
+        //             if (row.branch && row.branch.branch_location) {
+        //                 branchLocation = row.branch.branch_location;
+        //             }
 
-                    // Return client name and branch location separated by <br>
-                    return `<span>${clientName}</span><br><span class="text-primary">${branchLocation}</span>`;
-                },
-                orderable: true,
-                searchable: true,
-            },
-            {
-                data: 'pension_details',
-                name: 'pension_details',
-                render: function(data, type, row, meta) {
-                    return '<span>' + data + '</span>';
-                },
-                orderable: true,
-                searchable: true,
-            },
-            {
-                data: 'bank_account_no',
-                name: 'bank_account_no',
-                render: function(data, type, row, meta) {
-                    // Initialize the variable for replacement count
-                    let replacementCountDisplay = '';
-                    if (row.atm_client_banks && row.atm_client_banks.bank_name) {
-                        BankName = row.atm_client_banks.bank_name;
-                    }
-                    // Check if replacement_count is greater than 0
-                    if (row.replacement_count > 0) {
-                    replacementCountDisplay = `<span class="text-danger fw-bold h6"> / ${row.replacement_count}</span>`;
-                    }
+        //             // Return client name and branch location separated by <br>
+        //             return `<span>${clientName}</span><br><span class="text-primary">${branchLocation}</span>`;
+        //         },
+        //         orderable: true,
+        //         searchable: true,
+        //     },
+        //     {
+        //         data: 'pension_details',
+        //         name: 'pension_details',
+        //         render: function(data, type, row, meta) {
+        //             return '<span>' + data + '</span>';
+        //         },
+        //         orderable: true,
+        //         searchable: true,
+        //     },
+        //     {
+        //         data: 'bank_account_no',
+        //         name: 'bank_account_no',
+        //         render: function(data, type, row, meta) {
+        //             // Initialize the variable for replacement count
+        //             let replacementCountDisplay = '';
+        //             if (row.atm_client_banks && row.atm_client_banks.bank_name) {
+        //                 BankName = row.atm_client_banks.bank_name;
+        //             }
+        //             // Check if replacement_count is greater than 0
+        //             if (row.replacement_count > 0) {
+        //             replacementCountDisplay = `<span class="text-danger fw-bold h6"> / ${row.replacement_count}</span>`;
+        //             }
 
-                    return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span>
-                            ${replacementCountDisplay}<br>
-                            <span>${BankName}</span>`;
+        //             return `<span class="fw-bold h6" style="color: #5AAD5D;">${row.bank_account_no}</span>
+        //                     ${replacementCountDisplay}<br>
+        //                     <span>${BankName}</span>`;
 
-                },
-                orderable: true,
-                searchable: true,
-            },
+        //         },
+        //         orderable: true,
+        //         searchable: true,
+        //     },
 
-            {
-                data: 'atm_type',
-                name: 'atm_type',
-                render: function(data, type, row, meta) {
-                    let BankStatus = ''; // Define BankStatus outside the if block with a default value
-                    let atmTypeClass = ''; // Variable to hold the class based on atm_type
+        //     {
+        //         data: 'atm_type',
+        //         name: 'atm_type',
+        //         render: function(data, type, row, meta) {
+        //             let BankStatus = ''; // Define BankStatus outside the if block with a default value
+        //             let atmTypeClass = ''; // Variable to hold the class based on atm_type
 
-                    // Determine the BankStatus if it exists
-                    if (row.atm_client_banks && row.atm_client_banks.atm_status) {
-                        BankStatus = row.atm_client_banks.atm_status;
-                    }
+        //             // Determine the BankStatus if it exists
+        //             if (row.atm_client_banks && row.atm_client_banks.atm_status) {
+        //                 BankStatus = row.atm_client_banks.atm_status;
+        //             }
 
-                    // Determine the text color based on atm_type
-                    switch (row.atm_type) {
-                        case 'ATM':
-                            atmTypeClass = 'text-primary';
-                            break;
-                        case 'Passbook':
-                            atmTypeClass = 'text-danger';
-                            break;
-                        case 'Sim Card':
-                            atmTypeClass = 'text-info';
-                            break;
-                        default:
-                            atmTypeClass = 'text-secondary'; // Default color if none match
-                    }
+        //             // Determine the text color based on atm_type
+        //             switch (row.atm_type) {
+        //                 case 'ATM':
+        //                     atmTypeClass = 'text-primary';
+        //                     break;
+        //                 case 'Passbook':
+        //                     atmTypeClass = 'text-danger';
+        //                     break;
+        //                 case 'Sim Card':
+        //                     atmTypeClass = 'text-info';
+        //                     break;
+        //                 default:
+        //                     atmTypeClass = 'text-secondary'; // Default color if none match
+        //             }
 
-                    return `<span class="${atmTypeClass}">${row.atm_type}</span><br>
-                            <span class="fw-bold h6">${BankStatus}</span>`;
-                },
-                orderable: true,
-                searchable: true,
-            },
+        //             return `<span class="${atmTypeClass}">${row.atm_type}</span><br>
+        //                     <span class="fw-bold h6">${BankStatus}</span>`;
+        //         },
+        //         orderable: true,
+        //         searchable: true,
+        //     },
 
-            {
-                data: 'client_banks_id',
-                name: '',
-                render: function(data, type, row) {
-                    let PinCode = '';
-                    let BankAccountNo = '';
+        //     {
+        //         data: 'client_banks_id',
+        //         name: '',
+        //         render: function(data, type, row) {
+        //             let PinCode = '';
+        //             let BankAccountNo = '';
 
-                    // Check if atm_type is not "ATM" and pin_no exists
-                    if (row.atm_client_banks && row.atm_client_banks.pin_no && row.atm_type == 'ATM') {
-                        PinCode = row.atm_client_banks.pin_no;
-                        BankAccountNo = row.atm_client_banks.bank_account_no;
+        //             // Check if atm_type is not "ATM" and pin_no exists
+        //             if (row.atm_client_banks && row.atm_client_banks.pin_no && row.atm_type == 'ATM') {
+        //                 PinCode = row.atm_client_banks.pin_no;
+        //                 BankAccountNo = row.atm_client_banks.bank_account_no;
 
-                        // Return the eye icon with the data attributes
-                        return `<a href="#" class="text-info fs-4 view_pin_code"
-                                    data-pin="${PinCode}"
-                                    data-bank_account_no="${BankAccountNo}">
-                                    <i class="fas fa-eye"></i>
-                                </a><br>`;
-                    }
+        //                 // Return the eye icon with the data attributes
+        //                 return `<a href="#" class="text-info fs-4 view_pin_code"
+        //                             data-pin="${PinCode}"
+        //                             data-bank_account_no="${BankAccountNo}">
+        //                             <i class="fas fa-eye"></i>
+        //                         </a><br>`;
+        //             }
 
-                    // If conditions are not met, return an empty string
-                    return 'No Pin Code Detected';
-                },
-                orderable: true,
-                searchable: true,
-            },
+        //             // If conditions are not met, return an empty string
+        //             return 'No Pin Code Detected';
+        //         },
+        //         orderable: true,
+        //         searchable: true,
+        //     },
 
-            {
-                data: 'client_banks_id',
-                name: '',
-                render: function(data, type, row, meta) {
-                    let CollectionDate = ''; // Define CollectionDate outside the if block with a default value
+        //     {
+        //         data: 'client_banks_id',
+        //         name: '',
+        //         render: function(data, type, row, meta) {
+        //             let CollectionDate = ''; // Define CollectionDate outside the if block with a default value
 
-                    if (row.atm_client_banks && row.atm_client_banks.collection_date) {
-                        CollectionDate = row.atm_client_banks.collection_date;
-                    }
+        //             if (row.atm_client_banks && row.atm_client_banks.collection_date) {
+        //                 CollectionDate = row.atm_client_banks.collection_date;
+        //             }
 
-                    return `<span>${CollectionDate}</span>`;
-                },
-                orderable: true,
-                searchable: true,
-            },
+        //             return `<span>${CollectionDate}</span>`;
+        //         },
+        //         orderable: true,
+        //         searchable: true,
+        //     },
 
-            {
-                data: 'status',
-                name: 'status',
-                render: function(data, type, row, meta) {
-                    let badgeClass = '';
-                    let statusClass = '';
+        //     {
+        //         data: 'status',
+        //         name: 'status',
+        //         render: function(data, type, row, meta) {
+        //             let badgeClass = '';
+        //             let statusClass = '';
 
-                    // Determine the badge class and status label based on status value
-                    switch (row.status) {
-                        case 'ON GOING':
-                            badgeClass = 'pt-1 pb-1 ps-2 ps-2 pe-2 badge bg-warning fw-bold h6';
-                            statusClass = 'On Going';
-                            break;
-                        case 'CANCELLED':
-                            badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-danger fw-bold h6';
-                            statusClass = 'Cancelled';
-                            break;
-                        case 'COMPLETED':
-                            badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-success fw-bold h6';
-                            statusClass = 'Completed';
-                            break;
-                        default:
-                            badgeClass = 'badge bg-secondary fw-bold h6'; // Default badge class
-                            statusClass = 'Unknown Status';
-                    }
+        //             // Determine the badge class and status label based on status value
+        //             switch (row.status) {
+        //                 case 'ON GOING':
+        //                     badgeClass = 'pt-1 pb-1 ps-2 ps-2 pe-2 badge bg-warning fw-bold h6';
+        //                     statusClass = 'On Going';
+        //                     break;
+        //                 case 'CANCELLED':
+        //                     badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-danger fw-bold h6';
+        //                     statusClass = 'Cancelled';
+        //                     break;
+        //                 case 'COMPLETED':
+        //                     badgeClass = 'pt-1 pb-1 ps-2 pe-2 badge bg-success fw-bold h6';
+        //                     statusClass = 'Completed';
+        //                     break;
+        //                 default:
+        //                     badgeClass = 'badge bg-secondary fw-bold h6'; // Default badge class
+        //                     statusClass = 'Unknown Status';
+        //             }
 
-                    // Return the status wrapped in a span with the appropriate badge and status class
-                    return `<span class="${badgeClass} fw-bold h6">${statusClass}</span>`;
-                },
-                orderable: true,
-                searchable: true,
-            },
+        //             // Return the status wrapped in a span with the appropriate badge and status class
+        //             return `<span class="${badgeClass} fw-bold h6">${statusClass}</span>`;
+        //         },
+        //         orderable: true,
+        //         searchable: true,
+        //     },
 
-        ];
-        dataTable.initialize(url, columns);
+        // ];
+        // dataTable.initialize(url, columns);
 
         // Filtering of Transaction
             var branchId = @json($branch_id);

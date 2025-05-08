@@ -3,43 +3,25 @@
 namespace App\Http\Controllers\Settings;
 
 use App\Models\User;
-use App\Models\DataBankLists;
+use Illuminate\Http\Request;
 
+use App\Models\DataBankLists;
+use Illuminate\Support\Carbon;
 use App\Models\EFMain\DataArea;
-use App\Models\EFMain\DataDistrict;
 use App\Models\EFMain\DataBranch;
-use App\Models\EFMain\DataUserGroup;
 
 use App\Models\System\SystemLogs;
-use App\Http\Controllers\Controller;
-use Yajra\DataTables\Facades\DataTables;
-
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
+use App\Models\EFMain\DataDistrict;
+
+use App\Http\Controllers\Controller;
+use App\Models\EFMain\DataUserGroup;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
+use Yajra\DataTables\Facades\DataTables;
 
 class SettingsController extends Controller
 {
-    public function settings_monitoring_dashboard_data(Request $request){
-        $UserCount = User::where('status', 'Active')->count();
-        $AreaCount = DataArea::where('status', 'Active')->count();
-        $DistrictCount = DataDistrict::where('status', '1')->count();
-        $BranchCount = DataBranch::where('status', 'Active')->count();
-        $UserGroupCount = DataUserGroup::where('status', 'Active')->count();
-        $BanksCount = DataBankLists::where('status', 'Active')->count();
-
-        // Return the counts as a JSON response
-        return response()->json([
-            'UserCount' => $UserCount,
-            'AreaCount' => $AreaCount,
-            'DistrictCount' => $DistrictCount,
-            'BranchCount' => $BranchCount,
-            'UserGroupCount' => $UserGroupCount,
-            'BanksCount' => $BanksCount,
-        ]);
-    }
-
     public function settings_system_logs_page(){
         return view('pages.pages_backend.settings.settings_system_logs');
     }
@@ -85,6 +67,33 @@ class SettingsController extends Controller
     public function settings_dashboard(){
         return view('pages.pages_backend.settings_dashboard');
     }
+
+    public function validateAccess(Request $request)
+    {
+        $token = $request->query('token');
+        try {
+            $payload = json_decode(Crypt::decryptString($token), true);
+
+            $timestamp = Carbon::createFromTimestamp($payload['timestamp']);
+            if ($timestamp->diffInSeconds(now()) > 60) {
+                return abort(403, 'Token expired.');
+            }
+
+            $employee_id = $payload['employee_id'];
+
+            $elogUser = User::where('employee_id', $employee_id)->first();
+
+            if ($elogUser) {
+                Auth::login($elogUser);
+                return view('pages.pages_backend.main_dashboard'); // Blade view you create
+            }
+
+            return abort(403, 'User not found.');
+        } catch (\Exception $e) {
+            return abort(403, 'Invalid token.');
+        }
+    }
+
 
 }
 
