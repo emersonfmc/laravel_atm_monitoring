@@ -37,7 +37,6 @@ return new class extends Migration
             // $table->unsignedBigInteger('released_client_images_id')->nullable();
 
             $table->foreign('client_banks_id')->references('id')->on('atm_client_banks')->onDelete('set null')->onUpdate('cascade');
-            $table->foreign('request_by_employee_id')->references('employee_id')->on('users')->onDelete('set null')->onUpdate('cascade');
             // $table->foreign('released_client_images_id')->references('id')->on('atm_released_client_images')->onDelete('set null')->onUpdate('cascade');
 
             $table->softDeletes();

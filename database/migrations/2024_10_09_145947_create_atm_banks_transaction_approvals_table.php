@@ -25,7 +25,6 @@ return new class extends Migration
             $table->enum('status', ['Completed', 'Pending', 'Stand By', 'Cancelled', 'Open to Others'])->nullable();
             $table->enum('type', ['Received', 'Released'])->nullable();
 
-            $table->foreign('employee_id')->references('employee_id')->on('users')->onDelete('set null')->onUpdate('cascade');
             $table->foreign('banks_transactions_id')->references('id')->on('atm_banks_transactions')->onDelete('cascade')->onUpdate('cascade');
 
             $table->softDeletes();

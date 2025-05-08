@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\System;
+namespace App\Models\EFMain;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,4 +13,7 @@ class SystemAnnouncements extends Model
     protected $guarded = [];
     protected $connection = 'mysql_connection_ef_main';
 
+    public function Systems(){
+        return $this->belongsTo(System::class, 'system_id','id');
+    }
 }

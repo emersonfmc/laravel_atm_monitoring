@@ -31,9 +31,6 @@ return new class extends Migration
             $table->enum('status',['On Going','Cancelled','Completed','Returning to Branch'])->nullable();
 
             $table->foreign('client_banks_id')->references('id')->on('atm_client_banks')->onDelete('set null')->onUpdate('cascade');
-            $table->foreign('request_by_employee_id', 'request_by_employee_id')->references('employee_id')->on('users')->onDelete('set null')->onUpdate('cascade');
-
-            $table->foreign('scan_by_employee_id')->references('employee_id')->on('users')->onDelete('set null')->onUpdate('cascade');
             $table->softDeletes();
             $table->timestamps();
         });

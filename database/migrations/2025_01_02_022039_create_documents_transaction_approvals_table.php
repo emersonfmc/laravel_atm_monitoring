@@ -25,10 +25,6 @@ return new class extends Migration
             $table->enum('status', ['Completed','Pending','Stand By','Cancelled'])->nullable();
             $table->enum('type', ['Received', 'Released'])->nullable();
 
-            $table->foreign('employee_id')->references('employee_id')->on('users')->onDelete('set null')->onUpdate('cascade');
-            $table->foreign('documents_transactions_id','documents_transactions_id')->references('id')->on('documents_transactions')->onDelete('cascade')->onUpdate('cascade');
-
-
             $table->softDeletes();
             $table->timestamps();
         });

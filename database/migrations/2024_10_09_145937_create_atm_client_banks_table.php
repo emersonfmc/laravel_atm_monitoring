@@ -20,8 +20,8 @@ return new class extends Migration
             $table->unsignedBigInteger('branch_id')->nullable();
 
             $table->string('pension_number')->nullable();
-            $table->string('pension_type')->nullable();
             $table->enum('account_type', ['SSS', 'GSIS'])->nullable();
+            $table->string('pension_type')->nullable();
 
             $table->string('transaction_number')->nullable();
 
